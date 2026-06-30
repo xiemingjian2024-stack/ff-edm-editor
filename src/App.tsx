@@ -1,3 +1,3 @@
-export function App() {
-  return <main><h1>EDM 搭建器</h1></main>
-}
+import { EditorPage } from './editor/EditorPage'
+
+export function App() { return <EditorPage /> }

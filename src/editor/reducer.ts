@@ -3,6 +3,8 @@ import { getTemplate } from '../templates/registry'
 
 export interface EditorState { draft: EdmDraft; selectedFloorId: string | null }
 export type EditorAction =
+  | { type: 'loadDraft'; draft: EdmDraft }
+  | { type: 'renameDraft'; name: string }
   | { type: 'addFloor'; templateId: string }
   | { type: 'duplicateFloor'; floorId: string }
   | { type: 'deleteFloor'; floorId: string }
@@ -24,6 +26,8 @@ export function createEditorReducer(createId: () => string = () => crypto.random
   return (state: EditorState, action: EditorAction): EditorState => {
     let floors = state.draft.floors
     let selectedFloorId = state.selectedFloorId
+    if (action.type === 'loadDraft') return { draft: action.draft, selectedFloorId: action.draft.floors[0]?.id ?? null }
+    if (action.type === 'renameDraft') return { ...state, draft: { ...state.draft, name: action.name, updatedAt: new Date().toISOString() } }
     if (action.type === 'addFloor') {
       const floor = createFloor(action.templateId, createId()); floors = [...floors, floor]; selectedFloorId = floor.id
     } else if (action.type === 'duplicateFloor') {

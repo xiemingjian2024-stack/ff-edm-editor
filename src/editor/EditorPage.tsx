@@ -13,7 +13,7 @@ export function EditorPage() {
     <div className="workspace">
       <TemplateLibrary onAdd={templateId => dispatch({ type: 'addFloor', templateId })} />
       <Canvas floors={state.draft.floors} selectedId={state.selectedFloorId} onSelect={floorId => dispatch({ type: 'selectFloor', floorId })} onMove={(floorId, direction) => dispatch({ type: 'moveFloor', floorId, direction })} />
-      <PropertyPanel floor={selected} onChange={(fieldId, value) => selected && dispatch({ type: 'updateField', floorId: selected.id, fieldId, value })} onDuplicate={() => selected && dispatch({ type: 'duplicateFloor', floorId: selected.id })} onDelete={() => selected && dispatch({ type: 'deleteFloor', floorId: selected.id })} />
+      <PropertyPanel floor={selected} onChange={(fieldId, value) => selected && dispatch({ type: 'updateField', floorId: selected.id, fieldId, value })} onProductChange={(slotId, value) => selected && dispatch({ type: 'updateProduct', floorId: selected.id, slotId, value })} onDuplicate={() => selected && dispatch({ type: 'duplicateFloor', floorId: selected.id })} onDelete={() => selected && dispatch({ type: 'deleteFloor', floorId: selected.id })} />
     </div>
   </div>
 }

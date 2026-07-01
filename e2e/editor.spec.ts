@@ -32,7 +32,11 @@ test('创建、编辑、保存并恢复 EDM 草稿', async ({ page }) => {
 test('HEAD Logo 跟随主题色位并允许手动覆盖', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: '新建 EDM' }).click()
-  await expect(page.getByRole('button', { name: '配色套餐 FunnyFuzzy 经典' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '配色套餐 FunnyFuzzy 经典' })).toHaveCount(0)
+  await page.getByRole('button', { name: '配色', exact: true }).click()
+  await expect(page.getByText('FunnyFuzzy 经典')).toBeVisible()
+  await expect(page.getByText('主题色位 A')).toBeVisible()
+  await page.getByRole('button', { name: '楼层', exact: true }).click()
   await page.getByRole('button', { name: '添加 品牌 Logo' }).click()
 
   const head = page.getByTestId('head-brand-logo')

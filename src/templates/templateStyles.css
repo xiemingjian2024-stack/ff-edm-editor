@@ -1,4 +1,4 @@
-.floor-render { width: 375px; overflow: hidden; font-family: Arial, Helvetica, sans-serif; box-sizing: border-box; }
+.floor-render { --edm-font-family: "Euclid Circular A", "PingFang SC", "Microsoft YaHei", sans-serif; width: 375px; overflow: hidden; font-family: var(--edm-font-family); box-sizing: border-box; }
 .banner-simple { height: 250px; position: relative; padding: 28px; display: flex; align-items: flex-end; background-size: cover; background-position: center; }
 .banner-simple::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.58), transparent 70%); }
 .banner-simple h2 { position: relative; z-index: 1; margin: 0; max-width: 280px; font-size: 35px; line-height: .98; }

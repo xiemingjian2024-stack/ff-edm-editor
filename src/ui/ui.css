@@ -1,0 +1,19 @@
+:root {
+  --brand: #ffac33; --brand-hover: #f59a16; --brand-soft: #fff4df;
+  --workspace: #f6f7fa; --surface: #fff; --surface-soft: #f8f9fb;
+  --ink: #20242c; --muted: #818895; --border: #e5e8ee; --border-strong: #d6dae2;
+  --success-bg: #edf9f1; --success: #287a4b; --warning-bg: #fff7e6; --warning: #876114; --danger-bg: #fff0ed; --danger: #b44035;
+  --radius-sm: 6px; --radius-md: 8px; --shadow-canvas: 0 10px 35px rgba(31, 40, 55, .08);
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--workspace); font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 1100px; background: var(--workspace); }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.tool-button { width: 32px; height: 32px; display: inline-grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: var(--radius-sm); background: transparent; color: #6f7682; }
+.tool-button:hover:not(:disabled) { background: var(--surface-soft); color: var(--ink); }
+.tool-button.is-active { background: var(--brand-soft); color: #9a6305; border-color: #ffd990; }
+.tool-button:disabled { cursor: not-allowed; opacity: .32; }
+.primary-button { border: 1px solid var(--brand); border-radius: var(--radius-sm); background: var(--brand); color: #332000; font-weight: 700; }
+.primary-button:hover { background: var(--brand-hover); border-color: var(--brand-hover); }

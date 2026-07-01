@@ -28,3 +28,30 @@ test('创建、编辑、保存并恢复 EDM 草稿', async ({ page }) => {
   await page.getByRole('button', { name: '完整预览' }).click()
   await expect(page.getByRole('dialog', { name: '完整预览' })).toBeVisible()
 })
+
+test('HEAD Logo 跟随主题色位并允许手动覆盖', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '新建 EDM' }).click()
+  await expect(page.getByRole('button', { name: '配色套餐 FunnyFuzzy 经典' })).toBeVisible()
+  await page.getByRole('button', { name: '添加 品牌 Logo' }).click()
+
+  const head = page.getByTestId('head-brand-logo')
+  await expect(head).toBeVisible()
+  await expect(page.locator('.theme-binding-status')).toHaveText('主题色位 A')
+  await expect(head).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+  await expect(head.locator('img')).toHaveCSS('width', '90px')
+  await expect(head.locator('img')).toHaveCSS('height', '30px')
+
+  await page.getByRole('button', { name: '白色', exact: true }).click()
+  await expect(head.locator('img')).toHaveCSS('filter', 'invert(1)')
+  await page.getByLabel('背景颜色色值').fill('#EFEFEF')
+  await expect(page.locator('.theme-binding-status')).toHaveText('自定义颜色')
+  await expect(head).toHaveCSS('background-color', 'rgb(239, 239, 239)')
+  await page.getByRole('button', { name: '重新关联主题色位 A' }).click()
+  await expect(page.locator('.theme-binding-status')).toHaveText('主题色位 A')
+  await expect(head).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+
+  await page.getByRole('button', { name: '完整预览' }).click()
+  const previewHead = page.getByRole('dialog', { name: '完整预览' }).getByTestId('head-brand-logo')
+  await expect(previewHead).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+})

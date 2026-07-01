@@ -4,12 +4,14 @@ import type { FloorTemplate } from '../domain/edm'
 const field = z.discriminatedUnion('type', [
   z.object({ id: z.string().min(1), type: z.literal('text'), label: z.string(), defaultValue: z.string() }),
   z.object({ id: z.string().min(1), type: z.literal('color'), label: z.string(), defaultValue: z.string() }),
-  z.object({ id: z.string().min(1), type: z.literal('image'), label: z.string(), defaultValue: z.string() })
+  z.object({ id: z.string().min(1), type: z.literal('image'), label: z.string(), defaultValue: z.string() }),
+  z.object({ id: z.string().min(1), type: z.literal('choice'), label: z.string(), defaultValue: z.string(), options: z.array(z.object({ label: z.string(), value: z.string() })).min(1) })
 ])
 const schema = z.object({
   id: z.string().min(1), version: z.number().int().positive(), name: z.string().min(1),
-  category: z.enum(['banner', 'title', 'product-card', 'content', 'promotion', 'footer']),
+  category: z.enum(['head', 'banner', 'title', 'product-card', 'content', 'promotion', 'footer']),
   designWidth: z.literal(375), designHeight: z.number().positive(), fields: z.array(field),
+  themeColorFields: z.array(z.object({ fieldId: z.string().min(1), defaultSlot: z.string().min(1) })).optional(),
   productSlots: z.array(z.object({ id: z.string().min(1), label: z.string() })),
   exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional() }))
 })
@@ -20,6 +22,10 @@ export function parseTemplate(input: unknown): FloorTemplate {
   if (!unique(value.fields.map(item => item.id))) throw new Error('字段 ID 不能重复')
   if (!unique(value.productSlots.map(item => item.id))) throw new Error('商品槽位 ID 不能重复')
   const slots = new Set(value.productSlots.map(item => item.id))
+  const colorFields = new Set(value.fields.filter(item => item.type === 'color').map(item => item.id))
+  for (const themedField of value.themeColorFields ?? []) {
+    if (!colorFields.has(themedField.fieldId)) throw new Error(`主题色位只能关联颜色字段：${themedField.fieldId}`)
+  }
   for (const region of value.exportRegions) {
     if (region.x + region.width > 375 || region.y + region.height > value.designHeight) throw new Error(`导出区域 ${region.id} 超出楼层边界`)
     if (region.linkSlotId && !slots.has(region.linkSlotId)) throw new Error(`导出区域 linkSlotId ${region.linkSlotId} 不存在`)

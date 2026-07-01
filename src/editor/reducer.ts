@@ -14,7 +14,7 @@ export type EditorAction =
   | { type: 'updateProduct'; floorId: string; slotId: string; value: ProductValue }
 
 const now = new Date().toISOString()
-export const initialEditorState: EditorState = { draft: { id: 'draft-local', name: '未命名 EDM', floors: [], createdAt: now, updatedAt: now }, selectedFloorId: null }
+export const initialEditorState: EditorState = { draft: { id: 'draft-local', name: '未命名 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: now, updatedAt: now }, selectedFloorId: null }
 
 function createFloor(templateId: string, id: string): FloorInstance {
   const template = getTemplate(templateId)?.definition

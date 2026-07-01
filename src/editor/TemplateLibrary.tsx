@@ -2,7 +2,7 @@ import { useDeferredValue, useState } from 'react'
 import { templateRegistry } from '../templates/registry'
 import { Icon } from '../ui/Icon'
 
-const categoryNames = { banner: 'Banner', title: '标题', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
+const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
 
 export function TemplateLibrary({ onAdd }: { onAdd: (templateId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())

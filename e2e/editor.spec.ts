@@ -11,6 +11,15 @@ test('创建、编辑、保存并恢复 EDM 草稿', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveText('80%')
   await page.getByLabel('标题文案').fill('SUMMER PICKS')
   await expect(page.getByRole('heading', { name: 'SUMMER PICKS' })).toBeVisible()
+  const floorFont = await page.locator('.floor-render').first().evaluate(element => getComputedStyle(element).fontFamily)
+  const toolbarFont = await page.locator('.editor-toolbar').evaluate(element => getComputedStyle(element).fontFamily)
+  expect(floorFont).toContain('Euclid Circular A')
+  expect(toolbarFont).not.toContain('Euclid Circular A')
+  const weightsReady = await page.evaluate(async () => {
+    await document.fonts.ready
+    return [300, 400, 500, 600, 700].map(weight => document.fonts.check(`${weight} 16px "Euclid Circular A"`))
+  })
+  expect(weightsReady).toEqual([true, true, true, true, true])
   await page.waitForTimeout(650)
   await page.getByRole('button', { name: '返回草稿', exact: true }).click()
   await expect(page.getByText('未命名 EDM')).toBeVisible()

@@ -32,3 +32,17 @@ it('商品卡属性按颜色、商品和操作分组', async () => {
   expect(screen.getByRole('heading', { name: '操作' })).toBeVisible()
   expect(screen.queryByLabelText('字号')).not.toBeInTheDocument()
 })
+
+it('可查看配色套餐、切换 Logo 颜色并覆盖或恢复主题背景', async () => {
+  const user = userEvent.setup(); render(<EditorPage />)
+  expect(screen.getByRole('button', { name: /配色套餐 FunnyFuzzy 经典/ })).toBeVisible()
+  await user.click(screen.getByRole('button', { name: /添加 品牌 Logo/ }))
+  expect(screen.getByText('主题色位 A', { selector: '.theme-binding-status' })).toBeVisible()
+  await user.click(screen.getByRole('button', { name: '白色' }))
+  expect(screen.getByRole('img', { name: 'FunnyFuzzy' })).toHaveStyle({ filter: 'invert(1)' })
+  await user.clear(screen.getByLabelText('背景颜色色值'))
+  await user.type(screen.getByLabelText('背景颜色色值'), '#EFEFEF')
+  expect(screen.getByText('自定义颜色')).toBeVisible()
+  await user.click(screen.getByRole('button', { name: '重新关联主题色位 A' }))
+  expect(screen.getByText('主题色位 A', { selector: '.theme-binding-status' })).toBeVisible()
+})

@@ -1,5 +1,10 @@
 import type { ExportRegion, FloorInstance, FloorTemplate } from '../domain/edm'
 
+export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string {
+  if (region.navigationItemIndex !== undefined) return floor.navigationItems?.[region.navigationItemIndex]?.url ?? ''
+  return region.linkSlotId ? floor.products[region.linkSlotId]?.url ?? '' : ''
+}
+
 export function getFloorExportRegions(template: FloorTemplate, floor: FloorInstance): ExportRegion[] {
   const config = template.navigationConfig
   if (!config) return template.exportRegions

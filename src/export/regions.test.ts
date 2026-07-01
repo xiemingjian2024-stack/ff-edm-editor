@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { FloorInstance, FloorTemplate } from '../domain/edm'
-import { getFloorExportRegions } from './regions'
+import { getFloorExportRegions, getRegionUrl } from './regions'
 import { scaleRegions } from './render'
 
 const template = {
@@ -26,4 +26,11 @@ describe.each([2, 3, 4])('%s 项导航区域', count => {
 
 it('导航区域关联到对应导航项', () => {
   expect(getFloorExportRegions(template, floor(3)).map(item => item.navigationItemIndex)).toEqual([0, 1, 2])
+})
+
+it('导航区域读取对应链接字符串且允许为空', () => {
+  const current = floor(3)
+  current.navigationItems![1].url = '任意链接字符'
+  const regions = getFloorExportRegions(template, current)
+  expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', '任意链接字符', ''])
 })

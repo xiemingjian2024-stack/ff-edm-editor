@@ -3,7 +3,15 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'banner', 'title', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'title', 'product-card'])
+})
+
+it('分类导航固定为 375×46 并关联主题色位 A/B', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'head-category-navigation')!.definition
+  expect(template.designHeight).toBe(46)
+  expect(template.exportFullImage).toBe(false)
+  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }])
+  expect(template.navigationConfig?.defaultItems.slice(0, 3).map(item => item.text)).toEqual(['Home', 'Carrier & Travel', 'Couch Covers'])
 })
 
 it('HEAD 品牌 Logo 使用固定尺寸和主题色位 A', () => {

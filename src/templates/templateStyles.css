@@ -1,6 +1,10 @@
 .floor-render { --edm-font-family: "Euclid Circular A", "PingFang SC", "Microsoft YaHei", sans-serif; width: 375px; overflow: hidden; font-family: var(--edm-font-family); box-sizing: border-box; }
 .head-brand-logo { height: 56px; display: grid; place-items: center; }
 .head-brand-logo img { display: block; width: 90px; height: 30px; }
+.head-category-navigation { height: 46px; display: grid; align-items: stretch; }
+.head-navigation-item { min-width: 0; position: relative; display: grid; place-items: center; padding: 4px 12px; text-align: center; font-size: 11px; line-height: 1.15; }
+.head-navigation-item:not(:last-child)::after { content: ''; position: absolute; width: 1px; height: 10px; right: 0; top: 50%; background: currentColor; transform: translateY(-50%); opacity: .78; }
+.head-navigation-item > span { max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .banner-simple { height: 250px; position: relative; padding: 28px; display: flex; align-items: flex-end; background-size: cover; background-position: center; }
 .banner-simple::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.58), transparent 70%); }
 .banner-simple h2 { position: relative; z-index: 1; margin: 0; max-width: 280px; font-size: 35px; line-height: .98; }

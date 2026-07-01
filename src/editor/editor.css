@@ -29,6 +29,9 @@ button { cursor: pointer; }
 .template-tile strong { margin-top: 7px; font-size: 11px; }
 .template-tile small { margin-top: 2px; color: #aaa89f; font-size: 9px; }
 .template-mini { height: 62px; display: block; position: relative; overflow: hidden; border-radius: 6px; background: #ffe0a8; }
+.template-mini--head { height: 28px; background: #fff; }
+.template-mini--head i { position: absolute; width: 42px; height: 10px; left: 50%; top: 50%; border-radius: 2px; background: #111; transform: translate(-50%, -50%); }
+.theme-slot-tag { display: inline-flex; margin-top: 5px; padding: 2px 5px; border-radius: 999px; background: #fff1d5; color: #9a6000; font-size: 8px; font-style: normal; }
 .template-mini--title { height: 36px; background: #fff4dc; }
 .template-mini--product-card { background: linear-gradient(90deg, #fff 49%, #e5e2d8 49%, #e5e2d8 51%, #fff 51%); }
 .template-mini--product-card::before, .template-mini--product-card::after { content: ''; position: absolute; width: 35%; height: 32px; top: 7px; border-radius: 4px; background: #ece8dc; }

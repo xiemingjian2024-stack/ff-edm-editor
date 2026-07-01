@@ -17,6 +17,7 @@ export function TemplateLibrary({ onAdd }: { onAdd: (templateId: string) => void
       return <section className="template-category" key={category}><h3>{name}</h3><div className="template-list">
         {templates.map(({ definition }) => <button className="template-tile" key={definition.id} onClick={() => onAdd(definition.id)} aria-label={`添加 ${definition.name}`}>
           <span className={`template-mini template-mini--${definition.category}`}><i /></span><strong>{definition.name}</strong><small>{definition.designWidth} × {definition.designHeight}</small>
+          {definition.themeColorFields?.map(item => <em className="theme-slot-tag" key={item.fieldId}>主题色位 {item.defaultSlot}</em>)}
         </button>)}
       </div></section>
     })}

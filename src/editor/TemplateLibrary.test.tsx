@@ -10,3 +10,10 @@ it('按名称搜索模板并显示空结果', async () => {
   await user.clear(screen.getByLabelText('搜索楼层模板')); await user.type(screen.getByLabelText('搜索楼层模板'), '不存在')
   expect(screen.getByText('没有匹配的楼层')).toBeVisible()
 })
+
+it('显示 HEAD 品牌 Logo 及其主题色位标签', () => {
+  render(<TemplateLibrary onAdd={() => {}} />)
+  expect(screen.getByRole('heading', { name: 'HEAD' })).toBeVisible()
+  expect(screen.getByRole('button', { name: '添加 品牌 Logo' })).toBeVisible()
+  expect(screen.getByText('主题色位 A')).toBeVisible()
+})

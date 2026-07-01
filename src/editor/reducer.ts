@@ -1,4 +1,4 @@
-import type { EdmDraft, FloorInstance, ProductValue, ThemeSlot } from '../domain/edm'
+import type { EdmDraft, FloorInstance, NavigationItem, ProductValue, ThemeSlot } from '../domain/edm'
 import { getTemplate } from '../templates/registry'
 
 export interface EditorState { draft: EdmDraft; selectedFloorId: string | null }
@@ -15,6 +15,7 @@ export type EditorAction =
   | { type: 'changeThemePalette'; paletteId: string }
   | { type: 'overrideThemeColor'; floorId: string; fieldId: string; color: string }
   | { type: 'relinkThemeColor'; floorId: string; fieldId: string; slot: ThemeSlot }
+  | { type: 'updateNavigationItem'; floorId: string; index: number; value: NavigationItem }
 
 const now = new Date().toISOString()
 export const initialEditorState: EditorState = { draft: { id: 'draft-local', name: '未命名 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: now, updatedAt: now }, selectedFloorId: null }
@@ -27,6 +28,7 @@ function createFloor(templateId: string, id: string): FloorInstance {
     templateId,
     values: Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])),
     products: {},
+    navigationItems: template.navigationConfig ? structuredClone(template.navigationConfig.defaultItems) : undefined,
     themeColors: Object.fromEntries((template.themeColorFields ?? []).map(field => [field.fieldId, { mode: 'theme' as const, slot: field.defaultSlot }])),
   }
 }
@@ -70,6 +72,13 @@ export function createEditorReducer(createId: () => string = () => crypto.random
         ...floor,
         themeColors: { ...floor.themeColors, [action.fieldId]: { mode: 'theme', slot: action.slot } },
       } : floor)
+    } else if (action.type === 'updateNavigationItem') {
+      floors = floors.map(floor => {
+        if (floor.id !== action.floorId || !floor.navigationItems?.[action.index]) return floor
+        const navigationItems = [...floor.navigationItems]
+        navigationItems[action.index] = action.value
+        return { ...floor, navigationItems }
+      })
     }
     return { draft: { ...state.draft, floors, updatedAt: new Date().toISOString() }, selectedFloorId }
   }

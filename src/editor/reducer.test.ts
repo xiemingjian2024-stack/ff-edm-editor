@@ -47,3 +47,12 @@ it('切换套餐不会重写楼层自定义颜色', () => {
   expect(state.draft.themePaletteId).toBe('another-palette')
   expect(state.draft.floors[0].themeColors?.background).toEqual({ mode: 'custom', color: '#EFEFEF' })
 })
+
+it('更新导航项时保留其他导航项', () => {
+  const state = {
+    ...initialEditorState,
+    draft: { ...initialEditorState.draft, floors: [{ id: 'nav-1', templateId: 'head-category-navigation', values: { navigationCount: '2' }, products: {}, navigationItems: [{ text: 'Home', url: '' }, { text: 'Travel', url: 'old' }, { text: 'Hidden', url: 'keep' }] }] },
+  }
+  const next = reducer(state, { type: 'updateNavigationItem', floorId: 'nav-1', index: 1, value: { text: 'Carrier & Travel', url: '/travel' } })
+  expect(next.draft.floors[0].navigationItems).toEqual([{ text: 'Home', url: '' }, { text: 'Carrier & Travel', url: '/travel' }, { text: 'Hidden', url: 'keep' }])
+})

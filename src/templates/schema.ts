@@ -12,8 +12,10 @@ const schema = z.object({
   category: z.enum(['head', 'banner', 'title', 'product-card', 'content', 'promotion', 'footer']),
   designWidth: z.literal(375), designHeight: z.number().positive(), fields: z.array(field),
   themeColorFields: z.array(z.object({ fieldId: z.string().min(1), defaultSlot: z.string().min(1) })).optional(),
+  navigationConfig: z.object({ minItems: z.number().int().positive(), maxItems: z.number().int().positive(), defaultItems: z.array(z.object({ text: z.string(), url: z.string() })) }).optional(),
+  exportFullImage: z.boolean().optional(),
   productSlots: z.array(z.object({ id: z.string().min(1), label: z.string() })),
-  exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional() }))
+  exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional(), navigationItemIndex: z.number().int().nonnegative().optional() }))
 })
 
 export function parseTemplate(input: unknown): FloorTemplate {
@@ -21,6 +23,7 @@ export function parseTemplate(input: unknown): FloorTemplate {
   const unique = (items: string[]) => new Set(items).size === items.length
   if (!unique(value.fields.map(item => item.id))) throw new Error('字段 ID 不能重复')
   if (!unique(value.productSlots.map(item => item.id))) throw new Error('商品槽位 ID 不能重复')
+  if (value.navigationConfig && (value.navigationConfig.minItems > value.navigationConfig.maxItems || value.navigationConfig.defaultItems.length < value.navigationConfig.maxItems)) throw new Error('导航项配置无效')
   const slots = new Set(value.productSlots.map(item => item.id))
   const colorFields = new Set(value.fields.filter(item => item.type === 'color').map(item => item.id))
   for (const themedField of value.themeColorFields ?? []) {

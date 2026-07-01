@@ -9,7 +9,7 @@ import { ExportDialog } from '../export/ExportDialog'
 import { exportDraftFromDom } from '../export/package'
 import { EditorToolbar } from './EditorToolbar'
 import { EditorRail } from './EditorRail'
-import { themePalettes } from '../themes/palettes'
+import { getThemePalette, themePalettes } from '../themes/palettes'
 
 export function EditorPage({ initialDraft, onBack, onSave }: { initialDraft?: EdmDraft; onBack?: () => void; onSave?: (draft: EdmDraft) => void }) {
   const [state, dispatch] = useReducer(editorReducer, initialEditorState)
@@ -23,7 +23,7 @@ export function EditorPage({ initialDraft, onBack, onSave }: { initialDraft?: Ed
     <div className="workspace">
       <EditorRail onBack={onBack}/>
       <TemplateLibrary onAdd={templateId => dispatch({ type: 'addFloor', templateId })} />
-      <Canvas floors={state.draft.floors} selectedId={state.selectedFloorId} zoom={zoom} onZoomChange={setZoom} onSelect={floorId => dispatch({ type: 'selectFloor', floorId })} onMove={(floorId, direction) => dispatch({ type: 'moveFloor', floorId, direction })} />
+      <Canvas floors={state.draft.floors} palette={getThemePalette(state.draft.themePaletteId)} selectedId={state.selectedFloorId} zoom={zoom} onZoomChange={setZoom} onSelect={floorId => dispatch({ type: 'selectFloor', floorId })} onMove={(floorId, direction) => dispatch({ type: 'moveFloor', floorId, direction })} />
       <PropertyPanel floor={selected} onChange={(fieldId, value) => selected && dispatch({ type: 'updateField', floorId: selected.id, fieldId, value })} onThemeColorChange={(fieldId, color) => selected && dispatch({ type: 'overrideThemeColor', floorId: selected.id, fieldId, color })} onThemeColorRelink={(fieldId, slot) => selected && dispatch({ type: 'relinkThemeColor', floorId: selected.id, fieldId, slot })} onProductChange={(slotId, value) => selected && dispatch({ type: 'updateProduct', floorId: selected.id, slotId, value })} onDuplicate={() => selected && dispatch({ type: 'duplicateFloor', floorId: selected.id })} onDelete={() => selected && dispatch({ type: 'deleteFloor', floorId: selected.id })} />
     </div>{dialog ? <ExportDialog draft={state.draft} previewOnly={dialog === 'preview'} onClose={() => setDialog(null)} onExport={() => exportDraftFromDom(state.draft)} /> : null}
   </div>

@@ -104,3 +104,26 @@ test('新版 Banner 支持动态高度与可复用图片编辑入口', async ({ 
   await page.getByRole('button', { name: '导出切图' }).click()
   await expect(page.getByRole('dialog', { name: '导出切图' })).toContainText('必填图片尚未设置')
 })
+
+test('超长 EDM 画布和右侧属性面板可分别滚动到底', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '新建 EDM' }).click()
+  const addBanner = page.getByRole('button', { name: '添加 图文 Banner' })
+  await addBanner.click()
+  await addBanner.click()
+  await addBanner.click()
+
+  const canvasScroll = page.locator('.canvas-scroll')
+  await expect.poll(() => canvasScroll.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true)
+  await canvasScroll.hover()
+  await page.mouse.wheel(0, 5000)
+  await expect.poll(() => canvasScroll.evaluate(element => element.scrollTop)).toBeGreaterThan(0)
+  await expect.poll(() => canvasScroll.evaluate(element => Math.ceil(element.scrollTop + element.clientHeight) >= element.scrollHeight)).toBe(true)
+
+  const propertyPanel = page.locator('.property-panel')
+  await expect.poll(() => propertyPanel.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true)
+  await propertyPanel.hover()
+  await page.mouse.wheel(0, 5000)
+  await expect.poll(() => propertyPanel.evaluate(element => Math.ceil(element.scrollTop + element.clientHeight) >= element.scrollHeight)).toBe(true)
+  await expect(page.getByRole('button', { name: '删除楼层' })).toBeVisible()
+})

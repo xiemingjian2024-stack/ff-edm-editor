@@ -13,7 +13,7 @@ button { cursor: pointer; }
 .topbar-actions { display: flex; gap: 9px; }
 .topbar-actions button, .panel-actions button { border: 1px solid #d8d7d0; background: #fff; border-radius: 9px; padding: 9px 14px; font-weight: 700; font-size: 12px; }
 .topbar-actions .primary { background: #1d1d19; color: #fff; border-color: #1d1d19; }
-.workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: 256px minmax(520px, 1fr) 288px; }
+.workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: 256px minmax(520px, 1fr) 288px; grid-template-rows: minmax(0, 1fr); }
 .panel { background: #fff; min-height: 0; overflow: auto; }
 .template-library { border-right: 1px solid #dddcd5; }
 .property-panel { border-left: 1px solid #dddcd5; }

@@ -57,6 +57,7 @@ it('分类导航只编辑文案并保留隐藏项', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
   await user.click(screen.getByRole('button', { name: '添加 分类导航' }))
   expect(screen.getByLabelText('文案 1')).toHaveValue('Home')
+  expect(screen.getByLabelText('文案 1')).toHaveClass('property-text-input')
   expect(screen.queryByRole('heading', { name: '导航项' })).not.toBeInTheDocument()
   expect(screen.queryByRole('group', { name: '导航项 1' })).not.toBeInTheDocument()
   expect(screen.queryByLabelText('导航项 1 链接')).not.toBeInTheDocument()

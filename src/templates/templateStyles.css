@@ -8,6 +8,11 @@
 .banner-simple { height: 250px; position: relative; padding: 28px; display: flex; align-items: flex-end; background-size: cover; background-position: center; }
 .banner-simple::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.58), transparent 70%); }
 .banner-simple h2 { position: relative; z-index: 1; margin: 0; max-width: 280px; font-size: 35px; line-height: .98; }
+.banner-regular, .banner-image-copy { position: relative; }
+.banner-gradient { position: absolute; z-index: 1; left: 0; right: 0; height: 58%; pointer-events: none; }.banner-gradient--bottom { bottom: 0; background: linear-gradient(to bottom, transparent, rgba(0,0,0,.72)); }.banner-gradient--top { top: 0; background: linear-gradient(to top, transparent, rgba(0,0,0,.72)); }
+.banner-copy { position: relative; z-index: 2; display: flex; flex-direction: column; min-width: 0; }.banner-copy--overlay { position: absolute; left: 24px; right: 24px; }.banner-copy--panel { height: 180px; justify-content: center; padding: 24px; }
+.banner-copy h2 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 24px; line-height: 1.12; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }.banner-copy p { display: -webkit-box; overflow: hidden; margin: 10px 0 0; font-size: 14px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }.banner-button { min-width: 182px; max-width: 100%; height: 34px; display: grid; place-items: center; overflow: hidden; margin-top: 14px; padding: 0 24px; font-size: 12px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }
+.banner-image-stage { position: relative; overflow: hidden; }
 .title-centered { height: 112px; padding: 28px 24px; display: grid; place-items: center; text-align: center; }
 .title-centered h2 { margin: 0; font-size: 28px; line-height: 1.1; }
 .product-grid-two { height: 280px; display: grid; grid-template-columns: 1fr 1fr; }

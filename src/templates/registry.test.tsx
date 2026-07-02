@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'title', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'product-card'])
 })
 
 it('分类导航固定为 375×46 并关联主题色位 A/B', () => {
@@ -12,6 +12,19 @@ it('分类导航固定为 375×46 并关联主题色位 A/B', () => {
   expect(template.exportFullImage).toBe(false)
   expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }])
   expect(template.navigationConfig?.defaultItems.slice(0, 3).map(item => item.text)).toEqual(['Home', 'Carrier & Travel', 'Couch Covers'])
+})
+
+it('注册两个新 Banner 并保留隐藏的旧 Banner', () => {
+  const regular = templateRegistry.find(item => item.definition.id === 'banner-regular')!.definition
+  const imageCopy = templateRegistry.find(item => item.definition.id === 'banner-image-copy')!.definition
+  const legacy = templateRegistry.find(item => item.definition.id === 'banner-simple')!.definition
+  expect(regular.designHeight).toBe(375)
+  expect(regular.heightConfig).toEqual({ fieldId: 'height', min: 250, max: 600, offset: 0 })
+  expect(regular.themeColorFields).toEqual([
+    { fieldId: 'textColor', defaultSlot: 'A' }, { fieldId: 'buttonBackground', defaultSlot: 'C' }, { fieldId: 'buttonTextColor', defaultSlot: 'B' },
+  ])
+  expect(imageCopy.heightConfig).toEqual({ fieldId: 'imageHeight', min: 200, max: 500, offset: 180 })
+  expect(legacy.hiddenInLibrary).toBe(true)
 })
 
 it('HEAD 品牌 Logo 使用固定尺寸和主题色位 A', () => {

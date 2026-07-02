@@ -10,6 +10,7 @@ function BannerSimple({ floor }: FloorRenderProps) {
 export const bannerSimple: RegisteredTemplate = {
   definition: {
     id: 'banner-simple', version: 1, name: '夏日主视觉', category: 'banner', designWidth: 375, designHeight: 250,
+    hiddenInLibrary: true,
     fields: [
       { id: 'title', type: 'text', label: '主标题', defaultValue: 'MAKE EVERY DAY A LITTLE MORE FUN' },
       { id: 'textColor', type: 'color', label: '文字颜色', defaultValue: '#ffffff' },

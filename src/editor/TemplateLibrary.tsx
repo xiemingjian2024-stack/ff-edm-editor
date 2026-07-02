@@ -9,7 +9,7 @@ const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', 'produc
 export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())
   const [activeTab, setActiveTab] = useState<'floors' | 'palettes'>('floors')
-  const filtered = templateRegistry.filter(item => item.definition.name.toLowerCase().includes(deferredQuery) || categoryNames[item.definition.category].toLowerCase().includes(deferredQuery))
+  const filtered = templateRegistry.filter(item => !item.definition.hiddenInLibrary && (item.definition.name.toLowerCase().includes(deferredQuery) || categoryNames[item.definition.category].toLowerCase().includes(deferredQuery)))
   return <aside className="panel template-library">
     <div className="library-tabs"><button className={activeTab === 'floors' ? 'is-active' : ''} onClick={() => setActiveTab('floors')}>楼层</button><button className={activeTab === 'palettes' ? 'is-active' : ''} onClick={() => setActiveTab('palettes')}>配色</button></div>
     {activeTab === 'palettes' ? <div className="palette-library">

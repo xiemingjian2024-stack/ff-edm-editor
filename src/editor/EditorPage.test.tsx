@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { EditorPage } from './EditorPage'
 
@@ -64,4 +64,27 @@ it('分类导航将每项文案和链接放在同一分组并保留隐藏项', a
   expect(screen.queryByLabelText('导航项 3 文案')).not.toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: '3 项' }))
   expect(screen.getByLabelText('导航项 3 文案')).toHaveValue('Dog Beds')
+})
+
+it('常规 Banner 支持动态高度、文案位置、对齐和遮罩', async () => {
+  const user = userEvent.setup(); render(<EditorPage />)
+  await user.click(screen.getByRole('button', { name: '添加 常规 Banner' }))
+  expect(screen.getByTestId('banner-regular')).toHaveStyle({ height: '375px' })
+  fireEvent.change(screen.getByLabelText('楼层高度'), { target: { value: '420' } })
+  expect(screen.getByTestId('banner-regular')).toHaveStyle({ height: '420px' })
+  await user.click(screen.getByRole('button', { name: '顶部' }))
+  expect(screen.getByTestId('banner-copy')).toHaveAttribute('data-position', 'top')
+  await user.click(screen.getByRole('button', { name: '左对齐' }))
+  expect(screen.getByTestId('banner-copy')).toHaveStyle({ textAlign: 'left' })
+  await user.click(screen.getByRole('button', { name: '关闭遮罩' }))
+  expect(screen.queryByTestId('banner-overlay')).not.toBeInTheDocument()
+})
+
+it('图文 Banner 图片区高度变化时总高度同步变化', async () => {
+  const user = userEvent.setup(); render(<EditorPage />)
+  await user.click(screen.getByRole('button', { name: '添加 图文 Banner' }))
+  expect(screen.getByTestId('banner-image-copy')).toHaveStyle({ height: '480px' })
+  fireEvent.change(screen.getByLabelText('图片区域高度'), { target: { value: '360' } })
+  expect(screen.getByTestId('banner-image-copy')).toHaveStyle({ height: '540px' })
+  expect(screen.getByTestId('banner-image-stage')).toHaveStyle({ height: '360px' })
 })

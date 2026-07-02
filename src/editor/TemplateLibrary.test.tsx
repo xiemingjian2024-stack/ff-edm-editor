@@ -29,3 +29,10 @@ it('在楼层和配色内容之间切换', async () => {
   await user.click(screen.getByRole('button', { name: '楼层' }))
   expect(screen.getByLabelText('搜索楼层模板')).toBeVisible()
 })
+
+it('只展示两个新 Banner，不展示旧临时 Banner', () => {
+  render(<TemplateLibrary onAdd={() => {}} />)
+  expect(screen.getByRole('button', { name: '添加 常规 Banner' })).toBeVisible()
+  expect(screen.getByRole('button', { name: '添加 图文 Banner' })).toBeVisible()
+  expect(screen.queryByRole('button', { name: '添加 夏日主视觉' })).not.toBeInTheDocument()
+})

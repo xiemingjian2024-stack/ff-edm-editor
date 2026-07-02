@@ -57,7 +57,8 @@ it('标题文本模板隐藏空内容并兼容旧草稿字段', () => {
 
 it('EDM 内容使用品牌字体变量', () => {
   const css = readFileSync('src/templates/templateStyles.css', 'utf8')
-  expect(css).toContain('font-family: var(--edm-font-family)')
+  expect(css).toContain('.floor-render, .floor-render *')
+  expect(css).toContain('font-family: "Euclid Circular A"')
   expect(css).toContain('"Euclid Circular A"')
 })
 
@@ -69,4 +70,14 @@ it('注册固定尺寸的对比信息模板与双媒体槽位', () => {
   expect(template.autoHeight).toBe(true)
   expect(template.mediaSlots).toEqual([{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }])
   expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'C' }, { fieldId: 'textColor', defaultSlot: 'B' }])
+})
+
+it('对比信息将文字颜色显式应用到标题、描述和结果文案', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'comparison-information')!
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  render(<entry.Renderer template={entry.definition} floor={{ id: 'comparison', templateId: entry.definition.id, values: { title: 'Title', description: 'Description', beforeDescription: 'Before copy', afterDescription: 'After copy', background: '#FFAC33', textColor: '#123456' }, products: {}, mediaSlots: { before: media, after: media } }} />)
+  expect(screen.getByRole('heading', { name: 'Title' }).getAttribute('style')).toContain('color: rgb(18, 52, 86)')
+  expect(screen.getByText('Description').getAttribute('style')).toContain('color: rgb(18, 52, 86)')
+  expect(screen.getByText('Before copy').getAttribute('style')).toContain('color: rgb(18, 52, 86)')
+  expect(screen.getByText('After copy').getAttribute('style')).toContain('color: rgb(18, 52, 86)')
 })

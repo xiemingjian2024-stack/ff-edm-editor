@@ -1,4 +1,5 @@
-.floor-render { --edm-font-family: "Euclid Circular A", "PingFang SC", "Microsoft YaHei", sans-serif; width: 375px; overflow: hidden; font-family: var(--edm-font-family); box-sizing: border-box; }
+.floor-render { width: 375px; overflow: hidden; font-family: "Euclid Circular A", "PingFang SC", "Microsoft YaHei", sans-serif; font-synthesis: none; box-sizing: border-box; }
+.floor-render, .floor-render * { font-family: "Euclid Circular A", "PingFang SC", "Microsoft YaHei", sans-serif; font-synthesis: none; }
 .head-brand-logo { height: 56px; display: grid; place-items: center; }
 .head-brand-logo img { display: block; width: 90px; height: 30px; }
 .head-category-navigation { height: 46px; display: grid; align-items: stretch; }

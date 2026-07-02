@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
+import { vi } from 'vitest'
 import { ExportDialog } from './ExportDialog'
 
 it('显示导出规格和检查结果', () => {
@@ -23,4 +24,12 @@ it('弹窗外壳样式不会覆盖模板内部的标题与描述字号', () => {
   expect(css).not.toMatch(/\.export-dialog\s+header\s+p\s*\{/)
   expect(css).toContain('.export-dialog > header h2')
   expect(css).toContain('.export-dialog > header p')
+})
+
+it('同一楼层存在多个导出问题时不会产生重复列表标识', () => {
+  const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  render(<ExportDialog draft={{ id: 'a', name: '卖点', themePaletteId: 'funnyfuzzy-classic', createdAt: '', updatedAt: '', floors: [{ id: 'points', templateId: 'selling-points-information', values: { itemCount: '4' }, products: {}, mediaSlots: { point1: media, point2: media, point3: media, point4: media } }] }} onClose={() => {}} onExport={async () => {}} />)
+  expect(error).not.toHaveBeenCalled()
+  error.mockRestore()
 })

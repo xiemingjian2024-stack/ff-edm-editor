@@ -3,7 +3,30 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'product-card'])
+})
+
+it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition
+  expect(template?.category).toBe('information')
+  expect(template?.autoHeight).toBe(true)
+  expect(template?.fields.find(field => field.id === 'itemCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '4 个卖点', value: '4' }] })
+  expect(template?.mediaSlots?.map(slot => slot.id)).toEqual(['point1', 'point2', 'point3', 'point4'])
+  expect(template?.mediaSlotCountFieldId).toBe('itemCount')
+})
+
+it('卖点信息按数量显示卖点并将按钮放在网格之后', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'selling-points-information')!
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const floor = { id: 'points', templateId: entry.definition.id, values: { title: 'Title', description: '', buttonText: '', itemCount: '2', point1Title: 'One', point1Description: 'First', point2Title: 'Two', point2Description: 'Second', point3Title: 'Three', point3Description: 'Third', point4Title: 'Four', point4Description: 'Fourth', background: '#FFFFFF', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' }, products: {}, mediaSlots: { point1: media, point2: media, point3: media, point4: media } }
+  const { rerender } = render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getAllByTestId('selling-point')).toHaveLength(2)
+  expect(screen.queryByText('Shop Now')).not.toBeInTheDocument()
+  rerender(<entry.Renderer template={entry.definition} floor={{ ...floor, values: { ...floor.values, itemCount: '4', buttonText: 'Shop Now' } }} />)
+  expect(screen.getAllByTestId('selling-point')).toHaveLength(4)
+  const button = screen.getByText('Shop Now')
+  expect(button).toHaveClass('selling-points-button')
+  expect(button.parentElement?.lastElementChild).toBe(button)
 })
 
 it('分类导航固定为 375×46 并关联主题色位 A/B', () => {

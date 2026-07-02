@@ -32,3 +32,12 @@ it('对比信息缺少任一图片时阻断导出', () => {
   expect(result.blockers).toHaveLength(1)
   expect(result.blockers[0].message).toContain('After 图片')
 })
+
+it('卖点信息只校验当前显示的图片槽位', () => {
+  let state = editorReducer(initialEditorState, { type: 'addFloor', templateId: 'selling-points-information' })
+  const floorId = state.draft.floors[0].id
+  for (const slotId of ['point1', 'point2']) state = editorReducer(state, { type: 'updateMediaSlot', floorId, slotId, value: { image: `${slotId}.jpg`, url: '', scale: 1, offsetX: 0, offsetY: 0 } })
+  expect(validateDraft(state.draft).blockers).toHaveLength(0)
+  state = editorReducer(state, { type: 'updateField', floorId, fieldId: 'itemCount', value: '4' })
+  expect(validateDraft(state.draft).blockers.map(item => item.message)).toEqual(['卖点 3 图片尚未设置', '卖点 4 图片尚未设置'])
+})

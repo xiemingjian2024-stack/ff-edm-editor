@@ -10,6 +10,8 @@ export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColo
   const contentFields = template?.fields.filter(field => field.type !== 'color') ?? []
   const colorFields = template?.fields.filter(field => field.type === 'color') ?? []
   const navigationCount = template?.navigationConfig ? Math.min(template.navigationConfig.maxItems, Math.max(template.navigationConfig.minItems, Number(floor?.values.navigationCount) || template.navigationConfig.minItems)) : 0
+  const mediaSlotCount = template?.mediaSlotCountFieldId ? Number(floor?.values[template.mediaSlotCountFieldId]) : template?.mediaSlots?.length
+  const visibleMediaSlots = template?.mediaSlots?.slice(0, mediaSlotCount)
   const renderField = (field: NonNullable<typeof template>['fields'][number]) => {
     const themeDeclaration = template?.themeColorFields?.find(item => item.fieldId === field.id)
     const binding = floor?.themeColors?.[field.id]
@@ -25,7 +27,7 @@ export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColo
     {!floor || !template ? <div className="empty-panel"><strong>还没有选中楼层</strong><p>在画布中选择一个楼层后，这里会出现可编辑内容。</p></div> : <>
       {contentFields.length ? <InspectorSection title="内容"><div className="field-list">{contentFields.map(renderField)}</div></InspectorSection> : null}
       {template.mediaConfig && floor.media ? <InspectorSection title="图片"><BannerMediaEditor value={floor.media} onChange={onMediaChange} /></InspectorSection> : null}
-      {template.mediaSlots && floor.mediaSlots ? <InspectorSection title="图片"><div className="manual-media-list">{template.mediaSlots.map(slot => <ManualMediaEditor key={slot.id} label={slot.label} value={floor.mediaSlots![slot.id]} onChange={value => onMediaSlotChange(slot.id, value)} />)}</div></InspectorSection> : null}
+      {visibleMediaSlots && floor.mediaSlots ? <InspectorSection title="图片"><div className="manual-media-list">{visibleMediaSlots.map(slot => <ManualMediaEditor key={slot.id} label={slot.label} value={floor.mediaSlots![slot.id]} onChange={value => onMediaSlotChange(slot.id, value)} />)}</div></InspectorSection> : null}
       {navigationCount ? <InspectorSection title="导航项"><div className="navigation-item-list">{floor.navigationItems?.slice(0, navigationCount).map((item, index) => <fieldset className="navigation-item-editor" key={index}><legend>导航项 {index + 1}</legend><label><span>文案</span><input aria-label={`导航项 ${index + 1} 文案`} value={item.text} onChange={event => onNavigationItemChange(index, { ...item, text: event.target.value })} /></label><label><span>链接（可不填）</span><input aria-label={`导航项 ${index + 1} 链接`} value={item.url} onChange={event => onNavigationItemChange(index, { ...item, url: event.target.value })} placeholder="粘贴链接或其他字符" /></label></fieldset>)}</div></InspectorSection> : null}
       {colorFields.length ? <InspectorSection title="颜色"><div className="field-list">{colorFields.map(renderField)}</div></InspectorSection> : null}
       {template.productSlots.length ? <InspectorSection title="商品"><div className="product-list">{template.productSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} />)}</div></InspectorSection> : null}

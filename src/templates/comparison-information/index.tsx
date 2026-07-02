@@ -44,6 +44,7 @@ export const comparisonInformation: RegisteredTemplate = {
     ],
     themeColorFields: [{ fieldId: 'background', defaultSlot: 'C' }, { fieldId: 'textColor', defaultSlot: 'B' }],
     mediaSlots: [{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }],
+    autoHeight: true,
     productSlots: [], exportRegions: [{ id: 'full', name: '对比信息', x: 0, y: 0, width: 375, height: 420 }],
   }, Renderer: ComparisonInformation,
 }

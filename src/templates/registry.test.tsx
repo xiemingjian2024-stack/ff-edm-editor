@@ -66,6 +66,7 @@ it('注册固定尺寸的对比信息模板与双媒体槽位', () => {
   expect(template.name).toBe('对比信息')
   expect(template.category).toBe('information')
   expect(template.designHeight).toBe(420)
+  expect(template.autoHeight).toBe(true)
   expect(template.mediaSlots).toEqual([{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }])
   expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'C' }, { fieldId: 'textColor', defaultSlot: 'B' }])
 })

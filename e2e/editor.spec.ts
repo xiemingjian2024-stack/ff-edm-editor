@@ -157,7 +157,7 @@ test('对比信息模板支持两张图片独立上传与编辑', async ({ page 
   await page.getByRole('button', { name: '添加 对比信息' }).click()
 
   const comparison = page.getByTestId('comparison-information')
-  await expect(comparison).toHaveCSS('height', '420px')
+  const initialComparisonHeight = await comparison.evaluate(element => element.clientHeight)
   await expect(comparison.getByText('BEFORE', { exact: true })).toBeVisible()
   await expect(comparison.getByText('AFTER', { exact: true })).toBeVisible()
   await expect(comparison.getByAltText('VS')).toBeVisible()
@@ -173,13 +173,17 @@ test('对比信息模板支持两张图片独立上传与编辑', async ({ page 
   await expect(afterImage).toHaveCount(1)
   await expect(afterImage).not.toHaveAttribute('src', beforeSource!)
 
-  await expect(comparison.getByTestId('comparison-media')).toHaveCSS('border-radius', '16px')
+  await expect(comparison.getByTestId('comparison-media')).toHaveCSS('border-radius', '0px')
   const clipPaths = await comparison.locator('.comparison-pane').evaluateAll(elements => elements.map(element => getComputedStyle(element).clipPath))
   expect(clipPaths.every(value => value !== 'none')).toBe(true)
-  await expect(comparison.locator('.comparison-results')).toHaveCSS('height', '80px')
+  await expect(comparison.locator('.comparison-results')).toHaveCSS('padding-top', '8px')
+  await expect(comparison.locator('.comparison-results')).toHaveCSS('padding-bottom', '24px')
   const resultWidths = await comparison.locator('.comparison-result').evaluateAll(elements => elements.map(element => element.getBoundingClientRect().width))
   expect(resultWidths.every(width => width < 160)).toBe(true)
   await expect(comparison.locator('.comparison-result p').first()).toHaveCSS('-webkit-line-clamp', '3')
+  await expect(comparison.locator('.comparison-result').first()).toHaveCSS('opacity', '0.7')
+  await page.getByLabel('Before 描述', { exact: true }).fill('First line of comparison copy that continues onto a second line and then reaches a visible third line.')
+  await expect.poll(() => comparison.evaluate(element => element.clientHeight)).toBeGreaterThan(initialComparisonHeight)
 
   await page.getByLabel('Before 图片缩放').fill('150')
   await expect(page.getByLabel('Before 图片缩放')).toHaveValue('150')

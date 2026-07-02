@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'product-card'])
 })
 
 it('分类导航固定为 375×46 并关联主题色位 A/B', () => {
@@ -59,4 +59,13 @@ it('EDM 内容使用品牌字体变量', () => {
   const css = readFileSync('src/templates/templateStyles.css', 'utf8')
   expect(css).toContain('font-family: var(--edm-font-family)')
   expect(css).toContain('"Euclid Circular A"')
+})
+
+it('注册固定尺寸的对比信息模板与双媒体槽位', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'comparison-information')!.definition
+  expect(template.name).toBe('对比信息')
+  expect(template.category).toBe('information')
+  expect(template.designHeight).toBe(420)
+  expect(template.mediaSlots).toEqual([{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }])
+  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'C' }, { fieldId: 'textColor', defaultSlot: 'B' }])
 })

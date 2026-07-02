@@ -41,3 +41,7 @@ it('拒绝把主题色位关联到非颜色字段', () => {
 it('接受内容自适应高度模板声明', () => {
   expect(parseTemplate({ ...twoProductTemplate, autoHeight: true }).autoHeight).toBe(true)
 })
+
+it('接受两个具名媒体槽位声明', () => {
+  expect(parseTemplate({ ...twoProductTemplate, mediaSlots: [{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }] }).mediaSlots).toEqual([{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }])
+})

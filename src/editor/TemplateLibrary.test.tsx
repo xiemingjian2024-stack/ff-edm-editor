@@ -36,3 +36,9 @@ it('只展示两个新 Banner，不展示旧临时 Banner', () => {
   expect(screen.getByRole('button', { name: '添加 图文 Banner' })).toBeVisible()
   expect(screen.queryByRole('button', { name: '添加 夏日主视觉' })).not.toBeInTheDocument()
 })
+
+it('在信息分组展示对比信息模板', () => {
+  render(<TemplateLibrary onAdd={() => {}} />)
+  expect(screen.getByRole('heading', { name: '信息' })).toBeVisible()
+  expect(screen.getByRole('button', { name: '添加 对比信息' })).toBeVisible()
+})

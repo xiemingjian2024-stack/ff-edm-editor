@@ -149,3 +149,26 @@ test('标题文本模板按内容自适应高度并支持统一对齐', async ({
   await expect(titleFloor).toHaveAttribute('data-alignment', 'right')
   await expect(titleFloor).toHaveCSS('text-align', 'right')
 })
+
+test('对比信息模板支持两张图片独立上传与编辑', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '新建 EDM' }).click()
+  await expect(page.getByRole('heading', { name: '信息' })).toBeVisible()
+  await page.getByRole('button', { name: '添加 对比信息' }).click()
+
+  const comparison = page.getByTestId('comparison-information')
+  await expect(comparison).toHaveCSS('height', '420px')
+  await expect(comparison.getByText('BEFORE', { exact: true })).toBeVisible()
+  await expect(comparison.getByText('AFTER', { exact: true })).toBeVisible()
+  await expect(comparison.getByAltText('VS')).toBeVisible()
+
+  await page.getByLabel('上传 Before 图片').setInputFiles('src/assets/comparison/Before.svg')
+  await page.getByLabel('上传 After 图片').setInputFiles('src/assets/comparison/After.svg')
+  await expect(comparison.locator('.comparison-pane img')).toHaveCount(2)
+
+  await page.getByLabel('Before 图片缩放').fill('150')
+  await expect(page.getByLabel('Before 图片缩放')).toHaveValue('150')
+  await expect(page.getByLabel('After 图片缩放')).toHaveValue('100')
+  await page.getByLabel('描述', { exact: true }).fill('')
+  await expect(comparison.getByText('Give them a snug, supportive place to curl up, settle in and enjoy the journey.')).toHaveCount(0)
+})

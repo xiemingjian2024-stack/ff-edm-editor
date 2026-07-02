@@ -4,7 +4,7 @@ import { Icon } from '../ui/Icon'
 import type { ThemePalette } from '../domain/edm'
 import { classicPalette, themePalettes } from '../themes/palettes'
 
-const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
+const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
 
 export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())

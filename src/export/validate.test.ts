@@ -23,3 +23,12 @@ it('新版 Banner 设置图片后允许导出', () => {
   state = editorReducer(state, { type: 'updateMedia', floorId, value: { image: 'product.jpg', url: '', scale: 1, offsetX: 0, offsetY: 0 } })
   expect(validateDraft(state.draft).blockers).toHaveLength(0)
 })
+
+it('对比信息缺少任一图片时阻断导出', () => {
+  let state = editorReducer(initialEditorState, { type: 'addFloor', templateId: 'comparison-information' })
+  const floorId = state.draft.floors[0].id
+  state = editorReducer(state, { type: 'updateMediaSlot', floorId, slotId: 'before', value: { image: 'before.jpg', url: '', scale: 1, offsetX: 0, offsetY: 0 } })
+  const result = validateDraft(state.draft)
+  expect(result.blockers).toHaveLength(1)
+  expect(result.blockers[0].message).toContain('After 图片')
+})

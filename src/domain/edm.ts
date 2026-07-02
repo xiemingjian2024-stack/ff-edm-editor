@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-export type TemplateCategory = 'head' | 'banner' | 'title' | 'product-card' | 'content' | 'promotion' | 'footer'
+export type TemplateCategory = 'head' | 'banner' | 'title' | 'information' | 'product-card' | 'content' | 'promotion' | 'footer'
 export type ThemeSlot = string
 export interface ThemePalette { id: string; name: string; slots: Record<ThemeSlot, string> }
 export type ThemeColorBinding = { mode: 'theme'; slot: ThemeSlot } | { mode: 'custom'; color: string }
@@ -16,17 +16,18 @@ export interface NavigationItem { text: string; url: string }
 export interface NavigationConfig { minItems: number; maxItems: number; defaultItems: NavigationItem[] }
 export interface MediaState { image: string; url: string; scale: number; offsetX: number; offsetY: number }
 export interface MediaConfig { frameHeightFieldId?: string; fixedFrameHeight?: number }
+export interface MediaSlotDefinition { id: string; label: string }
 export interface HeightConfig { fieldId: string; min: number; max: number; offset: number }
 export interface ExportRegion { id: string; name: string; x: number; y: number; width: number; height: number; linkSlotId?: string; navigationItemIndex?: number; mediaLink?: boolean }
 export interface ThemeColorField { fieldId: string; defaultSlot: ThemeSlot }
 export interface FloorTemplate {
   id: string; version: number; name: string; category: TemplateCategory; designWidth: 375; designHeight: number
   fields: FieldDefinition[]; productSlots: ProductSlotDefinition[]; exportRegions: ExportRegion[]; themeColorFields?: ThemeColorField[]
-  navigationConfig?: NavigationConfig; exportFullImage?: boolean; mediaConfig?: MediaConfig; heightConfig?: HeightConfig; autoHeight?: boolean; hiddenInLibrary?: boolean
+  navigationConfig?: NavigationConfig; exportFullImage?: boolean; mediaConfig?: MediaConfig; mediaSlots?: MediaSlotDefinition[]; heightConfig?: HeightConfig; autoHeight?: boolean; hiddenInLibrary?: boolean
 }
 export interface ProductValue { image: string; title: string; price: string; url: string; gallery?: string[] }
-export interface FloorInstance { id: string; templateId: string; values: Record<string, string>; products: Record<string, ProductValue>; themeColors?: Record<string, ThemeColorBinding>; navigationItems?: NavigationItem[]; media?: MediaState }
+export interface FloorInstance { id: string; templateId: string; values: Record<string, string>; products: Record<string, ProductValue>; themeColors?: Record<string, ThemeColorBinding>; navigationItems?: NavigationItem[]; media?: MediaState; mediaSlots?: Record<string, MediaState> }
 export interface EdmDraft { id: string; name: string; floors: FloorInstance[]; themePaletteId: string; createdAt: string; updatedAt: string }
 export interface NormalizedProduct { title: string; image: string; gallery: string[]; price: string; url: string }
-export interface FloorRenderProps { floor: FloorInstance; template: FloorTemplate; onMediaChange?: (value: MediaState) => void }
+export interface FloorRenderProps { floor: FloorInstance; template: FloorTemplate; onMediaChange?: (value: MediaState) => void; onMediaSlotChange?: (slotId: string, value: MediaState) => void }
 export interface RegisteredTemplate { definition: FloorTemplate; Renderer: ComponentType<FloorRenderProps> }

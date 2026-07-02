@@ -76,3 +76,13 @@ it('更新媒体状态时不影响其他楼层', () => {
   expect(next.draft.floors[0].media).toMatchObject({ image: 'new.jpg', url: '/product', scale: 1.5, offsetX: 12, offsetY: -8 })
   expect(next.draft.floors[1].media).toEqual(media)
 })
+
+it('新增具名媒体模板并独立更新其中一个槽位', () => {
+  const mediaSlots = {
+    before: { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 },
+    after: { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 },
+  }
+  const state = reducer({ ...initialEditorState, draft: { ...initialEditorState.draft, floors: [{ id: 'comparison-1', templateId: 'comparison-information', values: {}, products: {}, mediaSlots }] } }, { type: 'updateMediaSlot', floorId: 'comparison-1', slotId: 'before', value: { image: 'before.jpg', url: '', scale: 1.4, offsetX: 10, offsetY: -6 } })
+  expect(state.draft.floors[0].mediaSlots?.before.image).toBe('before.jpg')
+  expect(state.draft.floors[0].mediaSlots?.after.image).toBe('')
+})

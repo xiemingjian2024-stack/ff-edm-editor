@@ -17,6 +17,7 @@ export type EditorAction =
   | { type: 'relinkThemeColor'; floorId: string; fieldId: string; slot: ThemeSlot }
   | { type: 'updateNavigationItem'; floorId: string; index: number; value: NavigationItem }
   | { type: 'updateMedia'; floorId: string; value: MediaState }
+  | { type: 'updateMediaSlot'; floorId: string; slotId: string; value: MediaState }
 
 const now = new Date().toISOString()
 export const initialEditorState: EditorState = { draft: { id: 'draft-local', name: '未命名 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: now, updatedAt: now }, selectedFloorId: null }
@@ -31,6 +32,7 @@ function createFloor(templateId: string, id: string): FloorInstance {
     products: {},
     navigationItems: template.navigationConfig ? structuredClone(template.navigationConfig.defaultItems) : undefined,
     media: template.mediaConfig ? { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 } : undefined,
+    mediaSlots: template.mediaSlots ? Object.fromEntries(template.mediaSlots.map(slot => [slot.id, { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }])) : undefined,
     themeColors: Object.fromEntries((template.themeColorFields ?? []).map(field => [field.fieldId, { mode: 'theme' as const, slot: field.defaultSlot }])),
   }
 }
@@ -92,6 +94,8 @@ export function createEditorReducer(createId: () => string = () => crypto.random
       })
     } else if (action.type === 'updateMedia') {
       floors = floors.map(floor => floor.id === action.floorId ? { ...floor, media: action.value } : floor)
+    } else if (action.type === 'updateMediaSlot') {
+      floors = floors.map(floor => floor.id === action.floorId && floor.mediaSlots?.[action.slotId] ? { ...floor, mediaSlots: { ...floor.mediaSlots, [action.slotId]: action.value } } : floor)
     }
     return { draft: { ...state.draft, floors, updatedAt: new Date().toISOString() }, selectedFloorId }
   }

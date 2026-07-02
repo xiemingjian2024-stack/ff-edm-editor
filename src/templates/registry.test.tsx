@@ -124,3 +124,10 @@ it('对比信息将文字颜色显式应用到标题、描述和结果文案', (
   expect(screen.getByText('Before copy').getAttribute('style')).toContain('color: rgb(18, 52, 86)')
   expect(screen.getByText('After copy').getAttribute('style')).toContain('color: rgb(18, 52, 86)')
 })
+
+it('对比信息上下间距与多卖点信息一致', () => {
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toContain('.comparison-heading { min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 24px 24px 22px;')
+  expect(css).toContain('padding: 12px 18px 24px;')
+  expect(css).toContain('.comparison-result p { display: -webkit-box; overflow: hidden; margin: 7px 0 0;')
+})

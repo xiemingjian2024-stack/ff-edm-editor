@@ -178,7 +178,7 @@ test('对比信息模板支持两张图片独立上传与编辑', async ({ page 
   await expect(comparison.getByTestId('comparison-media')).toHaveCSS('border-radius', '0px')
   const clipPaths = await comparison.locator('.comparison-pane').evaluateAll(elements => elements.map(element => getComputedStyle(element).clipPath))
   expect(clipPaths.every(value => value !== 'none')).toBe(true)
-  await expect(comparison.locator('.comparison-results')).toHaveCSS('padding-top', '8px')
+  await expect(comparison.locator('.comparison-results')).toHaveCSS('padding-top', '12px')
   await expect(comparison.locator('.comparison-results')).toHaveCSS('padding-bottom', '24px')
   const resultWidths = await comparison.locator('.comparison-result').evaluateAll(elements => elements.map(element => element.getBoundingClientRect().width))
   expect(resultWidths.every(width => width < 160)).toBe(true)

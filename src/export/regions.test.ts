@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { FloorInstance, FloorTemplate } from '../domain/edm'
-import { getFloorExportRegions, getRegionUrl } from './regions'
+import { getDomExportRegions, getFloorExportRegions, getRegionUrl } from './regions'
 import { scaleRegions } from './render'
 import { getTemplate } from '../templates/registry'
 
@@ -56,4 +56,18 @@ it('内容自适应模板按实际 DOM 高度生成完整导出区域', () => {
   const adaptive = getTemplate('title-centered')!.definition
   const current: FloorInstance = { id: 'title-1', templateId: adaptive.id, values: {}, products: {} }
   expect(getFloorExportRegions(adaptive, current, 224)[0]).toMatchObject({ width: 375, height: 224 })
+})
+
+it('按商品数量截取链接区域并用 DOM 实际矩形覆盖坐标', () => {
+  const adaptive = getTemplate('product-grid-n-by-2')!.definition
+  const current: FloorInstance = { id: 'products', templateId: adaptive.id, values: { productCount: '2' }, products: {} }
+  const regions = getFloorExportRegions(adaptive, current, 600)
+  expect(regions).toHaveLength(2)
+  const root = document.createElement('section')
+  const card = document.createElement('article')
+  card.dataset.exportRegionId = regions[0].id
+  root.appendChild(card)
+  root.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 475, bottom: 650, width: 375, height: 600, toJSON() {} })
+  card.getBoundingClientRect = () => ({ x: 112, y: 180, left: 112, top: 180, right: 287, bottom: 460, width: 175, height: 280, toJSON() {} })
+  expect(getDomExportRegions(root, regions)[0]).toMatchObject({ x: 12, y: 130, width: 175, height: 280 })
 })

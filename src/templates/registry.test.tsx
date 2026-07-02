@@ -6,6 +6,18 @@ it('注册 HEAD、Banner、标题和商品卡模板', () => {
   expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'product-card'])
 })
 
+it('用 N×2 商品卡替换旧双列商品卡', () => {
+  expect(templateRegistry.some(item => item.definition.id === 'product-grid-two')).toBe(false)
+  const template = templateRegistry.find(item => item.definition.id === 'product-grid-n-by-2')?.definition
+  expect(template?.name).toBe('N×2 商品卡')
+  expect(template?.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个商品', value: '2' }, { label: '4 个商品', value: '4' }, { label: '6 个商品', value: '6' }, { label: '8 个商品', value: '8' }] })
+  expect(template?.productSlots).toHaveLength(8)
+  expect(template?.productSlotCountFieldId).toBe('productCount')
+  expect(template?.domExportRegions).toBe(true)
+  expect(template?.exportRegions).toHaveLength(8)
+  expect(template?.themeColorFields).toContainEqual({ fieldId: 'background', defaultSlot: 'A' })
+})
+
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
   const template = templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition
   expect(template?.category).toBe('information')

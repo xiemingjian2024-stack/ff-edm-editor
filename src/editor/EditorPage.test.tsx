@@ -26,7 +26,7 @@ it('不提供字号和位置编辑控件', async () => {
 
 it('商品卡属性按颜色、商品和操作分组', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
-  await user.click(screen.getByRole('button', { name: /添加 双列商品卡/ }))
+  await user.click(screen.getByRole('button', { name: /添加 N×2 商品卡/ }))
   expect(screen.getByRole('heading', { name: '颜色' })).toBeVisible()
   expect(screen.getByRole('heading', { name: '商品' })).toBeVisible()
   expect(screen.getByRole('heading', { name: '操作' })).toBeVisible()

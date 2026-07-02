@@ -1,5 +1,6 @@
 import type { ExportRegion, FloorInstance, FloorTemplate } from '../domain/edm'
 import { getFloorHeight } from '../templates/floorGeometry'
+import { getActiveProductSlots } from '../templates/productSlots'
 
 export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string {
   if (region.navigationItemIndex !== undefined) return floor.navigationItems?.[region.navigationItemIndex]?.url ?? ''
@@ -11,7 +12,8 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
   const config = template.navigationConfig
   if (!config) {
     const floorHeight = template.autoHeight && actualHeight ? actualHeight : getFloorHeight(template, floor)
-    return template.exportRegions.map(region => region.y === 0 && region.height === template.designHeight ? { ...region, height: floorHeight } : region)
+    const activeProductIds = new Set(getActiveProductSlots(template, floor).map(slot => slot.id))
+    return template.exportRegions.filter(region => !template.productSlotCountFieldId || !region.linkSlotId || activeProductIds.has(region.linkSlotId)).map(region => region.y === 0 && region.height === template.designHeight ? { ...region, height: floorHeight } : region)
   }
   const requested = Number(floor.values.navigationCount)
   const count = Math.min(config.maxItems, Math.max(config.minItems, Number.isFinite(requested) ? requested : config.minItems))
@@ -27,5 +29,15 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
       height: template.designHeight,
       navigationItemIndex: index,
     }
+  })
+}
+
+export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]): ExportRegion[] {
+  const rootRect = root.getBoundingClientRect()
+  return regions.map(region => {
+    const node = root.querySelector<HTMLElement>(`[data-export-region-id="${region.id}"]`)
+    if (!node) return region
+    const rect = node.getBoundingClientRect()
+    return { ...region, x: rect.left - rootRect.left, y: rect.top - rootRect.top, width: rect.width, height: rect.height }
   })
 }

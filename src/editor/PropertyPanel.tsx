@@ -4,6 +4,7 @@ import { ProductSlotEditor } from './ProductSlotEditor'
 import { InspectorSection } from './InspectorSection'
 import { BannerMediaEditor } from './BannerMediaEditor'
 import { ManualMediaEditor } from './ManualMediaEditor'
+import { getActiveProductSlots } from '../templates/productSlots'
 
 export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColorRelink, onNavigationItemChange, onMediaChange, onMediaSlotChange = () => {}, onProductChange, onDuplicate, onDelete }: { floor?: FloorInstance; onChange: (fieldId: string, value: string) => void; onThemeColorChange: (fieldId: string, color: string) => void; onThemeColorRelink: (fieldId: string, slot: ThemeSlot) => void; onNavigationItemChange: (index: number, value: NavigationItem) => void; onMediaChange: (value: MediaState) => void; onMediaSlotChange?: (slotId: string, value: MediaState) => void; onProductChange: (slotId: string, value: import('../domain/edm').ProductValue) => void; onDuplicate: () => void; onDelete: () => void }) {
   const template = floor ? getTemplate(floor.templateId)?.definition : undefined
@@ -12,6 +13,7 @@ export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColo
   const navigationCount = template?.navigationConfig ? Math.min(template.navigationConfig.maxItems, Math.max(template.navigationConfig.minItems, Number(floor?.values.navigationCount) || template.navigationConfig.minItems)) : 0
   const mediaSlotCount = template?.mediaSlotCountFieldId ? Number(floor?.values[template.mediaSlotCountFieldId]) : template?.mediaSlots?.length
   const visibleMediaSlots = template?.mediaSlots?.slice(0, mediaSlotCount)
+  const visibleProductSlots = template && floor ? getActiveProductSlots(template, floor) : []
   const renderField = (field: NonNullable<typeof template>['fields'][number]) => {
     const themeDeclaration = template?.themeColorFields?.find(item => item.fieldId === field.id)
     const binding = floor?.themeColors?.[field.id]
@@ -30,7 +32,7 @@ export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColo
       {visibleMediaSlots && floor.mediaSlots ? <InspectorSection title="图片"><div className="manual-media-list">{visibleMediaSlots.map(slot => <ManualMediaEditor key={slot.id} label={slot.label} value={floor.mediaSlots![slot.id]} onChange={value => onMediaSlotChange(slot.id, value)} />)}</div></InspectorSection> : null}
       {navigationCount ? <InspectorSection title="导航项"><div className="navigation-item-list">{floor.navigationItems?.slice(0, navigationCount).map((item, index) => <fieldset className="navigation-item-editor" key={index}><legend>导航项 {index + 1}</legend><label><span>文案</span><input aria-label={`导航项 ${index + 1} 文案`} value={item.text} onChange={event => onNavigationItemChange(index, { ...item, text: event.target.value })} /></label><label><span>链接（可不填）</span><input aria-label={`导航项 ${index + 1} 链接`} value={item.url} onChange={event => onNavigationItemChange(index, { ...item, url: event.target.value })} placeholder="粘贴链接或其他字符" /></label></fieldset>)}</div></InspectorSection> : null}
       {colorFields.length ? <InspectorSection title="颜色"><div className="field-list">{colorFields.map(renderField)}</div></InspectorSection> : null}
-      {template.productSlots.length ? <InspectorSection title="商品"><div className="product-list">{template.productSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} />)}</div></InspectorSection> : null}
+      {visibleProductSlots.length ? <InspectorSection title="商品"><div className="product-list">{visibleProductSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} />)}</div></InspectorSection> : null}
       <InspectorSection title="操作"><div className="panel-actions"><button onClick={onDuplicate} aria-label="复制楼层">复制楼层</button><button className="danger" onClick={onDelete} aria-label="删除楼层">删除楼层</button></div></InspectorSection>
     </>}
   </aside>

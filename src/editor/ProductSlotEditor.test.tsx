@@ -10,3 +10,10 @@ it('读取商品并允许修改自动填充内容', async () => {
   await user.click(screen.getByRole('button', { name: '自动填充商品 1' }))
   expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ title: 'Cloud Bed', price: '99.00' }))
 })
+
+it('为商品标题、价格和跳转链接提供独立编辑标签', () => {
+  render(<ProductSlotEditor label="商品 3" value={{ title: 'Bed', image: 'a.jpg', price: '$19', url: 'link' }} onChange={() => {}} />)
+  expect(screen.getByLabelText('商品 3 商品标题')).toBeVisible()
+  expect(screen.getByLabelText('商品 3 价格')).toBeVisible()
+  expect(screen.getByLabelText('商品 3 跳转链接')).toBeVisible()
+})

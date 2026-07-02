@@ -8,7 +8,7 @@ it('将缺少必填图片设为阻断，将缺少链接设为提醒', () => {
 })
 
 it('商品卡缺少链接时给出提醒', () => {
-  let state = editorReducer(initialEditorState, { type: 'addFloor', templateId: 'product-grid-two' })
+  let state = editorReducer(initialEditorState, { type: 'addFloor', templateId: 'product-grid-n-by-2' })
   expect(validateDraft(state.draft).warnings.some(item => item.message.includes('链接'))).toBe(true)
 })
 
@@ -40,4 +40,13 @@ it('卖点信息只校验当前显示的图片槽位', () => {
   expect(validateDraft(state.draft).blockers).toHaveLength(0)
   state = editorReducer(state, { type: 'updateField', floorId, fieldId: 'itemCount', value: '4' })
   expect(validateDraft(state.draft).blockers.map(item => item.message)).toEqual(['卖点 3 图片尚未设置', '卖点 4 图片尚未设置'])
+})
+
+it('动态商品模板只校验当前显示的商品槽位', () => {
+  let state = editorReducer(initialEditorState, { type: 'addFloor', templateId: 'product-grid-n-by-2' })
+  const floorId = state.draft.floors[0].id
+  for (const slotId of ['product-1', 'product-2']) state = editorReducer(state, { type: 'updateProduct', floorId, slotId, value: { image: 'image.jpg', title: 'Title', price: '$10', url: 'link' } })
+  expect(validateDraft(state.draft).warnings).toHaveLength(0)
+  state = editorReducer(state, { type: 'updateField', floorId, fieldId: 'productCount', value: '4' })
+  expect(validateDraft(state.draft).warnings).toHaveLength(4)
 })

@@ -1,14 +1,14 @@
 import { useRef } from 'react'
 import type { MediaState } from '../domain/edm'
 
-export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图片', placeholder = '添加图片' }: { value: MediaState; onChange?: (value: MediaState) => void; ariaLabel?: string; placeholder?: string }) {
+export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图片', placeholder = '添加图片', designWidth = 375 }: { value: MediaState; onChange?: (value: MediaState) => void; ariaLabel?: string; placeholder?: string; designWidth?: number }) {
   const drag = useRef<{ x: number; y: number; offsetX: number; offsetY: number; ratio: number } | null>(null)
   return <div
     className={`editable-image-frame ${onChange ? 'is-editable' : ''}`}
     aria-label={ariaLabel}
     onPointerDown={event => {
       if (!onChange || !value.image) return
-      const ratio = event.currentTarget.getBoundingClientRect().width / 375 || 1
+      const ratio = event.currentTarget.getBoundingClientRect().width / designWidth || 1
       drag.current = { x: event.clientX, y: event.clientY, offsetX: value.offsetX, offsetY: value.offsetY, ratio }
       event.currentTarget.setPointerCapture?.(event.pointerId)
     }}

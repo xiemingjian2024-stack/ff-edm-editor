@@ -16,9 +16,8 @@ function ComparisonInformation({ floor, onMediaSlotChange }: FloorRenderProps) {
       {floor.values.description ? <p>{floor.values.description}</p> : null}
     </header>
     <div className="comparison-media" data-testid="comparison-media">
-      <div className="comparison-pane comparison-pane--before"><EditableImageFrame value={before} onChange={onMediaSlotChange ? value => onMediaSlotChange('before', value) : undefined} ariaLabel="Before 对比图片" placeholder="上传 Before 图片" /></div>
-      <div className="comparison-pane comparison-pane--after"><EditableImageFrame value={after} onChange={onMediaSlotChange ? value => onMediaSlotChange('after', value) : undefined} ariaLabel="After 对比图片" placeholder="上传 After 图片" /></div>
-      <span className="comparison-divider" style={{ backgroundColor: floor.values.background || '#FFAC33' }} />
+      <div className="comparison-pane comparison-pane--before"><EditableImageFrame value={before} onChange={onMediaSlotChange ? value => onMediaSlotChange('before', value) : undefined} ariaLabel="Before 对比图片" placeholder="上传 Before 图片" designWidth={212} /></div>
+      <div className="comparison-pane comparison-pane--after"><EditableImageFrame value={after} onChange={onMediaSlotChange ? value => onMediaSlotChange('after', value) : undefined} ariaLabel="After 对比图片" placeholder="上传 After 图片" designWidth={212} /></div>
       <img className="comparison-vs" src={vsIcon} alt="VS" />
     </div>
     <footer className="comparison-results">

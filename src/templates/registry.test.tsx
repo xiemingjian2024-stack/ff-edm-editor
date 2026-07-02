@@ -41,11 +41,11 @@ it('卖点信息按数量显示卖点并将按钮放在网格之后', () => {
   expect(button.parentElement?.lastElementChild).toBe(button)
 })
 
-it('分类导航固定为 375×46 并关联主题色位 A/B', () => {
+it('分类导航固定为 375×46 且只有背景关联主题色位', () => {
   const template = templateRegistry.find(item => item.definition.id === 'head-category-navigation')!.definition
   expect(template.designHeight).toBe(46)
   expect(template.exportFullImage).toBe(false)
-  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }])
+  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
   expect(template.navigationConfig?.defaultItems.slice(0, 3).map(item => item.text)).toEqual(['Home', 'Carrier & Travel', 'Couch Covers'])
 })
 

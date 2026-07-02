@@ -3,7 +3,6 @@ import { getFloorHeight } from '../templates/floorGeometry'
 import { getActiveProductSlots } from '../templates/productSlots'
 
 export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string {
-  if (region.navigationItemIndex !== undefined) return floor.navigationItems?.[region.navigationItemIndex]?.url ?? ''
   if (region.mediaLink) return floor.media?.url ?? ''
   return region.linkSlotId ? floor.products[region.linkSlotId]?.url ?? '' : ''
 }
@@ -27,7 +26,6 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
       y: 0,
       width: nextX - x,
       height: template.designHeight,
-      navigationItemIndex: index,
     }
   })
 }

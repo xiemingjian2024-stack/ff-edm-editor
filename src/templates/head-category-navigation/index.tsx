@@ -20,7 +20,7 @@ export const headCategoryNavigation: RegisteredTemplate = {
       { id: 'background', type: 'color', label: '背景颜色', defaultValue: '#FFFFFF' },
       { id: 'textColor', type: 'color', label: '文字颜色', defaultValue: '#000000' },
     ],
-    themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }],
+    themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }],
     navigationConfig: {
       minItems: 2, maxItems: 4,
       defaultItems: [{ text: 'Home', url: '' }, { text: 'Carrier & Travel', url: '' }, { text: 'Couch Covers', url: '' }, { text: 'New Category', url: '' }],

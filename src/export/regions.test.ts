@@ -25,15 +25,15 @@ describe.each([2, 3, 4])('%s 项导航区域', count => {
   })
 })
 
-it('导航区域关联到对应导航项', () => {
-  expect(getFloorExportRegions(template, floor(3)).map(item => item.navigationItemIndex)).toEqual([0, 1, 2])
+it('导航区域不关联链接', () => {
+  expect(getFloorExportRegions(template, floor(3)).map(item => item.navigationItemIndex)).toEqual([undefined, undefined, undefined])
 })
 
-it('导航区域读取对应链接字符串且允许为空', () => {
+it('导航区域忽略旧数据中的链接字符串', () => {
   const current = floor(3)
   current.navigationItems![1].url = '任意链接字符'
   const regions = getFloorExportRegions(template, current)
-  expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', '任意链接字符', ''])
+  expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', '', ''])
 })
 
 it('Banner 导出区域读取图片关联的 Shopify 链接', () => {

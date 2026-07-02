@@ -53,11 +53,13 @@ it('可从左侧配色 Tab 查看套餐，再切换 Logo 颜色并覆盖或恢�
   expect(screen.getByText('主题色位 A', { selector: '.theme-binding-status' })).toBeVisible()
 })
 
-it('分类导航将每项文案和链接放在同一分组并保留隐藏项', async () => {
+it('分类导航只编辑文案并保留隐藏项', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
   await user.click(screen.getByRole('button', { name: '添加 分类导航' }))
   expect(screen.getByLabelText('导航项 1 文案')).toHaveValue('Home')
-  expect(screen.getByLabelText('导航项 1 链接')).toHaveValue('')
+  expect(screen.queryByLabelText('导航项 1 链接')).not.toBeInTheDocument()
+  expect(screen.queryByText('主题色位 B', { selector: '.theme-binding-status' })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '2 项' }).parentElement).toHaveClass('choice-field--three')
   await user.clear(screen.getByLabelText('导航项 3 文案'))
   await user.type(screen.getByLabelText('导航项 3 文案'), 'Dog Beds')
   await user.click(screen.getByRole('button', { name: '2 项' }))

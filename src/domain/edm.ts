@@ -17,7 +17,7 @@ export interface NavigationConfig { minItems: number; maxItems: number; defaultI
 export interface MediaState { image: string; url: string; scale: number; offsetX: number; offsetY: number }
 export interface MediaConfig { frameHeightFieldId?: string; fixedFrameHeight?: number }
 export interface HeightConfig { fieldId: string; min: number; max: number; offset: number }
-export interface ExportRegion { id: string; name: string; x: number; y: number; width: number; height: number; linkSlotId?: string; navigationItemIndex?: number }
+export interface ExportRegion { id: string; name: string; x: number; y: number; width: number; height: number; linkSlotId?: string; navigationItemIndex?: number; mediaLink?: boolean }
 export interface ThemeColorField { fieldId: string; defaultSlot: ThemeSlot }
 export interface FloorTemplate {
   id: string; version: number; name: string; category: TemplateCategory; designWidth: 375; designHeight: number

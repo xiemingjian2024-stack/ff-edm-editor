@@ -19,7 +19,7 @@ const schema = z.object({
   heightConfig: z.object({ fieldId: z.string().min(1), min: z.number().positive(), max: z.number().positive(), offset: z.number().nonnegative() }).optional(),
   hiddenInLibrary: z.boolean().optional(),
   productSlots: z.array(z.object({ id: z.string().min(1), label: z.string() })),
-  exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional(), navigationItemIndex: z.number().int().nonnegative().optional() }))
+  exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional(), navigationItemIndex: z.number().int().nonnegative().optional(), mediaLink: z.boolean().optional() }))
 })
 
 export function parseTemplate(input: unknown): FloorTemplate {

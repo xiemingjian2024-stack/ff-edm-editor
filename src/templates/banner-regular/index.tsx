@@ -38,6 +38,6 @@ export const bannerRegular: RegisteredTemplate = {
     ],
     themeColorFields: [{ fieldId: 'textColor', defaultSlot: 'A' }, { fieldId: 'buttonBackground', defaultSlot: 'C' }, { fieldId: 'buttonTextColor', defaultSlot: 'B' }],
     mediaConfig: {}, heightConfig: { fieldId: 'height', min: 250, max: 600, offset: 0 },
-    productSlots: [], exportRegions: [{ id: 'full', name: '常规 Banner', x: 0, y: 0, width: 375, height: 375 }],
+    productSlots: [], exportRegions: [{ id: 'full', name: '常规 Banner', x: 0, y: 0, width: 375, height: 375, mediaLink: true }],
   }, Renderer: BannerRegular,
 }

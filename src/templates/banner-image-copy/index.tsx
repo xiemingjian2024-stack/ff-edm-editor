@@ -32,6 +32,6 @@ export const bannerImageCopy: RegisteredTemplate = {
     ],
     themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }, { fieldId: 'buttonBackground', defaultSlot: 'B' }, { fieldId: 'buttonTextColor', defaultSlot: 'A' }],
     mediaConfig: { frameHeightFieldId: 'imageHeight' }, heightConfig: { fieldId: 'imageHeight', min: 200, max: 500, offset: 180 },
-    productSlots: [], exportRegions: [{ id: 'full', name: '图文 Banner', x: 0, y: 0, width: 375, height: 480 }],
+    productSlots: [], exportRegions: [{ id: 'full', name: '图文 Banner', x: 0, y: 0, width: 375, height: 480, mediaLink: true }],
   }, Renderer: BannerImageCopy,
 }

@@ -3,6 +3,7 @@ import { getFloorHeight } from '../templates/floorGeometry'
 
 export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string {
   if (region.navigationItemIndex !== undefined) return floor.navigationItems?.[region.navigationItemIndex]?.url ?? ''
+  if (region.mediaLink) return floor.media?.url ?? ''
   return region.linkSlotId ? floor.products[region.linkSlotId]?.url ?? '' : ''
 }
 

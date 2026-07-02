@@ -1,5 +1,6 @@
 import { scaleRegion, scaleRegions } from './render'
 import { getTemplate } from '../templates/registry'
+import { getFloorExportRegions } from './regions'
 
 it('将设计坐标转换为 2 倍导出坐标', () => {
   expect(scaleRegion({ id: 'r', name: '右侧', x: 187.5, y: 0, width: 187.5, height: 240 })).toMatchObject({ x: 375, y: 0, width: 375, height: 480 })
@@ -15,4 +16,10 @@ it('三等分区域总宽度保持 750 且无缝隙', () => {
 it('HEAD Logo 完整楼层按 2 倍导出为 750×112', () => {
   const template = getTemplate('head-brand-logo')!.definition
   expect(scaleRegion(template.exportRegions[0])).toMatchObject({ width: 750, height: 112 })
+})
+
+it('常规 Banner 按当前动态高度导出完整 JPG', () => {
+  const template = getTemplate('banner-regular')!.definition
+  const floor = { id: 'banner-1', templateId: template.id, values: { height: '420' }, products: {} }
+  expect(scaleRegion(getFloorExportRegions(template, floor)[0])).toMatchObject({ width: 750, height: 840 })
 })

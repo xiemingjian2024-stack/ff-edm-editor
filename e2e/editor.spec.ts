@@ -75,3 +75,32 @@ test('分类导航支持数量切换及同组文案链接编辑', async ({ page 
   await page.getByRole('button', { name: '导出切图' }).click()
   await expect(page.getByRole('dialog', { name: '导出切图' })).toBeVisible()
 })
+
+test('新版 Banner 支持动态高度与可复用图片编辑入口', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '新建 EDM' }).click()
+
+  await expect(page.getByRole('button', { name: '添加 常规 Banner' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '添加 图文 Banner' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '添加 简约 Banner' })).toHaveCount(0)
+
+  await page.getByRole('button', { name: '添加 常规 Banner' }).click()
+  const regular = page.getByTestId('banner-regular')
+  await expect(regular).toHaveCSS('height', '375px')
+  await page.getByLabel('楼层高度').fill('420')
+  await expect(regular).toHaveCSS('height', '420px')
+  await expect(page.getByLabel('Banner Shopify 链接')).toBeVisible()
+  await expect(page.getByLabel('手动上传 Banner 图片')).toBeVisible()
+  await expect(page.getByLabel('图片缩放')).toBeVisible()
+  await expect(page.getByRole('button', { name: '重置图片位置' })).toBeVisible()
+
+  await page.getByRole('button', { name: '添加 图文 Banner' }).click()
+  const imageCopy = page.getByTestId('banner-image-copy')
+  await expect(imageCopy).toHaveCSS('height', '480px')
+  await page.getByLabel('图片区域高度').fill('360')
+  await expect(imageCopy).toHaveCSS('height', '540px')
+  await expect(imageCopy.getByTestId('banner-image-stage')).toHaveCSS('height', '360px')
+
+  await page.getByRole('button', { name: '导出切图' }).click()
+  await expect(page.getByRole('dialog', { name: '导出切图' })).toContainText('必填图片尚未设置')
+})

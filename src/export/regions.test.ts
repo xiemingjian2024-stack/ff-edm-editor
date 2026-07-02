@@ -34,3 +34,19 @@ it('导航区域读取对应链接字符串且允许为空', () => {
   const regions = getFloorExportRegions(template, current)
   expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', '任意链接字符', ''])
 })
+
+it('Banner 导出区域读取图片关联的 Shopify 链接', () => {
+  const current: FloorInstance = {
+    id: 'banner-1', templateId: 'banner-regular', values: {}, products: {},
+    media: { image: 'product.jpg', url: 'https://shop.example/products/bed', scale: 1, offsetX: 0, offsetY: 0 },
+  }
+  expect(getRegionUrl(current, { id: 'full', name: 'Banner', x: 0, y: 0, width: 375, height: 375, mediaLink: true })).toBe('https://shop.example/products/bed')
+})
+
+it('手动上传的 Banner 图片允许导出空链接', () => {
+  const current: FloorInstance = {
+    id: 'banner-1', templateId: 'banner-regular', values: {}, products: {},
+    media: { image: 'blob:manual-image', url: '', scale: 1, offsetX: 0, offsetY: 0 },
+  }
+  expect(getRegionUrl(current, { id: 'full', name: 'Banner', x: 0, y: 0, width: 375, height: 375, mediaLink: true })).toBe('')
+})

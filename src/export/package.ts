@@ -6,6 +6,7 @@ import { captureFloor, cropJpeg, scaleRegions } from './render'
 import type { EdmDraft } from '../domain/edm'
 import { getTemplate } from '../templates/registry'
 import { getFloorExportRegions, getRegionUrl } from './regions'
+import { getFloorHeight } from '../templates/floorGeometry'
 
 export interface RenderedFloor { fullName: string; full: Blob; width: number; height: number; includeFull: boolean; regions: { name: string; blob: Blob }[] }
 export async function composeLongPreview(floors: RenderedFloor[]) {
@@ -35,7 +36,7 @@ export async function exportDraftFromDom(draft: EdmDraft) {
     const exportRegions = getFloorExportRegions(template, floor)
     const full = await captureFloor(node); const names = makeFileNames(index + 1, template.category, exportRegions.map(region => region.id)); const scaled = scaleRegions(exportRegions)
     const regions = await Promise.all(scaled.map(async (region, regionIndex) => { const name = names.regions[regionIndex]; rows.push({ floorNumber: index + 1, floorName: template.name, fileName: name, regionName: region.name, width: region.width, height: region.height, url: getRegionUrl(floor, region) }); return { name, blob: await cropJpeg(full, region) } }))
-    rendered.push({ fullName: names.full, full, width: 750, height: template.designHeight * 2, includeFull: template.exportFullImage !== false, regions })
+    rendered.push({ fullName: names.full, full, width: 750, height: getFloorHeight(template, floor) * 2, includeFull: template.exportFullImage !== false, regions })
   }
   const zip = await buildExportZip(rendered, rows); const url = URL.createObjectURL(zip); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `${draft.name || 'edm'}-export.zip`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

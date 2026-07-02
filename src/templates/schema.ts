@@ -5,7 +5,8 @@ const field = z.discriminatedUnion('type', [
   z.object({ id: z.string().min(1), type: z.literal('text'), label: z.string(), defaultValue: z.string() }),
   z.object({ id: z.string().min(1), type: z.literal('color'), label: z.string(), defaultValue: z.string() }),
   z.object({ id: z.string().min(1), type: z.literal('image'), label: z.string(), defaultValue: z.string() }),
-  z.object({ id: z.string().min(1), type: z.literal('choice'), label: z.string(), defaultValue: z.string(), options: z.array(z.object({ label: z.string(), value: z.string() })).min(1) })
+  z.object({ id: z.string().min(1), type: z.literal('choice'), label: z.string(), defaultValue: z.string(), options: z.array(z.object({ label: z.string(), value: z.string() })).min(1) }),
+  z.object({ id: z.string().min(1), type: z.literal('range'), label: z.string(), defaultValue: z.string(), min: z.number(), max: z.number(), step: z.number().positive(), unit: z.string().optional() })
 ])
 const schema = z.object({
   id: z.string().min(1), version: z.number().int().positive(), name: z.string().min(1),
@@ -14,6 +15,9 @@ const schema = z.object({
   themeColorFields: z.array(z.object({ fieldId: z.string().min(1), defaultSlot: z.string().min(1) })).optional(),
   navigationConfig: z.object({ minItems: z.number().int().positive(), maxItems: z.number().int().positive(), defaultItems: z.array(z.object({ text: z.string(), url: z.string() })) }).optional(),
   exportFullImage: z.boolean().optional(),
+  mediaConfig: z.object({ frameHeightFieldId: z.string().optional(), fixedFrameHeight: z.number().positive().optional() }).optional(),
+  heightConfig: z.object({ fieldId: z.string().min(1), min: z.number().positive(), max: z.number().positive(), offset: z.number().nonnegative() }).optional(),
+  hiddenInLibrary: z.boolean().optional(),
   productSlots: z.array(z.object({ id: z.string().min(1), label: z.string() })),
   exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional(), navigationItemIndex: z.number().int().nonnegative().optional() }))
 })
@@ -24,6 +28,7 @@ export function parseTemplate(input: unknown): FloorTemplate {
   if (!unique(value.fields.map(item => item.id))) throw new Error('字段 ID 不能重复')
   if (!unique(value.productSlots.map(item => item.id))) throw new Error('商品槽位 ID 不能重复')
   if (value.navigationConfig && (value.navigationConfig.minItems > value.navigationConfig.maxItems || value.navigationConfig.defaultItems.length < value.navigationConfig.maxItems)) throw new Error('导航项配置无效')
+  if (value.heightConfig && !value.fields.some(item => item.id === value.heightConfig?.fieldId && item.type === 'range')) throw new Error('动态高度字段必须是范围字段')
   const slots = new Set(value.productSlots.map(item => item.id))
   const colorFields = new Set(value.fields.filter(item => item.type === 'color').map(item => item.id))
   for (const themedField of value.themeColorFields ?? []) {

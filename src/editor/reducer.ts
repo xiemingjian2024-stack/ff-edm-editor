@@ -1,4 +1,4 @@
-import type { EdmDraft, FloorInstance, NavigationItem, ProductValue, ThemeSlot } from '../domain/edm'
+import type { EdmDraft, FloorInstance, MediaState, NavigationItem, ProductValue, ThemeSlot } from '../domain/edm'
 import { getTemplate } from '../templates/registry'
 
 export interface EditorState { draft: EdmDraft; selectedFloorId: string | null }
@@ -16,6 +16,7 @@ export type EditorAction =
   | { type: 'overrideThemeColor'; floorId: string; fieldId: string; color: string }
   | { type: 'relinkThemeColor'; floorId: string; fieldId: string; slot: ThemeSlot }
   | { type: 'updateNavigationItem'; floorId: string; index: number; value: NavigationItem }
+  | { type: 'updateMedia'; floorId: string; value: MediaState }
 
 const now = new Date().toISOString()
 export const initialEditorState: EditorState = { draft: { id: 'draft-local', name: '未命名 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: now, updatedAt: now }, selectedFloorId: null }
@@ -29,6 +30,7 @@ function createFloor(templateId: string, id: string): FloorInstance {
     values: Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])),
     products: {},
     navigationItems: template.navigationConfig ? structuredClone(template.navigationConfig.defaultItems) : undefined,
+    media: template.mediaConfig ? { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 } : undefined,
     themeColors: Object.fromEntries((template.themeColorFields ?? []).map(field => [field.fieldId, { mode: 'theme' as const, slot: field.defaultSlot }])),
   }
 }
@@ -79,6 +81,8 @@ export function createEditorReducer(createId: () => string = () => crypto.random
         navigationItems[action.index] = action.value
         return { ...floor, navigationItems }
       })
+    } else if (action.type === 'updateMedia') {
+      floors = floors.map(floor => floor.id === action.floorId ? { ...floor, media: action.value } : floor)
     }
     return { draft: { ...state.draft, floors, updatedAt: new Date().toISOString() }, selectedFloorId }
   }

@@ -56,3 +56,17 @@ it('更新导航项时保留其他导航项', () => {
   const next = reducer(state, { type: 'updateNavigationItem', floorId: 'nav-1', index: 1, value: { text: 'Carrier & Travel', url: '/travel' } })
   expect(next.draft.floors[0].navigationItems).toEqual([{ text: 'Home', url: '' }, { text: 'Carrier & Travel', url: '/travel' }, { text: 'Hidden', url: 'keep' }])
 })
+
+it('更新媒体状态时不影响其他楼层', () => {
+  const media = { image: 'old.jpg', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const state = {
+    ...initialEditorState,
+    draft: { ...initialEditorState.draft, floors: [
+      { id: 'banner-1', templateId: 'banner-regular', values: {}, products: {}, media },
+      { id: 'banner-2', templateId: 'banner-regular', values: {}, products: {}, media },
+    ] },
+  }
+  const next = reducer(state, { type: 'updateMedia', floorId: 'banner-1', value: { image: 'new.jpg', url: '/product', scale: 1.5, offsetX: 12, offsetY: -8 } })
+  expect(next.draft.floors[0].media).toMatchObject({ image: 'new.jpg', url: '/product', scale: 1.5, offsetX: 12, offsetY: -8 })
+  expect(next.draft.floors[1].media).toEqual(media)
+})

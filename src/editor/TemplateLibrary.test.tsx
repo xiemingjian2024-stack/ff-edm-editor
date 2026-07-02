@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TemplateLibrary } from './TemplateLibrary'
 import { classicPalette } from '../themes/palettes'
+import { readFileSync } from 'node:fs'
 
 it('按名称搜索模板并显示空结果', async () => {
   const user = userEvent.setup(); render(<TemplateLibrary onAdd={() => {}} />)
@@ -19,6 +20,12 @@ it('模板卡片不展示主题色位且预览框使用统一标识', () => {
   expect(screen.queryByText('主题色位 A')).not.toBeInTheDocument()
   const previews = screen.getAllByTestId('template-thumbnail')
   expect(previews).toHaveLength(screen.getAllByRole('button', { name: /添加/ }).length)
+})
+
+it('商品卡 SVG 缩略图不叠加旧占位色块', () => {
+  const css = readFileSync('src/editor/editor.css', 'utf8')
+  expect(css).not.toContain('.template-mini--product-card::before')
+  expect(css).not.toContain('.template-mini--product-card::after')
 })
 
 it('在楼层和配色内容之间切换', async () => {

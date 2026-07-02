@@ -33,9 +33,6 @@ button { cursor: pointer; }
 .template-mini--head { height: auto; background: #fff; }
 .template-mini--head i { position: absolute; width: 42px; height: 10px; left: 50%; top: 50%; border-radius: 2px; background: #111; transform: translate(-50%, -50%); }
 .template-mini--title { height: auto; background: #fff4dc; }
-.template-mini--product-card { background: linear-gradient(90deg, #fff 49%, #e5e2d8 49%, #e5e2d8 51%, #fff 51%); }
-.template-mini--product-card::before, .template-mini--product-card::after { content: ''; position: absolute; width: 35%; height: 32px; top: 7px; border-radius: 4px; background: #ece8dc; }
-.template-mini--product-card::before { left: 9%; }.template-mini--product-card::after { right: 9%; }
 .canvas-area { min-width: 0; display: flex; flex-direction: column; background: #eeeee9; }
 .canvas-toolbar { height: 58px; flex: 0 0 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid #dddcd5; color: #85847d; font-size: 11px; }
 .canvas-toolbar div { display: flex; gap: 10px; align-items: center; }.canvas-toolbar strong { color: #292824; font-size: 13px; }

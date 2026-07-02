@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TemplateLibrary } from './TemplateLibrary'
 import { classicPalette } from '../themes/palettes'
@@ -12,12 +12,12 @@ it('按名称搜索模板并显示空结果', async () => {
   expect(screen.getByText('没有匹配的楼层')).toBeVisible()
 })
 
-it('显示 HEAD 品牌 Logo 及其主题色位标签', () => {
+it('模板卡片不展示主题色位且预览框使用统一标识', () => {
   render(<TemplateLibrary onAdd={() => {}} />)
   expect(screen.getByRole('heading', { name: 'HEAD' })).toBeVisible()
-  const logoTemplate = screen.getByRole('button', { name: '添加 品牌 Logo' })
-  expect(logoTemplate).toBeVisible()
-  expect(within(logoTemplate).getByText('主题色位 A')).toBeVisible()
+  expect(screen.queryByText('主题色位 A')).not.toBeInTheDocument()
+  const previews = screen.getAllByTestId('template-thumbnail')
+  expect(previews).toHaveLength(screen.getAllByRole('button', { name: /添加/ }).length)
 })
 
 it('在楼层和配色内容之间切换', async () => {

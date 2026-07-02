@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { readFileSync } from 'node:fs'
 import { ExportDialog } from './ExportDialog'
 
 it('显示导出规格和检查结果', () => {
@@ -14,4 +15,12 @@ it('完整预览使用解析后的主题颜色', () => {
     floors: [{ id: 'head-1', templateId: 'head-brand-logo', values: { background: '#123456', logoColor: '#000000' }, products: {}, themeColors: { background: { mode: 'theme', slot: 'A' } } }],
   }} previewOnly onClose={() => {}} onExport={async () => {}} />)
   expect(screen.getByTestId('head-brand-logo')).toHaveStyle({ backgroundColor: '#FFFFFF' })
+})
+
+it('弹窗外壳样式不会覆盖模板内部的标题与描述字号', () => {
+  const css = readFileSync('src/editor/editor.css', 'utf8')
+  expect(css).not.toMatch(/\.export-dialog\s+h2\s*\{/)
+  expect(css).not.toMatch(/\.export-dialog\s+header\s+p\s*\{/)
+  expect(css).toContain('.export-dialog > header h2')
+  expect(css).toContain('.export-dialog > header p')
 })

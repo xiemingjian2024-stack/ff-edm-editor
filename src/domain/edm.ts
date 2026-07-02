@@ -22,7 +22,7 @@ export interface ThemeColorField { fieldId: string; defaultSlot: ThemeSlot }
 export interface FloorTemplate {
   id: string; version: number; name: string; category: TemplateCategory; designWidth: 375; designHeight: number
   fields: FieldDefinition[]; productSlots: ProductSlotDefinition[]; exportRegions: ExportRegion[]; themeColorFields?: ThemeColorField[]
-  navigationConfig?: NavigationConfig; exportFullImage?: boolean; mediaConfig?: MediaConfig; heightConfig?: HeightConfig; hiddenInLibrary?: boolean
+  navigationConfig?: NavigationConfig; exportFullImage?: boolean; mediaConfig?: MediaConfig; heightConfig?: HeightConfig; autoHeight?: boolean; hiddenInLibrary?: boolean
 }
 export interface ProductValue { image: string; title: string; price: string; url: string; gallery?: string[] }
 export interface FloorInstance { id: string; templateId: string; values: Record<string, string>; products: Record<string, ProductValue>; themeColors?: Record<string, ThemeColorBinding>; navigationItems?: NavigationItem[]; media?: MediaState }

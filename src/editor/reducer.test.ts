@@ -9,6 +9,12 @@ it('添加楼层并自动选中', () => {
   expect(state.selectedFloorId).toBe('floor-1')
 })
 
+it('加载旧标题草稿时补齐新版模板默认字段', () => {
+  const legacyDraft = { ...initialEditorState.draft, floors: [{ id: 'old-title', templateId: 'title-centered', values: { title: '旧标题', textColor: '#111111', background: '#ffffff' }, products: {} }] }
+  const state = reducer(initialEditorState, { type: 'loadDraft', draft: legacyDraft })
+  expect(state.draft.floors[0].values).toMatchObject({ title: '旧标题', description: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.', buttonText: 'SHOP NOW', alignment: 'center' })
+})
+
 it('复制楼层时生成新 ID 并保留内容', () => {
   let state = reducer(initialEditorState, { type: 'addFloor', templateId: 'title-centered' })
   state = reducer(state, { type: 'updateField', floorId: 'floor-2', fieldId: 'title', value: '新品上线' })

@@ -7,11 +7,11 @@ export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string
   return region.linkSlotId ? floor.products[region.linkSlotId]?.url ?? '' : ''
 }
 
-export function getFloorExportRegions(template: FloorTemplate, floor: FloorInstance): ExportRegion[] {
+export function getFloorExportRegions(template: FloorTemplate, floor: FloorInstance, actualHeight?: number): ExportRegion[] {
   const config = template.navigationConfig
   if (!config) {
-    const actualHeight = getFloorHeight(template, floor)
-    return template.exportRegions.map(region => region.y === 0 && region.height === template.designHeight ? { ...region, height: actualHeight } : region)
+    const floorHeight = template.autoHeight && actualHeight ? actualHeight : getFloorHeight(template, floor)
+    return template.exportRegions.map(region => region.y === 0 && region.height === template.designHeight ? { ...region, height: floorHeight } : region)
   }
   const requested = Number(floor.values.navigationCount)
   const count = Math.min(config.maxItems, Math.max(config.minItems, Number.isFinite(requested) ? requested : config.minItems))

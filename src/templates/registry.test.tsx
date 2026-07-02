@@ -34,10 +34,25 @@ it('HEAD 品牌 Logo 使用固定尺寸和主题色位 A', () => {
   expect(template.exportRegions).toEqual([{ id: 'full', name: 'HEAD 品牌 Logo', x: 0, y: 0, width: 375, height: 56 }])
 })
 
-it('模板渲染修改后的文案', () => {
+it('标题文本常规模板包含内容、对齐、颜色和自适应高度配置', () => {
   const entry = templateRegistry.find(item => item.definition.id === 'title-centered')!
-  render(<entry.Renderer template={entry.definition} floor={{ id: '1', templateId: entry.definition.id, values: { title: 'Summer Picks', textColor: '#111111', background: '#ffffff' }, products: {} }} />)
+  expect(entry.definition.name).toBe('标题文本-常规')
+  expect(entry.definition.autoHeight).toBe(true)
+  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
+  expect(entry.definition.themeColorFields).toEqual([
+    { fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' },
+    { fieldId: 'buttonBackground', defaultSlot: 'B' }, { fieldId: 'buttonTextColor', defaultSlot: 'A' },
+  ])
+})
+
+it('标题文本模板隐藏空内容并兼容旧草稿字段', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'title-centered')!
+  const { rerender } = render(<entry.Renderer template={entry.definition} floor={{ id: '1', templateId: entry.definition.id, values: { title: 'Summer Picks', textColor: '#111111', background: '#ffffff' }, products: {} }} />)
   expect(screen.getByText('Summer Picks')).toBeVisible()
+  expect(screen.queryByText('SHOP NOW')).not.toBeInTheDocument()
+  rerender(<entry.Renderer template={entry.definition} floor={{ id: '1', templateId: entry.definition.id, values: { title: '', description: '', buttonText: '', alignment: 'right', textColor: '#111111', background: '#ffffff', buttonBackground: '#000000', buttonTextColor: '#ffffff' }, products: {} }} />)
+  expect(screen.getByTestId('title-content')).toHaveAttribute('data-alignment', 'right')
+  expect(screen.queryByRole('heading')).not.toBeInTheDocument()
 })
 
 it('EDM 内容使用品牌字体变量', () => {

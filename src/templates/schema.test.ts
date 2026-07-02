@@ -37,3 +37,7 @@ it('拒绝把主题色位关联到非颜色字段', () => {
     themeColorFields: [{ fieldId: 'title', defaultSlot: 'A' }],
   })).toThrow(/颜色字段/)
 })
+
+it('接受内容自适应高度模板声明', () => {
+  expect(parseTemplate({ ...twoProductTemplate, autoHeight: true }).autoHeight).toBe(true)
+})

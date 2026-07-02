@@ -33,10 +33,11 @@ export async function exportDraftFromDom(draft: EdmDraft) {
     const floor = draft.floors[index], template = getTemplate(floor.templateId)?.definition
     const node = document.querySelector(`[data-floor-id="${floor.id}"] .floor-render`) as HTMLElement | null
     if (!template || !node) throw new Error(`楼层 ${index + 1} 无法渲染`)
-    const exportRegions = getFloorExportRegions(template, floor)
+    const actualHeight = node.clientHeight
+    const exportRegions = getFloorExportRegions(template, floor, actualHeight)
     const full = await captureFloor(node); const names = makeFileNames(index + 1, template.category, exportRegions.map(region => region.id)); const scaled = scaleRegions(exportRegions)
     const regions = await Promise.all(scaled.map(async (region, regionIndex) => { const name = names.regions[regionIndex]; rows.push({ floorNumber: index + 1, floorName: template.name, fileName: name, regionName: region.name, width: region.width, height: region.height, url: getRegionUrl(floor, region) }); return { name, blob: await cropJpeg(full, region) } }))
-    rendered.push({ fullName: names.full, full, width: 750, height: getFloorHeight(template, floor) * 2, includeFull: template.exportFullImage !== false, regions })
+    rendered.push({ fullName: names.full, full, width: 750, height: (template.autoHeight ? actualHeight : getFloorHeight(template, floor)) * 2, includeFull: template.exportFullImage !== false, regions })
   }
   const zip = await buildExportZip(rendered, rows); const url = URL.createObjectURL(zip); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `${draft.name || 'edm'}-export.zip`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

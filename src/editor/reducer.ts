@@ -35,11 +35,20 @@ function createFloor(templateId: string, id: string): FloorInstance {
   }
 }
 
+function hydrateFloorDefaults(floor: FloorInstance): FloorInstance {
+  const template = getTemplate(floor.templateId)?.definition
+  if (!template) return floor
+  return { ...floor, values: { ...Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])), ...floor.values } }
+}
+
 export function createEditorReducer(createId: () => string = () => crypto.randomUUID()) {
   return (state: EditorState, action: EditorAction): EditorState => {
     let floors = state.draft.floors
     let selectedFloorId = state.selectedFloorId
-    if (action.type === 'loadDraft') return { draft: action.draft, selectedFloorId: action.draft.floors[0]?.id ?? null }
+    if (action.type === 'loadDraft') {
+      const draft = { ...action.draft, floors: action.draft.floors.map(hydrateFloorDefaults) }
+      return { draft, selectedFloorId: draft.floors[0]?.id ?? null }
+    }
     if (action.type === 'renameDraft') return { ...state, draft: { ...state.draft, name: action.name, updatedAt: new Date().toISOString() } }
     if (action.type === 'changeThemePalette') return { ...state, draft: { ...state.draft, themePaletteId: action.paletteId, updatedAt: new Date().toISOString() } }
     if (action.type === 'addFloor') {

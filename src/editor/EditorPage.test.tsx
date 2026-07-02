@@ -5,8 +5,8 @@ import { EditorPage } from './EditorPage'
 it('添加、编辑、复制并删除楼层', async () => {
   const user = userEvent.setup()
   render(<EditorPage />)
-  await user.click(screen.getByRole('button', { name: /添加 标题居中/ }))
-  const input = screen.getByLabelText('标题文案')
+  await user.click(screen.getByRole('button', { name: /添加 标题文本-常规/ }))
+  const input = screen.getByLabelText('标题', { selector: 'textarea' })
   await user.clear(input)
   await user.type(input, 'Summer Picks')
   expect(screen.getByRole('heading', { name: 'Summer Picks' })).toBeVisible()
@@ -19,7 +19,7 @@ it('添加、编辑、复制并删除楼层', async () => {
 it('不提供字号和位置编辑控件', async () => {
   const user = userEvent.setup()
   render(<EditorPage />)
-  await user.click(screen.getByRole('button', { name: /添加 标题居中/ }))
+  await user.click(screen.getByRole('button', { name: /添加 标题文本-常规/ }))
   expect(screen.queryByLabelText('字号')).not.toBeInTheDocument()
   expect(screen.queryByLabelText('位置')).not.toBeInTheDocument()
 })

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { FloorInstance, FloorTemplate } from '../domain/edm'
 import { getFloorExportRegions, getRegionUrl } from './regions'
 import { scaleRegions } from './render'
+import { getTemplate } from '../templates/registry'
 
 const template = {
   id: 'head-category-navigation', version: 1, name: '分类导航', category: 'head', designWidth: 375, designHeight: 46,
@@ -49,4 +50,10 @@ it('手动上传的 Banner 图片允许导出空链接', () => {
     media: { image: 'blob:manual-image', url: '', scale: 1, offsetX: 0, offsetY: 0 },
   }
   expect(getRegionUrl(current, { id: 'full', name: 'Banner', x: 0, y: 0, width: 375, height: 375, mediaLink: true })).toBe('')
+})
+
+it('内容自适应模板按实际 DOM 高度生成完整导出区域', () => {
+  const adaptive = getTemplate('title-centered')!.definition
+  const current: FloorInstance = { id: 'title-1', templateId: adaptive.id, values: {}, products: {} }
+  expect(getFloorExportRegions(adaptive, current, 224)[0]).toMatchObject({ width: 375, height: 224 })
 })

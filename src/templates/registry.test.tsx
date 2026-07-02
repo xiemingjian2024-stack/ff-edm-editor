@@ -14,7 +14,7 @@ it('用 N×2 商品卡替换旧双列商品卡', () => {
   expect(template?.productSlots).toHaveLength(8)
   expect(template?.productSlotCountFieldId).toBe('productCount')
   expect(template?.domExportRegions).toBe(true)
-  expect(template?.exportRegions).toHaveLength(8)
+  expect(template?.exportRegions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'button'])
   expect(template?.themeColorFields).toContainEqual({ fieldId: 'background', defaultSlot: 'A' })
 })
 

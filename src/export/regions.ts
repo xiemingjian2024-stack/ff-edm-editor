@@ -34,10 +34,10 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
 
 export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]): ExportRegion[] {
   const rootRect = root.getBoundingClientRect()
-  return regions.map(region => {
+  return regions.flatMap(region => {
     const node = root.querySelector<HTMLElement>(`[data-export-region-id="${region.id}"]`)
-    if (!node) return region
+    if (!node) return []
     const rect = node.getBoundingClientRect()
-    return { ...region, x: rect.left - rootRect.left, y: rect.top - rootRect.top, width: rect.width, height: rect.height }
+    return [{ ...region, x: rect.left - rootRect.left, y: rect.top - rootRect.top, width: rect.width, height: rect.height }]
   })
 }

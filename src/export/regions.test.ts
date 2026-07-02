@@ -62,12 +62,12 @@ it('按商品数量截取链接区域并用 DOM 实际矩形覆盖坐标', () =>
   const adaptive = getTemplate('product-grid-n-by-2')!.definition
   const current: FloorInstance = { id: 'products', templateId: adaptive.id, values: { productCount: '2' }, products: {} }
   const regions = getFloorExportRegions(adaptive, current, 600)
-  expect(regions).toHaveLength(2)
+  expect(regions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'button'])
   const root = document.createElement('section')
   const card = document.createElement('article')
-  card.dataset.exportRegionId = regions[0].id
+  card.dataset.exportRegionId = 'item-1'
   root.appendChild(card)
   root.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 475, bottom: 650, width: 375, height: 600, toJSON() {} })
   card.getBoundingClientRect = () => ({ x: 112, y: 180, left: 112, top: 180, right: 287, bottom: 460, width: 175, height: 280, toJSON() {} })
-  expect(getDomExportRegions(root, regions)[0]).toMatchObject({ x: 12, y: 130, width: 175, height: 280 })
+  expect(getDomExportRegions(root, regions)).toEqual([expect.objectContaining({ id: 'item-1', x: 12, y: 130, width: 175, height: 280 })])
 })

@@ -8,10 +8,15 @@ import { getActiveProductSlots } from '../templates/productSlots'
 
 export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColorRelink, onNavigationItemChange, onMediaChange, onMediaSlotChange = () => {}, onProductChange, onDuplicate, onDelete }: { floor?: FloorInstance; onChange: (fieldId: string, value: string) => void; onThemeColorChange: (fieldId: string, color: string) => void; onThemeColorRelink: (fieldId: string, slot: ThemeSlot) => void; onNavigationItemChange: (index: number, value: NavigationItem) => void; onMediaChange: (value: MediaState) => void; onMediaSlotChange?: (slotId: string, value: MediaState) => void; onProductChange: (slotId: string, value: import('../domain/edm').ProductValue) => void; onDuplicate: () => void; onDelete: () => void }) {
   const template = floor ? getTemplate(floor.templateId)?.definition : undefined
-  const contentFields = template?.fields.filter(field => field.type !== 'color') ?? []
   const colorFields = template?.fields.filter(field => field.type === 'color') ?? []
   const navigationCount = template?.navigationConfig ? Math.min(template.navigationConfig.maxItems, Math.max(template.navigationConfig.minItems, Number(floor?.values.navigationCount) || template.navigationConfig.minItems)) : 0
   const mediaSlotCount = template?.mediaSlotCountFieldId ? Number(floor?.values[template.mediaSlotCountFieldId]) : template?.mediaSlots?.length
+  const contentFields = template?.fields.filter(field => {
+    if (field.type === 'color') return false
+    if (template.id !== 'selling-points-information') return true
+    const match = field.id.match(/^point(\d+)(Title|Description)$/)
+    return !match || Number(match[1]) <= (mediaSlotCount ?? 0)
+  }) ?? []
   const visibleMediaSlots = template?.mediaSlots?.slice(0, mediaSlotCount)
   const visibleProductSlots = template && floor ? getActiveProductSlots(template, floor) : []
   const renderField = (field: NonNullable<typeof template>['fields'][number]) => {

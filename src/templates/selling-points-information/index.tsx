@@ -38,7 +38,7 @@ const pointFields: FieldDefinition[] = defaults.flatMap(([title, description], i
 
 export const sellingPointsInformation: RegisteredTemplate = {
   definition: {
-    id: 'selling-points-information', version: 1, name: '卖点信息', category: 'information', designWidth: 375, designHeight: 390,
+    id: 'selling-points-information', version: 1, name: '多卖点信息', category: 'information', designWidth: 375, designHeight: 390,
     fields: [
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
@@ -52,6 +52,6 @@ export const sellingPointsInformation: RegisteredTemplate = {
     ],
     themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }, { fieldId: 'buttonBackground', defaultSlot: 'B' }, { fieldId: 'buttonTextColor', defaultSlot: 'A' }],
     mediaSlots: Array.from({ length: 4 }, (_, index) => ({ id: `point${index + 1}`, label: `卖点 ${index + 1} 图片` })),
-    mediaSlotCountFieldId: 'itemCount', autoHeight: true, productSlots: [], exportRegions: [{ id: 'full', name: '卖点信息', x: 0, y: 0, width: 375, height: 390 }],
+    mediaSlotCountFieldId: 'itemCount', autoHeight: true, productSlots: [], exportRegions: [{ id: 'full', name: '多卖点信息', x: 0, y: 0, width: 375, height: 390 }],
   }, Renderer: SellingPointsInformation,
 }

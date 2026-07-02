@@ -11,7 +11,7 @@ function TitleCentered({ floor }: FloorRenderProps) {
 }
 export const titleCentered: RegisteredTemplate = {
   definition: {
-    id: 'title-centered', version: 2, name: '标题文本-常规', category: 'title', designWidth: 375, designHeight: 200,
+    id: 'title-centered', version: 2, name: '常规标题', category: 'title', designWidth: 375, designHeight: 200,
     fields: [
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
@@ -23,6 +23,6 @@ export const titleCentered: RegisteredTemplate = {
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
     themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' }, { fieldId: 'buttonBackground', defaultSlot: 'B' }, { fieldId: 'buttonTextColor', defaultSlot: 'A' }],
-    autoHeight: true, productSlots: [], exportRegions: [{ id: 'full', name: '标题文本-常规', x: 0, y: 0, width: 375, height: 200 }]
+    autoHeight: true, productSlots: [], exportRegions: [{ id: 'full', name: '常规标题', x: 0, y: 0, width: 375, height: 200 }]
   }, Renderer: TitleCentered
 }

@@ -4,9 +4,9 @@ test('创建、编辑、保存并恢复 EDM 草稿', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: '新建 EDM' }).click()
   await page.getByLabel('搜索楼层模板').fill('标题')
-  await expect(page.getByRole('button', { name: '添加 标题文本-常规' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '添加 常规标题' })).toBeVisible()
   await expect(page.getByRole('button', { name: '添加 双列商品卡' })).toHaveCount(0)
-  await page.getByRole('button', { name: '添加 标题文本-常规' }).click()
+  await page.getByRole('button', { name: '添加 常规标题' }).click()
   await page.getByRole('button', { name: '缩小画布' }).click()
   await expect(page.getByRole('status')).toHaveText('80%')
   await page.getByLabel('标题', { exact: true }).fill('SUMMER PICKS')
@@ -132,9 +132,10 @@ test('标题文本模板按内容自适应高度并支持统一对齐', async ({
   await page.goto('/')
   await page.getByRole('button', { name: '新建 EDM' }).click()
   await expect(page.getByRole('button', { name: '添加 标题居中' })).toHaveCount(0)
-  await page.getByRole('button', { name: '添加 标题文本-常规' }).click()
+  await page.getByRole('button', { name: '添加 常规标题' }).click()
 
   const titleFloor = page.getByTestId('title-content')
+  await expect(titleFloor.locator('h2')).toHaveCSS('font-weight', '400')
   const initialHeight = await titleFloor.evaluate(element => element.clientHeight)
   await expect(titleFloor.getByRole('heading', { name: 'A Better Spot for Every Ride' })).toBeVisible()
   await expect(titleFloor.getByText('SHOP NOW')).toBeVisible()
@@ -157,6 +158,7 @@ test('对比信息模板支持两张图片独立上传与编辑', async ({ page 
   await page.getByRole('button', { name: '添加 对比信息' }).click()
 
   const comparison = page.getByTestId('comparison-information')
+  await expect(comparison.locator('.comparison-heading h2')).toHaveCSS('font-weight', '400')
   const initialComparisonHeight = await comparison.evaluate(element => element.clientHeight)
   await expect(comparison.getByText('BEFORE', { exact: true })).toBeVisible()
   await expect(comparison.getByText('AFTER', { exact: true })).toBeVisible()
@@ -192,12 +194,13 @@ test('对比信息模板支持两张图片独立上传与编辑', async ({ page 
   await expect(comparison.getByText('Give them a snug, supportive place to curl up, settle in and enjoy the journey.')).toHaveCount(0)
 })
 
-test('卖点信息支持 2/4 项切换、独立图片与底部按钮', async ({ page }) => {
+test('多卖点信息支持 2/4 项切换、独立图片与底部按钮', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: '新建 EDM' }).click()
-  await page.getByRole('button', { name: '添加 卖点信息' }).click()
+  await page.getByRole('button', { name: '添加 多卖点信息' }).click()
 
   const floor = page.getByTestId('selling-points-information')
+  await expect(floor.locator('.selling-points-heading h2')).toHaveCSS('font-weight', '400')
   await expect(floor.getByTestId('selling-point')).toHaveCount(2)
   await expect(floor.getByTestId('selling-point-media')).toHaveCount(2)
   await expect(page.getByLabel('上传 卖点 1 图片')).toBeVisible()

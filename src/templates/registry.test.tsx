@@ -59,13 +59,21 @@ it('HEAD 品牌 Logo 使用固定尺寸和主题色位 A', () => {
 
 it('标题文本常规模板包含内容、对齐、颜色和自适应高度配置', () => {
   const entry = templateRegistry.find(item => item.definition.id === 'title-centered')!
-  expect(entry.definition.name).toBe('标题文本-常规')
+  expect(entry.definition.name).toBe('常规标题')
   expect(entry.definition.autoHeight).toBe(true)
   expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
   expect(entry.definition.themeColorFields).toEqual([
     { fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' },
     { fieldId: 'buttonBackground', defaultSlot: 'B' }, { fieldId: 'buttonTextColor', defaultSlot: 'A' },
   ])
+})
+
+it('多卖点信息使用新名称且三个信息模板主标题为常规字重', () => {
+  expect(templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition.name).toBe('多卖点信息')
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  for (const selector of ['title-content', 'comparison-heading', 'selling-points-heading']) {
+    expect(css).toMatch(new RegExp(`\\.${selector} h2 \\{[^}]*font-weight: 400`))
+  }
 })
 
 it('标题文本模板隐藏空内容并兼容旧草稿字段', () => {

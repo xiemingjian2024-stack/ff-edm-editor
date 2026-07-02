@@ -3,8 +3,17 @@ import { templateRegistry } from '../templates/registry'
 import { Icon } from '../ui/Icon'
 import type { ThemePalette } from '../domain/edm'
 import { classicPalette, themePalettes } from '../themes/palettes'
+import logoThumb from '../assets/thumbnails/缩略图-head-品牌logo.svg'
+import navigationThumb from '../assets/thumbnails/缩略图-head-分类导航.svg'
+import regularBannerThumb from '../assets/thumbnails/缩略图-banner-常规banner.svg'
+import imageCopyBannerThumb from '../assets/thumbnails/缩略图-banner-常规banner-1.svg'
+import titleThumb from '../assets/thumbnails/缩略图-标题-常规标题.svg'
+import comparisonThumb from '../assets/thumbnails/缩略图-信息-对比信息.svg'
+import pointsThumb from '../assets/thumbnails/缩略图-信息-多卖点信息.svg'
+import productsThumb from '../assets/thumbnails/缩略图-商品卡-Nx2商品卡.svg'
 
 const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
+const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'selling-points-information': pointsThumb, 'product-grid-n-by-2': productsThumb }
 
 export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())
@@ -26,7 +35,7 @@ export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes
       if (!templates.length) return null
       return <section className="template-category" key={category}><h3>{name}</h3><div className="template-list">
         {templates.map(({ definition }) => <button className="template-tile" key={definition.id} onClick={() => onAdd(definition.id)} aria-label={`添加 ${definition.name}`}>
-          <span data-testid="template-thumbnail" className={`template-mini template-mini--${definition.category}`}><i /></span><strong>{definition.name}</strong><small>{definition.designWidth} × {definition.designHeight}</small>
+          <span data-testid="template-thumbnail" className={`template-mini template-mini--${definition.category}`}>{thumbnails[definition.id] ? <img src={thumbnails[definition.id]} alt="" /> : <i />}</span><strong>{definition.name}</strong><small>{definition.designWidth} × {definition.designHeight}</small>
         </button>)}
       </div></section>
     })}</>}

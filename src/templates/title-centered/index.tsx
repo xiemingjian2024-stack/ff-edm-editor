@@ -6,7 +6,7 @@ function TitleCentered({ floor }: FloorRenderProps) {
   return <section className="floor-render title-content" data-testid="title-content" data-alignment={alignment} style={{ backgroundColor: floor.values.background || '#FFFFFF', textAlign: alignment as 'left' | 'center' | 'right' }}>
     {floor.values.title ? <h2 style={{ color: floor.values.textColor || '#000000' }}>{floor.values.title}</h2> : null}
     {floor.values.description ? <p style={{ color: floor.values.textColor || '#000000' }}>{floor.values.description}</p> : null}
-    {floor.values.buttonText ? <span className="banner-button" style={{ alignSelf, backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className="banner-button non-banner-button" style={{ alignSelf, backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 export const titleCentered: RegisteredTemplate = {

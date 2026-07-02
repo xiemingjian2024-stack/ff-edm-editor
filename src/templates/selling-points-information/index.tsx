@@ -27,7 +27,7 @@ export function SellingPointsInformation({ floor, onMediaSlotChange }: FloorRend
         </article>
       })}
     </div>
-    {floor.values.buttonText ? <span className="banner-button selling-points-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className="banner-button non-banner-button selling-points-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 

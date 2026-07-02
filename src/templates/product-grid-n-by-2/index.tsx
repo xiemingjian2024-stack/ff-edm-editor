@@ -12,7 +12,7 @@ function ProductGridNBy2({ floor, template }: FloorRenderProps) {
       <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
       <div className="product-grid-n-price"><span>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</span><img src={arrowIcon} alt="" /></div>
     </article> })}</div>
-    {floor.values.buttonText ? <span className="banner-button product-grid-n-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className="banner-button non-banner-button product-grid-n-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 

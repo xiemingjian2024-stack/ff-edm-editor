@@ -17,3 +17,35 @@ it('为商品标题、价格和跳转链接提供独立编辑标签', () => {
   expect(screen.getByLabelText('商品 3 价格')).toBeVisible()
   expect(screen.getByLabelText('商品 3 跳转链接')).toBeVisible()
 })
+
+it('没有 Shopify 链接时也能手动填写商品内容', async () => {
+  const user = userEvent.setup()
+  const onChange = vi.fn()
+  render(<ProductSlotEditor label="商品 2" value={undefined} onChange={onChange} />)
+
+  expect(screen.getByLabelText('上传 商品 2 商品图片')).toBeVisible()
+  await user.type(screen.getByLabelText('商品 2 商品标题'), '手')
+  expect(onChange).toHaveBeenLastCalledWith({
+    image: '',
+    title: '手',
+    price: '',
+    url: '',
+    gallery: [],
+  })
+})
+
+it('可以通过图片链接手动填写商品图片并保留其他内容', async () => {
+  const user = userEvent.setup()
+  const onChange = vi.fn()
+  render(<ProductSlotEditor label="商品 4" value={{ image: '', title: 'Cloud Bed', price: '$99', url: '/products/cloud', gallery: [] }} onChange={onChange} />)
+
+  await user.type(screen.getByLabelText('商品 4 商品图片链接'), 'https://cdn.example.com/cloud.jpg')
+  await user.click(screen.getByRole('button', { name: '从链接获取 商品 4 商品图片' }))
+  expect(onChange).toHaveBeenLastCalledWith({
+    image: 'https://cdn.example.com/cloud.jpg',
+    title: 'Cloud Bed',
+    price: '$99',
+    url: '/products/cloud',
+    gallery: [],
+  })
+})

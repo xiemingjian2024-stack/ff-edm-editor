@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { MediaState, NormalizedProduct } from '../domain/edm'
 
-export function MediaControlCard({ label, value, onChange, reader }: { label: string; value: MediaState; onChange: (value: MediaState) => void; reader?: (url: string) => Promise<NormalizedProduct> }) {
+export function MediaControlCard({ label, value, onChange, reader, showTransformControls = true }: { label: string; value: MediaState; onChange: (value: MediaState) => void; reader?: (url: string) => Promise<NormalizedProduct>; showTransformControls?: boolean }) {
   const [url, setUrl] = useState(value.url)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -43,7 +43,7 @@ export function MediaControlCard({ label, value, onChange, reader }: { label: st
     <div className="media-preview-card">
       {value.image ? <img src={value.image} alt={`${label}预览`} /> : <span>＋ 上传图片</span>}
       <label className="media-preview-upload"><input aria-label={`上传 ${label}`} type="file" accept="image/*" onChange={event => upload(event.target.files?.[0])} /></label>
-      {value.image ? <div className="media-hover-tools">
+      {value.image && showTransformControls ? <div className="media-hover-tools">
         <label className="media-hover-upload"><span>重新上传</span><input aria-label={`重新上传 ${label}`} type="file" accept="image/*" onChange={event => upload(event.target.files?.[0])} /></label>
         <button type="button" onClick={() => onChange({ ...value, scale: 1, offsetX: 0, offsetY: 0 })} aria-label={`重置 ${label}位置`}>重置位置</button>
         <label className="media-hover-scale"><span>缩放</span><input aria-label={`${label}缩放`} type="range" min="100" max="300" step="1" value={Math.round(value.scale * 100)} onChange={event => onChange({ ...value, scale: Number(event.target.value) / 100 })} /><output>{Math.round(value.scale * 100)}%</output></label>

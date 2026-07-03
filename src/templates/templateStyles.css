@@ -42,6 +42,9 @@
 .selling-point-copy h3 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 14px; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .selling-point-copy p { display: -webkit-box; overflow: hidden; margin: 7px 0 0; font-size: 12px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
 .selling-points-button { text-align: center; }
+.single-selling-point-information { display: flex; flex-direction: column; padding-bottom: 24px; }
+.single-selling-point-media { position: relative; width: 100%; overflow: hidden; }
+.single-selling-point-button { margin-top: 20px; text-align: center; }
 .product-grid-n-by-2 { display: flex; flex-direction: column; padding-bottom: 24px; }
 .product-grid-heading { padding: 28px 24px 24px; text-align: center; }.product-grid-heading h2 { margin: 0; font-size: 20px; font-weight: 400; line-height: 1.2; }.product-grid-heading p { margin: 10px 0 0; font-size: 14px; line-height: 1.35; }
 .product-grid-n-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 8px; }

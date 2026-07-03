@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'product-card'])
 })
 
 it('用 N×2 商品卡替换旧双列商品卡', () => {
@@ -39,6 +39,33 @@ it('卖点信息按数量显示卖点并将按钮放在网格之后', () => {
   const button = screen.getByText('Shop Now')
   expect(button).toHaveClass('selling-points-button')
   expect(button.parentElement?.lastElementChild).toBe(button)
+})
+
+it('注册单卖点信息模板及可调图片高度', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'single-selling-point-information')?.definition
+  const sellingPoints = templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition
+  expect(template?.name).toBe('单卖点信息')
+  expect(template?.category).toBe('information')
+  expect(template?.autoHeight).toBe(true)
+  expect(template?.fields.find(field => field.id === 'imageHeight')).toMatchObject({ type: 'range', defaultValue: '200', min: 100, max: 300, step: 1, unit: 'px' })
+  expect(template?.mediaSlots).toEqual([{ id: 'feature', label: '卖点图片' }])
+  expect(template?.themeColorFields).toEqual(sellingPoints?.themeColorFields)
+  expect(template?.exportRegions).toEqual([{ id: 'full', name: '单卖点信息', x: 0, y: 0, width: 375, height: 390 }])
+})
+
+it('单卖点信息按设置显示图片高度并将可选按钮放在图片之后', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'single-selling-point-information')!
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const floor = { id: 'single-point', templateId: entry.definition.id, values: { title: 'Title', description: 'Description', buttonText: '', imageHeight: '200', background: '#FFFFFF', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' }, products: {}, mediaSlots: { feature: media } }
+  const { rerender } = render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getByTestId('single-selling-point-media')).toHaveStyle({ height: '200px' })
+  expect(screen.queryByText('Shop Now')).not.toBeInTheDocument()
+  rerender(<entry.Renderer template={entry.definition} floor={{ ...floor, values: { ...floor.values, imageHeight: '300', buttonText: 'Shop Now' } }} />)
+  expect(screen.getByTestId('single-selling-point-media')).toHaveStyle({ height: '300px' })
+  const button = screen.getByText('Shop Now')
+  expect(button).toHaveClass('single-selling-point-button')
+  expect(button.parentElement?.lastElementChild).toBe(button)
+  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.single-selling-point-button \{[^}]*margin-top: 20px;/)
 })
 
 it('分类导航固定为 375×46 且只有背景关联主题色位', () => {

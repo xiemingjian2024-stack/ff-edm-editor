@@ -93,3 +93,12 @@ it('图文 Banner 图片区高度变化时总高度同步变化', async () => {
   expect(screen.getByTestId('banner-image-copy')).toHaveStyle({ height: '540px' })
   expect(screen.getByTestId('banner-image-stage')).toHaveStyle({ height: '360px' })
 })
+
+it('单卖点信息提供图片高度和单图编辑控件', async () => {
+  const user = userEvent.setup(); render(<EditorPage />)
+  await user.click(screen.getByRole('button', { name: '添加 单卖点信息' }))
+  expect(screen.getByTestId('single-selling-point-information')).toBeVisible()
+  expect(screen.getByLabelText('图片高度')).toHaveValue('200')
+  expect(screen.getByLabelText('上传 卖点图片')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '粘贴 卖点图片' })).toBeInTheDocument()
+})

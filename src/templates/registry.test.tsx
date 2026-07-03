@@ -15,7 +15,7 @@ it('用 N×2 商品卡替换旧双列商品卡', () => {
   expect(template?.productSlotCountFieldId).toBe('productCount')
   expect(template?.domExportRegions).toBe(true)
   expect(template?.exportRegions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'button'])
-  expect(template?.themeColorFields).toContainEqual({ fieldId: 'background', defaultSlot: 'A' })
+  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
 })
 
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
@@ -25,6 +25,7 @@ it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
   expect(template?.fields.find(field => field.id === 'itemCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '4 个卖点', value: '4' }] })
   expect(template?.mediaSlots?.map(slot => slot.id)).toEqual(['point1', 'point2', 'point3', 'point4'])
   expect(template?.mediaSlotCountFieldId).toBe('itemCount')
+  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
 })
 
 it('卖点信息按数量显示卖点并将按钮放在网格之后', () => {
@@ -49,7 +50,7 @@ it('注册单卖点信息模板及可调图片高度', () => {
   expect(template?.autoHeight).toBe(true)
   expect(template?.fields.find(field => field.id === 'imageHeight')).toMatchObject({ type: 'range', defaultValue: '200', min: 100, max: 300, step: 1, unit: 'px' })
   expect(template?.mediaSlots).toEqual([{ id: 'feature', label: '卖点图片' }])
-  expect(template?.themeColorFields).toEqual(sellingPoints?.themeColorFields)
+  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
   expect(template?.exportRegions).toEqual([{ id: 'full', name: '单卖点信息', x: 0, y: 0, width: 375, height: 390 }])
 })
 
@@ -136,7 +137,7 @@ it('注册固定尺寸的对比信息模板与双媒体槽位', () => {
   expect(template.designHeight).toBe(420)
   expect(template.autoHeight).toBe(true)
   expect(template.mediaSlots).toEqual([{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }])
-  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'C' }, { fieldId: 'textColor', defaultSlot: 'B' }])
+  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'C' }])
 })
 
 it('对比信息将文字颜色显式应用到标题、描述和结果文案', () => {

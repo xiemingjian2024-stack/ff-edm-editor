@@ -11,9 +11,10 @@ import titleThumb from '../assets/thumbnails/缩略图-标题-常规标题.svg'
 import comparisonThumb from '../assets/thumbnails/缩略图-信息-对比信息.svg'
 import pointsThumb from '../assets/thumbnails/缩略图-信息-多卖点信息.svg'
 import productsThumb from '../assets/thumbnails/缩略图-商品卡-Nx2商品卡.svg'
+import productListThumb from '../assets/thumbnails/缩略图-商品卡-Nx1商品卡.svg'
 
 const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
-const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'selling-points-information': pointsThumb, 'product-grid-n-by-2': productsThumb }
+const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'selling-points-information': pointsThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb }
 
 export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())

@@ -50,3 +50,12 @@ it('动态商品模板只校验当前显示的商品槽位', () => {
   state = editorReducer(state, { type: 'updateField', floorId, fieldId: 'productCount', value: '4' })
   expect(validateDraft(state.draft).warnings).toHaveLength(4)
 })
+
+it('N×1 商品卡只校验当前显示的商品槽位', () => {
+  let state = editorReducer(initialEditorState, { type: 'addFloor', templateId: 'product-list-n-by-1' })
+  const floorId = state.draft.floors[0].id
+  state = editorReducer(state, { type: 'updateProduct', floorId, slotId: 'product-1', value: { image: 'image.jpg', title: 'Title', price: '$10', url: 'link' } })
+  expect(validateDraft(state.draft).warnings).toHaveLength(0)
+  state = editorReducer(state, { type: 'updateField', floorId, fieldId: 'productCount', value: '4' })
+  expect(validateDraft(state.draft).warnings).toHaveLength(6)
+})

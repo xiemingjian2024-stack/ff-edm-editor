@@ -71,3 +71,19 @@ it('按商品数量截取链接区域并用 DOM 实际矩形覆盖坐标', () =>
   card.getBoundingClientRect = () => ({ x: 112, y: 180, left: 112, top: 180, right: 287, bottom: 460, width: 175, height: 280, toJSON() {} })
   expect(getDomExportRegions(root, regions)).toEqual([expect.objectContaining({ id: 'item-1', x: 12, y: 130, width: 175, height: 280 })])
 })
+
+it('N×1 商品卡只导出当前商品并关联各自 Shopify 链接', () => {
+  const adaptive = getTemplate('product-list-n-by-1')!.definition
+  const current: FloorInstance = {
+    id: 'product-list', templateId: adaptive.id, values: { productCount: '3' },
+    products: {
+      'product-1': { image: 'one.png', title: 'One', price: '£10', url: '/products/one' },
+      'product-2': { image: 'two.png', title: 'Two', price: '£20', url: '/products/two' },
+      'product-3': { image: 'three.png', title: 'Three', price: '£30', url: '/products/three' },
+    },
+  }
+  const regions = getFloorExportRegions(adaptive, current)
+  expect(regions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'button'])
+  expect(regions.filter(region => region.linkSlotId).map(region => region.linkSlotId)).toEqual(['product-1', 'product-2', 'product-3'])
+  expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/products/one', '/products/two', '/products/three'])
+})

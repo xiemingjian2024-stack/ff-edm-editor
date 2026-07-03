@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'product-card', 'product-card'])
 })
 
 it('用 N×2 商品卡替换旧双列商品卡', () => {
@@ -16,6 +16,38 @@ it('用 N×2 商品卡替换旧双列商品卡', () => {
   expect(template?.domExportRegions).toBe(true)
   expect(template?.exportRegions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'button'])
   expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+})
+
+it('注册支持 1 至 4 个商品的 N×1 商品卡', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'product-list-n-by-1')?.definition
+  expect(template?.name).toBe('N×1 商品卡')
+  expect(template?.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '1', options: [{ label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }] })
+  expect(template?.productSlots).toHaveLength(4)
+  expect(template?.productSlotCountFieldId).toBe('productCount')
+  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+})
+
+it('N×1 商品卡按商品数量左右交替并统一卡片与图片背景', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'product-list-n-by-1')!
+  const floor = {
+    id: 'product-list', templateId: entry.definition.id,
+    values: { title: 'Title', description: 'Description', buttonText: 'See More', cardButtonText: 'Shop Now', productCount: '3', pricePrefix: 'From', background: '#FFFFFF', cardBackground: '#F5E1C9', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
+    products: {
+      'product-1': { image: 'one.png', title: 'One', price: '£10', url: '/one' },
+      'product-2': { image: 'two.png', title: 'Two', price: '£20', url: '/two' },
+      'product-3': { image: 'three.png', title: 'Three', price: '£30', url: '/three' },
+    },
+  }
+  render(<entry.Renderer template={entry.definition} floor={floor} />)
+  const cards = screen.getAllByTestId('product-list-n-card')
+  expect(cards).toHaveLength(3)
+  expect(cards[0]).toHaveClass('is-image-left')
+  expect(cards[1]).toHaveClass('is-image-right')
+  expect(cards[2]).toHaveClass('is-image-left')
+  expect(cards[0]).toHaveStyle({ backgroundColor: '#F5E1C9' })
+  expect(screen.getAllByTestId('product-list-n-image')[0]).toHaveStyle({ backgroundColor: '#F5E1C9' })
+  expect(screen.getByText('From £10')).toBeVisible()
+  expect(screen.getAllByText('Shop Now')).toHaveLength(3)
 })
 
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {

@@ -33,6 +33,15 @@ it('商品卡属性按颜色、商品和操作分组', async () => {
   expect(screen.queryByLabelText('字号')).not.toBeInTheDocument()
 })
 
+it('N×1 商品卡的右侧商品填写区跟随 1 至 4 个商品增减', async () => {
+  const user = userEvent.setup(); render(<EditorPage />)
+  await user.click(screen.getByRole('button', { name: '添加 N×1 商品卡' }))
+  expect(screen.getAllByLabelText(/Shopify 链接$/)).toHaveLength(1)
+  await user.click(screen.getByRole('button', { name: '4 个商品' }))
+  expect(screen.getAllByLabelText(/Shopify 链接$/)).toHaveLength(4)
+  expect(screen.getAllByTestId('product-list-n-card')).toHaveLength(4)
+})
+
 it('可从左侧配色 Tab 查看套餐，再切换 Logo 颜色并覆盖或恢复主题背景', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
   expect(screen.queryByRole('button', { name: /配色套餐 FunnyFuzzy 经典/ })).not.toBeInTheDocument()

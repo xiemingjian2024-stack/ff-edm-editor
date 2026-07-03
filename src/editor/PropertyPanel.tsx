@@ -36,7 +36,7 @@ export function PropertyPanel({ floor, onChange, onThemeColorChange, onThemeColo
       {template.mediaConfig && floor.media ? <InspectorSection title="图片"><BannerMediaEditor value={floor.media} onChange={onMediaChange} /></InspectorSection> : null}
       {visibleMediaSlots && floor.mediaSlots ? <InspectorSection title="图片"><div className="manual-media-list">{visibleMediaSlots.map(slot => <ManualMediaEditor key={slot.id} label={slot.label} value={floor.mediaSlots![slot.id]} onChange={value => onMediaSlotChange(slot.id, value)} />)}</div></InspectorSection> : null}
       {colorFields.length ? <InspectorSection title="颜色"><div className="field-list">{colorFields.map(renderField)}</div></InspectorSection> : null}
-      {visibleProductSlots.length ? <InspectorSection title="商品"><div className="product-list">{visibleProductSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} />)}</div></InspectorSection> : null}
+      {visibleProductSlots.length ? <InspectorSection title="商品"><div className="product-list">{visibleProductSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} showPrice={slot.showPrice !== false} />)}</div></InspectorSection> : null}
       <InspectorSection title="操作"><div className="panel-actions"><button onClick={onDuplicate} aria-label="复制楼层">复制楼层</button><button className="danger" onClick={onDelete} aria-label="删除楼层">删除楼层</button></div></InspectorSection>
     </>}
   </aside>

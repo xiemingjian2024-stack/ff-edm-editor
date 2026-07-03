@@ -11,7 +11,7 @@ export type FieldDefinition =
   | { id: string; type: 'choice'; label: string; defaultValue: string; options: Array<{ label: string; value: string }> }
   | { id: string; type: 'range'; label: string; defaultValue: string; min: number; max: number; step: number; unit?: string }
 
-export interface ProductSlotDefinition { id: string; label: string }
+export interface ProductSlotDefinition { id: string; label: string; showPrice?: boolean }
 export interface NavigationItem { text: string; url: string }
 export interface NavigationConfig { minItems: number; maxItems: number; defaultItems: NavigationItem[] }
 export interface MediaState { image: string; url: string; scale: number; offsetX: number; offsetY: number }

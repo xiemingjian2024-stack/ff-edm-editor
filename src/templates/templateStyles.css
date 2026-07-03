@@ -78,3 +78,13 @@
 .code-information-action-text { max-width: 160px; overflow: hidden; font-size: 18px; font-weight: 700; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
 .code-information-arrow { width: 8px; height: 8px; border-width: 1px 1px 0 0; border-style: solid; transform: rotate(45deg); }
 .code-information-note { max-width: 100%; overflow: hidden; margin: 12px 0 0; color: #666; font-size: 12px; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
+.product-grid-n-by-3 { display: flex; flex-direction: column; padding-bottom: 24px; }
+.product-grid-n-by-3-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 0 6px; }
+.product-grid-n-by-3-card { min-width: 0; overflow: hidden; border-radius: 4px; }
+.product-grid-n-by-3-image { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; }
+.product-grid-n-by-3-image .editable-image-frame { background: transparent; }
+.product-grid-n-by-3-copy { padding: 10px 10px 12px; }
+.product-grid-n-by-3-stars { display: block; overflow: hidden; font-size: 15px; line-height: 1; letter-spacing: 1px; white-space: nowrap; }
+.product-grid-n-by-3-title { overflow: hidden; margin: 10px 0 0; font-size: 12px; font-weight: 400; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
+.product-grid-n-by-3-card-button { height: 30px; display: grid; place-items: center; overflow: hidden; margin-top: 12px; padding: 0 8px; font-size: 10px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }
+.product-grid-n-by-3-main-button { text-align: center; }

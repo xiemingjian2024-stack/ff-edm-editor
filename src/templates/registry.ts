@@ -3,6 +3,7 @@ import { bannerSimple } from './banner-simple'
 import { titleCentered } from './title-centered'
 import { productGridNBy2 } from './product-grid-n-by-2'
 import { productListNBy1 } from './product-list-n-by-1'
+import { productGridNBy3 } from './product-grid-n-by-3'
 import { headBrandLogo } from './head-brand-logo'
 import { headCategoryNavigation } from './head-category-navigation'
 import { bannerRegular } from './banner-regular'
@@ -14,5 +15,5 @@ import { codeInformation } from './code-information'
 import './templateStyles.css'
 import './fonts.css'
 
-export const templateRegistry = [headBrandLogo, headCategoryNavigation, bannerRegular, bannerImageCopy, bannerSimple, titleCentered, comparisonInformation, singleSellingPointInformation, sellingPointsInformation, codeInformation, productGridNBy2, productListNBy1].map(entry => ({ ...entry, definition: parseTemplate(entry.definition) }))
+export const templateRegistry = [headBrandLogo, headCategoryNavigation, bannerRegular, bannerImageCopy, bannerSimple, titleCentered, comparisonInformation, singleSellingPointInformation, sellingPointsInformation, codeInformation, productGridNBy2, productListNBy1, productGridNBy3].map(entry => ({ ...entry, definition: parseTemplate(entry.definition) }))
 export const getTemplate = (id: string) => templateRegistry.find(item => item.definition.id === id)

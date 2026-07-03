@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card'])
 })
 
 it('注册只绑定背景色位的 CODE 信息模板', () => {
@@ -108,6 +108,32 @@ it('N×1 与 N×2 应用商品图片变换并上报各自商品槽位', () => {
     expect(onProductChange).toHaveBeenCalledWith('product-1', expect.objectContaining({ imageOffsetX: expect.any(Number), imageOffsetY: expect.any(Number) }))
     unmount()
   }
+})
+
+it('注册固定三槽位且隐藏价格的 N×3 商品卡', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'product-grid-n-by-3')?.definition
+  expect(template?.name).toBe('N×3 商品卡')
+  expect(template?.productSlots).toEqual([
+    { id: 'product-1', label: '商品 1', showPrice: false },
+    { id: 'product-2', label: '商品 2', showPrice: false },
+    { id: 'product-3', label: '商品 3', showPrice: false },
+  ])
+  expect(template?.productSlotCountFieldId).toBeUndefined()
+  expect(template?.fields.some(field => field.id === 'pricePrefix')).toBe(false)
+  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+})
+
+it('N×3 渲染三张卡、固定五星和单行标题', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'product-grid-n-by-3')!
+  const products = Object.fromEntries([1, 2, 3].map(index => [`product-${index}`, { image: `${index}.png`, title: `Product ${index}`, price: '', url: `/product-${index}` }]))
+  const floor = { id: 'n3', templateId: entry.definition.id, values: { title: 'Title', description: '', buttonText: '', cardButtonText: 'SHOP NOW', background: '#FFFFFF', cardBackground: '#EEEEEE', starColor: '#F59E0B', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' }, products }
+  const { container } = render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getAllByTestId('product-grid-n-by-3-card')).toHaveLength(3)
+  expect(screen.getAllByLabelText('5 星')).toHaveLength(3)
+  expect(screen.getAllByText('★★★★★')).toHaveLength(3)
+  expect(screen.getAllByText('SHOP NOW')).toHaveLength(3)
+  expect(container.querySelector('.product-grid-n-by-3-stars')).toHaveStyle({ color: '#F59E0B' })
+  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.product-grid-n-by-3-title \{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis;/)
 })
 
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {

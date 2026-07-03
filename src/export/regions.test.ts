@@ -98,3 +98,14 @@ it('CODE 模板跳过中间占位且两个导出区域都没有链接', () => {
   ])
   expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', ''])
 })
+
+it('N×3 商品卡导出标题、三张商品卡和底部按钮并关联各自链接', () => {
+  const template = getTemplate('product-grid-n-by-3')!.definition
+  const current: FloorInstance = {
+    id: 'n3', templateId: template.id, values: {},
+    products: Object.fromEntries([1, 2, 3].map(index => [`product-${index}`, { image: `${index}.png`, title: `${index}`, price: '', url: `/product-${index}` }])),
+  }
+  const regions = getFloorExportRegions(template, current)
+  expect(regions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'button'])
+  expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/product-1', '/product-2', '/product-3'])
+})

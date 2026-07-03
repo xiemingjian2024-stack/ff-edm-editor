@@ -66,3 +66,11 @@ it('为商品图片提供独立缩放并写回商品数据', () => {
   fireEvent.change(scale, { target: { value: '150' } })
   expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ imageScale: 1.5, imageOffsetX: 4, imageOffsetY: -3 }))
 })
+
+it('可按商品槽位隐藏价格且默认仍显示价格', () => {
+  const product = { image: '', title: 'Bed', price: '$19', url: '/bed' }
+  const { rerender } = render(<ProductSlotEditor label="商品 1" value={product} onChange={() => {}} showPrice={false} />)
+  expect(screen.queryByLabelText('商品 1 价格')).not.toBeInTheDocument()
+  rerender(<ProductSlotEditor label="商品 1" value={product} onChange={() => {}} />)
+  expect(screen.getByLabelText('商品 1 价格')).toBeVisible()
+})

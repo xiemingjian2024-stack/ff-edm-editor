@@ -58,6 +58,11 @@ it('N×1 奇偶商品卡分别贴左右边且使用紧凑卡内按钮', () => {
   expect(css).toMatch(/\.product-list-n-card-button \{[^}]*width: 112px;[^}]*height: 28px;/)
 })
 
+it('N×1 商品图片框使用透明底透出卡片背景', () => {
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.product-list-n-image \.editable-image-frame \{[^}]*background: transparent;/)
+})
+
 it('N×1 与 N×2 应用商品图片变换并上报各自商品槽位', () => {
   for (const [templateId, fit] of [['product-list-n-by-1', 'contain'], ['product-grid-n-by-2', 'cover']] as const) {
     const entry = templateRegistry.find(item => item.definition.id === templateId)!

@@ -10,7 +10,7 @@ function ProductGridNBy2({ floor, template, onProductChange }: FloorRenderProps)
   return <section className="floor-render product-grid-n-by-2" data-testid="product-grid-n-by-2" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
     <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floor.values.title}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}</header>
     <div className="product-grid-n-list">{slots.map((slot, index) => { const product = floor.products[slot.id]; return <article className="product-grid-n-card" data-testid="product-grid-n-card" data-export-region-id={`item-${index + 1}`} key={slot.id}>
-      <div className="product-grid-n-image"><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×2 商品卡 商品 ${index + 1} 图片`} placeholder="添加商品图片" designWidth={175.5} fit="cover" /></div>
+      <div className="product-grid-n-image"><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×2 商品卡 商品 ${index + 1} 图片`} designWidth={175.5} fit="cover" /></div>
       <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
       <div className="product-grid-n-price"><span>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</span><img src={arrowIcon} alt="" /></div>
     </article> })}</div>

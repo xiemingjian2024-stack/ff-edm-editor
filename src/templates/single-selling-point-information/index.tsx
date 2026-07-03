@@ -13,7 +13,7 @@ export function SingleSellingPointInformation({ floor, onMediaSlotChange }: Floo
       {floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}
     </header>
     <div className="single-selling-point-media" data-testid="single-selling-point-media" style={{ height: imageHeight }}>
-      <EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange('feature', value) : undefined} ariaLabel="卖点图片" placeholder="上传卖点图片" />
+      <EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange('feature', value) : undefined} ariaLabel="卖点图片" />
     </div>
     {floor.values.buttonText ? <span className="banner-button non-banner-button single-selling-point-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>

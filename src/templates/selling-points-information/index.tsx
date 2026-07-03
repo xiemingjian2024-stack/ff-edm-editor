@@ -22,7 +22,7 @@ export function SellingPointsInformation({ floor, onMediaSlotChange }: FloorRend
         const id = `point${index + 1}`
         const media = floor.mediaSlots?.[id] ?? emptyMedia
         return <article className="selling-point" data-testid="selling-point" key={id}>
-          <div className="selling-point-media" data-testid="selling-point-media"><EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange(id, value) : undefined} ariaLabel={`卖点 ${index + 1} 图片`} placeholder={`上传卖点 ${index + 1} 图片`} designWidth={184} /></div>
+          <div className="selling-point-media" data-testid="selling-point-media"><EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange(id, value) : undefined} ariaLabel={`卖点 ${index + 1} 图片`} designWidth={184} /></div>
           <div className="selling-point-copy"><h3 style={{ color: textColor }}>{floor.values[`${id}Title`]}</h3><p style={{ color: textColor }}>{floor.values[`${id}Description`]}</p></div>
         </article>
       })}

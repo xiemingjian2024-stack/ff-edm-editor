@@ -34,3 +34,9 @@ it('支持 contain 并默认保持 cover', () => {
   rerender(<EditableImageFrame value={value} ariaLabel="常规商品图" />)
   expect(container.querySelector('img')).toHaveStyle({ objectFit: 'cover' })
 })
+
+it('空图片框不在画布显示上传提示文案', () => {
+  const { container } = render(<EditableImageFrame value={{ image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }} ariaLabel="空图片" />)
+  expect(container.querySelector('.editable-image-placeholder')).not.toBeInTheDocument()
+  expect(screen.queryByText(/添加图片|上传图片/)).not.toBeInTheDocument()
+})

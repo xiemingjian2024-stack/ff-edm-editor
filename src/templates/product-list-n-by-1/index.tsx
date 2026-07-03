@@ -12,7 +12,7 @@ function ProductListNBy1({ floor, template, onProductChange }: FloorRenderProps)
     <div className="product-list-n-items">{slots.map((slot, index) => {
       const product = floor.products[slot.id]
       return <article className={`product-list-n-card ${index % 2 === 0 ? 'is-image-left' : 'is-image-right'}`} data-testid="product-list-n-card" data-export-region-id={`item-${index + 1}`} key={slot.id} style={{ backgroundColor: cardBackground }}>
-        <div className="product-list-n-image" data-testid="product-list-n-image" style={{ backgroundColor: cardBackground }}><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×1 商品卡 商品 ${index + 1} 图片`} placeholder="添加商品图片" designWidth={181.5} fit="contain" /></div>
+        <div className="product-list-n-image" data-testid="product-list-n-image" style={{ backgroundColor: cardBackground }}><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×1 商品卡 商品 ${index + 1} 图片`} designWidth={181.5} fit="contain" /></div>
         <div className="product-list-n-copy" style={{ color: textColor }}>
           <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
           <p>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</p>

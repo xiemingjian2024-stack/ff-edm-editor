@@ -26,3 +26,11 @@ it('窄图片框按自身设计宽度换算拖拽距离', () => {
   fireEvent.pointerMove(frame, { pointerId: 1, clientX: 112, clientY: 94 })
   expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ offsetX: 12, offsetY: -6 }))
 })
+
+it('支持 contain 并默认保持 cover', () => {
+  const value = { image: 'image.png', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const { container, rerender } = render(<EditableImageFrame value={value} fit="contain" ariaLabel="透明商品图" />)
+  expect(container.querySelector('img')).toHaveStyle({ objectFit: 'contain' })
+  rerender(<EditableImageFrame value={value} ariaLabel="常规商品图" />)
+  expect(container.querySelector('img')).toHaveStyle({ objectFit: 'cover' })
+})

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
@@ -56,6 +56,26 @@ it('N×1 奇偶商品卡分别贴左右边且使用紧凑卡内按钮', () => {
   expect(css).toMatch(/\.product-list-n-card\.is-image-left \{[^}]*justify-self: start;/)
   expect(css).toMatch(/\.product-list-n-card\.is-image-right \{[^}]*justify-self: end;/)
   expect(css).toMatch(/\.product-list-n-card-button \{[^}]*width: 112px;[^}]*height: 28px;/)
+})
+
+it('N×1 与 N×2 应用商品图片变换并上报各自商品槽位', () => {
+  for (const [templateId, fit] of [['product-list-n-by-1', 'contain'], ['product-grid-n-by-2', 'cover']] as const) {
+    const entry = templateRegistry.find(item => item.definition.id === templateId)!
+    const onProductChange = vi.fn()
+    const floor = {
+      id: templateId, templateId,
+      values: { title: 'Title', description: '', buttonText: '', cardButtonText: '', productCount: templateId === 'product-list-n-by-1' ? '1' : '2', pricePrefix: 'From', background: '#FFFFFF', cardBackground: '#F5E1C9', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
+      products: { 'product-1': { image: 'product.png', title: 'Product', price: '$10', url: '/product', imageScale: 1.4, imageOffsetX: 8, imageOffsetY: -6 } },
+    }
+    const { unmount } = render(<entry.Renderer template={entry.definition} floor={floor} onProductChange={onProductChange} />)
+    const frame = screen.getByLabelText(`${entry.definition.name} 商品 1 图片`)
+    expect(frame.querySelector('img')).toHaveStyle({ objectFit: fit, transform: 'translate(-50%, -50%) translate(8px, -6px) scale(1.4)' })
+    vi.spyOn(frame, 'getBoundingClientRect').mockReturnValue({ x: 0, y: 0, width: templateId === 'product-list-n-by-1' ? 181.5 : 175.5, height: 160, top: 0, right: 181.5, bottom: 160, left: 0, toJSON: () => ({}) })
+    fireEvent.pointerDown(frame, { pointerId: 1, clientX: 50, clientY: 50 })
+    fireEvent.pointerMove(frame, { pointerId: 1, clientX: 60, clientY: 45 })
+    expect(onProductChange).toHaveBeenCalledWith('product-1', expect.objectContaining({ imageOffsetX: expect.any(Number), imageOffsetY: expect.any(Number) }))
+    unmount()
+  }
 })
 
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {

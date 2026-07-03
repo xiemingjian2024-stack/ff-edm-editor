@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import type { MediaState } from '../domain/edm'
 
-export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图片', placeholder = '添加图片', designWidth = 375 }: { value: MediaState; onChange?: (value: MediaState) => void; ariaLabel?: string; placeholder?: string; designWidth?: number }) {
+export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图片', placeholder = '添加图片', designWidth = 375, fit = 'cover' }: { value: MediaState; onChange?: (value: MediaState) => void; ariaLabel?: string; placeholder?: string; designWidth?: number; fit?: 'cover' | 'contain' }) {
   const drag = useRef<{ x: number; y: number; offsetX: number; offsetY: number; ratio: number } | null>(null)
   return <div
     className={`editable-image-frame ${onChange ? 'is-editable' : ''}`}
@@ -19,6 +19,6 @@ export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图�
     onPointerUp={event => { drag.current = null; event.currentTarget.releasePointerCapture?.(event.pointerId) }}
     onPointerCancel={() => { drag.current = null }}
   >
-    {value.image ? <img src={value.image} alt="" draggable={false} style={{ transform: `translate(-50%, -50%) translate(${value.offsetX}px, ${value.offsetY}px) scale(${value.scale})` }} /> : <span className="editable-image-placeholder">{placeholder}</span>}
+    {value.image ? <img src={value.image} alt="" draggable={false} style={{ objectFit: fit, transform: `translate(-50%, -50%) translate(${value.offsetX}px, ${value.offsetY}px) scale(${value.scale})` }} /> : <span className="editable-image-placeholder">{placeholder}</span>}
   </div>
 }

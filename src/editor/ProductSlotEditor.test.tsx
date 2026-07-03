@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ProductSlotEditor } from './ProductSlotEditor'
 
@@ -51,5 +51,18 @@ it('可以通过图片链接手动填写商品图片并保留其他内容', asyn
     price: '$99',
     url: '/products/cloud',
     gallery: [],
+    imageScale: 1,
+    imageOffsetX: 0,
+    imageOffsetY: 0,
   })
+})
+
+it('为商品图片提供独立缩放并写回商品数据', () => {
+  const onChange = vi.fn()
+  render(<ProductSlotEditor label="商品 1" value={{ image: 'bed.png', title: 'Bed', price: '$19', url: '/bed', imageScale: 1.2, imageOffsetX: 4, imageOffsetY: -3 }} onChange={onChange} />)
+
+  const scale = screen.getByLabelText('商品 1 商品图片缩放')
+  expect(scale).toHaveValue('120')
+  fireEvent.change(scale, { target: { value: '150' } })
+  expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ imageScale: 1.5, imageOffsetX: 4, imageOffsetY: -3 }))
 })

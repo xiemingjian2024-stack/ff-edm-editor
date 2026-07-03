@@ -73,10 +73,8 @@ it('标题文本常规模板包含内容、对齐、颜色和自适应高度配�
   expect(entry.definition.name).toBe('常规标题')
   expect(entry.definition.autoHeight).toBe(true)
   expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
-  expect(entry.definition.themeColorFields).toEqual([
-    { fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'textColor', defaultSlot: 'B' },
-    { fieldId: 'buttonBackground', defaultSlot: 'B' }, { fieldId: 'buttonTextColor', defaultSlot: 'A' },
-  ])
+  expect(entry.definition.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.title-content \{[^}]*padding: 24px;/)
 })
 
 it('多卖点信息使用新名称且三个信息模板主标题为常规字重', () => {

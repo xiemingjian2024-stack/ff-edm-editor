@@ -11,11 +11,15 @@ it('读取商品并允许修改自动填充内容', async () => {
   expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ title: 'Cloud Bed', price: '99.00' }))
 })
 
-it('为商品标题、价格和跳转链接提供独立编辑标签', () => {
-  render(<ProductSlotEditor label="商品 3" value={{ title: 'Bed', image: 'a.jpg', price: '$19', url: 'link' }} onChange={() => {}} />)
+it('使用 Shopify 商品链接作为跳转链接且不显示重复输入框', async () => {
+  const user = userEvent.setup()
+  const onChange = vi.fn()
+  render(<ProductSlotEditor label="商品 3" value={{ title: 'Bed', image: 'a.jpg', price: '$19', url: '' }} onChange={onChange} />)
   expect(screen.getByLabelText('商品 3 商品标题')).toBeVisible()
   expect(screen.getByLabelText('商品 3 价格')).toBeVisible()
-  expect(screen.getByLabelText('商品 3 跳转链接')).toBeVisible()
+  expect(screen.queryByLabelText('商品 3 跳转链接')).not.toBeInTheDocument()
+  await user.type(screen.getByLabelText('商品 3 Shopify 链接'), 'a')
+  expect(onChange).toHaveBeenLastCalledWith({ title: 'Bed', image: 'a.jpg', price: '$19', url: 'a' })
 })
 
 it('没有 Shopify 链接时也能手动填写商品内容', async () => {

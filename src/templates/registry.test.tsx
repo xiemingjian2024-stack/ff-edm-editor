@@ -50,6 +50,14 @@ it('N×1 商品卡按商品数量左右交替并统一卡片与图片背景', ()
   expect(screen.getAllByText('Shop Now')).toHaveLength(3)
 })
 
+it('N×1 奇偶商品卡分别贴左右边且使用紧凑卡内按钮', () => {
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.product-list-n-card \{[^}]*width: calc\(100% - 12px\);/)
+  expect(css).toMatch(/\.product-list-n-card\.is-image-left \{[^}]*justify-self: start;/)
+  expect(css).toMatch(/\.product-list-n-card\.is-image-right \{[^}]*justify-self: end;/)
+  expect(css).toMatch(/\.product-list-n-card-button \{[^}]*width: 112px;[^}]*height: 28px;/)
+})
+
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
   const template = templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition
   expect(template?.category).toBe('information')

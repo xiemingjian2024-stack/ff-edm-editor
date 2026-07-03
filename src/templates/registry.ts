@@ -10,8 +10,9 @@ import { bannerImageCopy } from './banner-image-copy'
 import { comparisonInformation } from './comparison-information'
 import { singleSellingPointInformation } from './single-selling-point-information'
 import { sellingPointsInformation } from './selling-points-information'
+import { codeInformation } from './code-information'
 import './templateStyles.css'
 import './fonts.css'
 
-export const templateRegistry = [headBrandLogo, headCategoryNavigation, bannerRegular, bannerImageCopy, bannerSimple, titleCentered, comparisonInformation, singleSellingPointInformation, sellingPointsInformation, productGridNBy2, productListNBy1].map(entry => ({ ...entry, definition: parseTemplate(entry.definition) }))
+export const templateRegistry = [headBrandLogo, headCategoryNavigation, bannerRegular, bannerImageCopy, bannerSimple, titleCentered, comparisonInformation, singleSellingPointInformation, sellingPointsInformation, codeInformation, productGridNBy2, productListNBy1].map(entry => ({ ...entry, definition: parseTemplate(entry.definition) }))
 export const getTemplate = (id: string) => templateRegistry.find(item => item.definition.id === id)

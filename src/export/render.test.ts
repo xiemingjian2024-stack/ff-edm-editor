@@ -23,3 +23,9 @@ it('常规 Banner 按当前动态高度导出完整 JPG', () => {
   const floor = { id: 'banner-1', templateId: template.id, values: { height: '420' }, products: {} }
   expect(scaleRegion(getFloorExportRegions(template, floor)[0])).toMatchObject({ width: 750, height: 840 })
 })
+
+it('CODE 模板只将顶部和底部缩放为两张独立切图', () => {
+  const template = getTemplate('code-information')!.definition
+  expect(template.exportRegions.map(region => region.id)).toEqual(['top', 'bottom'])
+  expect(scaleRegions(template.exportRegions).map(region => ({ width: region.width, height: region.height }))).toEqual([{ width: 750, height: 120 }, { width: 750, height: 168 }])
+})

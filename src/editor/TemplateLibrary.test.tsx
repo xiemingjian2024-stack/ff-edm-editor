@@ -50,4 +50,5 @@ it('在信息分组展示对比信息模板', () => {
   render(<TemplateLibrary onAdd={() => {}} />)
   expect(screen.getByRole('heading', { name: '信息' })).toBeVisible()
   expect(screen.getByRole('button', { name: '添加 对比信息' })).toBeVisible()
+  expect(screen.getByRole('button', { name: '添加 CODE' })).toBeVisible()
 })

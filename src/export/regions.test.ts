@@ -87,3 +87,14 @@ it('N×1 商品卡只导出当前商品并关联各自 Shopify 链接', () => {
   expect(regions.filter(region => region.linkSlotId).map(region => region.linkSlotId)).toEqual(['product-1', 'product-2', 'product-3'])
   expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/products/one', '/products/two', '/products/three'])
 })
+
+it('CODE 模板跳过中间占位且两个导出区域都没有链接', () => {
+  const code = getTemplate('code-information')!.definition
+  const current: FloorInstance = { id: 'code', templateId: code.id, values: {}, products: {} }
+  const regions = getFloorExportRegions(code, current)
+  expect(regions).toEqual([
+    { id: 'top', name: 'CODE 顶部', x: 0, y: 0, width: 375, height: 60 },
+    { id: 'bottom', name: 'CODE 底部', x: 0, y: 116, width: 375, height: 84 },
+  ])
+  expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', ''])
+})

@@ -3,7 +3,34 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'product-card', 'product-card'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card'])
+})
+
+it('注册只绑定背景色位的 CODE 信息模板', () => {
+  const template = templateRegistry.find(item => item.definition.id === 'code-information')?.definition
+  expect(template?.name).toBe('CODE')
+  expect(template?.category).toBe('information')
+  expect(template?.designHeight).toBe(200)
+  expect(template?.fields.map(field => field.id)).toEqual(['topText', 'actionText', 'noteText', 'background', 'accentColor'])
+  expect(template?.productSlots).toEqual([])
+  expect(template?.mediaSlots).toBeUndefined()
+  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+})
+
+it('CODE 模板渲染三段结构并让行动元素共用强调色', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'code-information')!
+  const floor = { id: 'code', templateId: entry.definition.id, values: { topText: 'Copy Your Code', actionText: 'SAVE NOW', noteText: '*Selected Products Only', background: '#FFFFFF', accentColor: '#F59E0B' }, products: {} }
+  const { container } = render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getByTestId('code-information-top')).toHaveTextContent('Copy Your Code')
+  expect(screen.getByTestId('code-information-placeholder')).toBeVisible()
+  expect(screen.getByTestId('code-information-bottom')).toHaveTextContent('SAVE NOW')
+  expect(screen.getByTestId('code-information-bottom')).toHaveTextContent('*Selected Products Only')
+  expect(container.querySelector('.code-information-action')).toHaveStyle({ color: '#F59E0B' })
+  expect(container.querySelectorAll('.code-information-line')).toHaveLength(2)
+  container.querySelectorAll('.code-information-line').forEach(line => expect(line).toHaveStyle({ backgroundColor: '#F59E0B' }))
+  expect(container.querySelector('.code-information-arrow')).toHaveStyle({ borderColor: '#F59E0B' })
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  for (const selector of ['code-information-title', 'code-information-action-text', 'code-information-note']) expect(css).toMatch(new RegExp(`\\.${selector} \\{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis;`))
 })
 
 it('用 N×2 商品卡替换旧双列商品卡', () => {

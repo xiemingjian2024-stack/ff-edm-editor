@@ -9,6 +9,13 @@ export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string
 
 export function getFloorExportRegions(template: FloorTemplate, floor: FloorInstance, actualHeight?: number): ExportRegion[] {
   const config = template.navigationConfig
+  if (config && template.domExportRegions) {
+    const requested = Number(floor.values.navigationCount)
+    const count = Math.min(config.maxItems, Math.max(config.minItems, Number.isFinite(requested) ? requested : config.minItems))
+    return template.exportRegions
+      .filter(region => region.navigationItemIndex === undefined || region.navigationItemIndex < count)
+      .map(region => region.navigationItemIndex === undefined ? region : { ...region, name: floor.navigationItems?.[region.navigationItemIndex]?.text || `链接 ${region.navigationItemIndex + 1}` })
+  }
   if (!config) {
     const floorHeight = template.autoHeight && actualHeight ? actualHeight : getFloorHeight(template, floor)
     const activeProductIds = new Set(getActiveProductSlots(template, floor).map(slot => slot.id))

@@ -2,8 +2,26 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
-it('注册 HEAD、Banner、标题和商品卡模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card'])
+it('注册 HEAD、Banner、标题、信息、商品卡和页尾模板', () => {
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card', 'footer'])
+})
+
+it('注册支持 1 至 6 条链接且固定上下图片的页尾模板', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'footer-links')!
+  expect(entry.definition.name).toBe('页尾')
+  expect(entry.definition.category).toBe('footer')
+  expect(entry.definition.navigationConfig).toMatchObject({ minItems: 1, maxItems: 6 })
+  expect(entry.definition.fields).toEqual([
+    expect.objectContaining({ id: 'navigationCount', type: 'choice', defaultValue: '3' }),
+  ])
+  const floor = {
+    id: 'footer', templateId: entry.definition.id, values: { navigationCount: '2' }, products: {},
+    navigationItems: [{ text: 'HOME', url: '' }, { text: 'Travel Carriers', url: '' }, { text: 'Sofa Covers', url: '' }],
+  }
+  render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getByTestId('footer-showcase')).toHaveAttribute('src', expect.stringContaining('footer-showcase'))
+  expect(screen.getAllByTestId('footer-link')).toHaveLength(2)
+  expect(screen.getByTestId('footer-copy')).toHaveAttribute('src', expect.stringContaining('footer-copy'))
 })
 
 it('注册只绑定背景色位的 CODE 信息模板', () => {

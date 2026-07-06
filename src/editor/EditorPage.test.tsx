@@ -89,6 +89,19 @@ it('分类导航只编辑文案并保留隐藏项', async () => {
   expect(screen.getByLabelText('文案 3')).toHaveValue('Dog Beds')
 })
 
+it('页尾链接数量同步控制画布和右侧文案输入框', async () => {
+  const user = userEvent.setup(); render(<EditorPage />)
+  await user.click(screen.getByRole('button', { name: '添加 页尾' }))
+  expect(screen.getAllByTestId('footer-link')).toHaveLength(3)
+  expect(screen.getByLabelText('文案 3')).toHaveValue('Sofa Covers')
+  await user.click(screen.getByRole('button', { name: '6 个链接' }))
+  expect(screen.getAllByTestId('footer-link')).toHaveLength(6)
+  expect(screen.getByLabelText('文案 6')).toBeVisible()
+  await user.click(screen.getByRole('button', { name: '1 个链接' }))
+  expect(screen.getAllByTestId('footer-link')).toHaveLength(1)
+  expect(screen.queryByLabelText('文案 2')).not.toBeInTheDocument()
+})
+
 it('常规 Banner 支持动态高度、文案位置、对齐和遮罩', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
   await user.click(screen.getByRole('button', { name: '添加 常规 Banner' }))

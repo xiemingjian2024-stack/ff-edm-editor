@@ -109,3 +109,14 @@ it('N×3 商品卡导出标题、三张商品卡和底部按钮并关联各自�
   expect(regions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'button'])
   expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/product-1', '/product-2', '/product-3'])
 })
+
+it('页尾按展示区、当前链接和文案顺序生成 DOM 导出区域', () => {
+  const template = getTemplate('footer-links')!.definition
+  const current: FloorInstance = {
+    id: 'footer', templateId: template.id, values: { navigationCount: '2' }, products: {},
+    navigationItems: [{ text: 'HOME', url: '' }, { text: 'Travel Carriers', url: '' }, { text: 'Sofa Covers', url: '' }],
+  }
+  const regions = getFloorExportRegions(template, current)
+  expect(regions.map(region => region.id)).toEqual(['showcase', 'link-1', 'link-2', 'copy'])
+  expect(regions.map(region => region.name)).toEqual(['页尾展示区', 'HOME', 'Travel Carriers', '页尾文案'])
+})

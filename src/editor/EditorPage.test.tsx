@@ -5,6 +5,7 @@ import { EditorPage } from './EditorPage'
 it('添加、编辑、复制并删除楼层', async () => {
   const user = userEvent.setup()
   render(<EditorPage />)
+  expect(screen.getByRole('img', { name: 'EDM Editor' })).toBeVisible()
   await user.click(screen.getByRole('button', { name: /添加 常规标题/ }))
   const input = screen.getByLabelText('标题', { selector: 'textarea' })
   await user.clear(input)

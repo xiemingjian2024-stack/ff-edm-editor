@@ -20,6 +20,15 @@ it('每个 EDM 只保留最近一次导出快照', async () => {
   expect(await repo.listExports()).toEqual([expect.objectContaining({ id: 'same', draft: expect.objectContaining({ name: '第二版' }) })])
 })
 
+it('保存、覆盖和删除自定义配色套餐', async () => {
+  const repo = createDraftRepository(`test-${crypto.randomUUID()}`)
+  await repo.savePalette({ id: 'summer', name: '夏日', slots: { A: '#FFFFFF', B: '#FFAC33', C: '#000000' } })
+  await repo.savePalette({ id: 'summer', name: '夏日新版', slots: { A: '#FFF000', B: '#FFAC33', C: '#111111' } })
+  expect(await repo.listPalettes()).toEqual([expect.objectContaining({ id: 'summer', name: '夏日新版' })])
+  await repo.deletePalette('summer')
+  expect(await repo.listPalettes()).toEqual([])
+})
+
 it('加载旧草稿时补充配色套餐', async () => {
   const repo = createDraftRepository(`test-${crypto.randomUUID()}`)
   await repo.save({ ...initialEditorState.draft, id: 'legacy', themePaletteId: undefined } as never)

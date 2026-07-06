@@ -1,11 +1,12 @@
 import { openDB } from 'idb'
-import type { EdmDraft, ExportRecord } from '../domain/edm'
+import type { EdmDraft, ExportRecord, ThemePalette } from '../domain/edm'
 import { migrateDraftTheme } from '../themes/resolveThemeColor'
 
 export function createDraftRepository(name = 'ff-edm-builder') {
-  const database = openDB(name, 2, { upgrade(db) {
+  const database = openDB(name, 3, { upgrade(db) {
     if (!db.objectStoreNames.contains('drafts')) db.createObjectStore('drafts', { keyPath: 'id' })
     if (!db.objectStoreNames.contains('exports')) db.createObjectStore('exports', { keyPath: 'id' })
+    if (!db.objectStoreNames.contains('palettes')) db.createObjectStore('palettes', { keyPath: 'id' })
   } })
   return {
     async save(draft: EdmDraft) { (await database).put('drafts', structuredClone(draft)) },
@@ -16,6 +17,9 @@ export function createDraftRepository(name = 'ff-edm-builder') {
     async saveExport(record: ExportRecord) { (await database).put('exports', structuredClone(record)) },
     async listExports() { const items = await (await database).getAll('exports') as ExportRecord[]; return items.sort((a, b) => b.exportedAt.localeCompare(a.exportedAt)) },
     async deleteExport(id: string) { (await database).delete('exports', id) },
+    async savePalette(palette: ThemePalette) { (await database).put('palettes', structuredClone(palette)) },
+    async listPalettes() { return await (await database).getAll('palettes') as ThemePalette[] },
+    async deletePalette(id: string) { (await database).delete('palettes', id) },
   }
 }
 export const draftRepository = createDraftRepository()

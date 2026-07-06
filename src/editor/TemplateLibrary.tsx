@@ -21,18 +21,25 @@ const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', informa
 const paletteSlotNames: Record<string, string> = { A: '背景间隔色 A', B: '背景间隔色 B', C: '按钮色 C' }
 const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'single-selling-point-information': singlePointThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb, 'footer-links': footerThumb }
 
-export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
+type PaletteForm = { id: string; name: string; A: string; B: string; C: string }
+const isHex = (value: string) => /^#[0-9A-Fa-f]{6}$/.test(value)
+
+export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {}, onPaletteSave = () => {}, onPaletteDelete = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void; onPaletteSave?: (palette: ThemePalette) => void; onPaletteDelete?: (paletteId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())
   const [activeTab, setActiveTab] = useState<'floors' | 'palettes'>('floors')
+  const [paletteForm, setPaletteForm] = useState<PaletteForm | null>(null)
+  const startPalette = (palette?: ThemePalette, duplicate = false) => setPaletteForm(palette ? { id: duplicate ? crypto.randomUUID() : palette.id, name: duplicate ? `${palette.name} - 副本` : palette.name, A: palette.slots.A, B: palette.slots.B, C: palette.slots.C } : { id: crypto.randomUUID(), name: '', A: '#FFFFFF', B: '#FFAC33', C: '#000000' })
+  const validPalette = Boolean(paletteForm?.name.trim() && isHex(paletteForm.A) && isHex(paletteForm.B) && isHex(paletteForm.C))
   const filtered = templateRegistry.filter(item => !item.definition.hiddenInLibrary && (item.definition.name.toLowerCase().includes(deferredQuery) || categoryNames[item.definition.category].toLowerCase().includes(deferredQuery)))
   return <aside className="panel template-library">
     <div className="library-tabs"><button className={activeTab === 'floors' ? 'is-active' : ''} onClick={() => setActiveTab('floors')}>楼层</button><button className={activeTab === 'palettes' ? 'is-active' : ''} onClick={() => setActiveTab('palettes')}>配色</button></div>
     {activeTab === 'palettes' ? <div className="palette-library">
-      <header><h2>配色套餐</h2><p>统一控制楼层间隔背景与按钮颜色。</p></header>
-      {palettes.map(palette => <button className={`palette-card ${palette.id === paletteId ? 'is-selected' : ''}`} key={palette.id} onClick={() => onPaletteChange(palette.id)} aria-label={`应用配色套餐 ${palette.name}`}>
-        <span className="palette-card-title"><strong>{palette.name}</strong>{palette.id === paletteId ? <em>使用中</em> : null}</span>
-        <span className="palette-slot-list">{Object.entries(palette.slots).map(([slot, color]) => <span className="palette-slot" key={slot}><i style={{ backgroundColor: color }} /><span><strong>{paletteSlotNames[slot] ?? `配色 ${slot}`}</strong><small>{color}</small></span></span>)}</span>
-      </button>)}
+      <header><div><h2>配色套餐</h2><p>统一控制楼层间隔背景与按钮颜色。</p></div><button type="button" onClick={() => startPalette()} aria-label="新建配色">新建</button></header>
+      {paletteForm ? <div className="palette-form"><label><span>配色名称</span><input aria-label="配色名称" value={paletteForm.name} onChange={event => setPaletteForm({ ...paletteForm, name: event.target.value })}/></label>{(['A', 'B', 'C'] as const).map(slot => <label key={slot}><span>{paletteSlotNames[slot]}</span><div><i style={{ backgroundColor: isHex(paletteForm[slot]) ? paletteForm[slot] : '#FFFFFF' }}/><input aria-label={`${paletteSlotNames[slot]} 色值`} value={paletteForm[slot]} onChange={event => setPaletteForm({ ...paletteForm, [slot]: event.target.value })}/></div></label>)}<div className="palette-form-actions"><button type="button" onClick={() => setPaletteForm(null)}>取消</button><button type="button" aria-label="保存配色" disabled={!validPalette} onClick={() => { if (!validPalette) return; onPaletteSave({ id: paletteForm.id, name: paletteForm.name.trim(), slots: { A: paletteForm.A.toUpperCase(), B: paletteForm.B.toUpperCase(), C: paletteForm.C.toUpperCase() } }); setPaletteForm(null) }}>保存</button></div></div> : null}
+      {palettes.map(palette => <div className={`palette-card ${palette.id === paletteId ? 'is-selected' : ''}`} key={palette.id}>
+        <button className="palette-apply" onClick={() => onPaletteChange(palette.id)} aria-label={`应用配色套餐 ${palette.name}`}><span className="palette-card-title"><strong>{palette.name}</strong>{palette.id === paletteId ? <em>使用中</em> : null}</span><span className="palette-slot-list">{Object.entries(palette.slots).map(([slot, color]) => <span className="palette-slot" key={slot}><i style={{ backgroundColor: color }} /><span><strong>{paletteSlotNames[slot] ?? `配色 ${slot}`}</strong><small>{color}</small></span></span>)}</span></button>
+        {palette.id !== classicPalette.id ? <div className="palette-card-actions"><button aria-label={`编辑 ${palette.name}`} onClick={() => startPalette(palette)}>编辑</button><button aria-label={`复制 ${palette.name}`} onClick={() => startPalette(palette, true)}>复制</button><button aria-label={`删除 ${palette.name}`} onClick={() => onPaletteDelete(palette.id)}>删除</button></div> : null}
+      </div>)}
     </div> : <>
     <label className="template-search"><Icon name="search"/><input aria-label="搜索楼层模板" placeholder="搜索楼层..." value={query} onChange={event => setQuery(event.target.value)}/></label>
     {filtered.length === 0 ? <div className="library-empty"><strong>没有匹配的楼层</strong><p>换一个关键词试试</p></div> : null}

@@ -47,6 +47,29 @@ it('在楼层和配色内容之间切换', async () => {
   expect(screen.getByLabelText('搜索楼层模板')).toBeVisible()
 })
 
+it('创建自定义配色并校验十六进制颜色', async () => {
+  const user = userEvent.setup(); const onPaletteSave = vi.fn()
+  render(<TemplateLibrary onAdd={() => {}} paletteId={classicPalette.id} palettes={[classicPalette]} onPaletteSave={onPaletteSave} />)
+  await user.click(screen.getByRole('button', { name: '配色' }))
+  await user.click(screen.getByRole('button', { name: '新建配色' }))
+  await user.type(screen.getByLabelText('配色名称'), '暖秋')
+  await user.clear(screen.getByLabelText('背景间隔色 A 色值')); await user.type(screen.getByLabelText('背景间隔色 A 色值'), '错误')
+  expect(screen.getByRole('button', { name: '保存配色' })).toBeDisabled()
+  await user.clear(screen.getByLabelText('背景间隔色 A 色值')); await user.type(screen.getByLabelText('背景间隔色 A 色值'), '#FFF7EA')
+  await user.click(screen.getByRole('button', { name: '保存配色' }))
+  expect(onPaletteSave).toHaveBeenCalledWith(expect.objectContaining({ name: '暖秋', slots: { A: '#FFF7EA', B: '#FFAC33', C: '#000000' } }))
+})
+
+it('经典配色只读，自定义配色可编辑、复制和删除', async () => {
+  const user = userEvent.setup(); const custom = { id: 'custom', name: '自定义', slots: { A: '#EEEEEE', B: '#FFAC33', C: '#111111' } }
+  render(<TemplateLibrary onAdd={() => {}} palettes={[classicPalette, custom]} onPaletteSave={() => {}} onPaletteDelete={() => {}} />)
+  await user.click(screen.getByRole('button', { name: '配色' }))
+  expect(screen.queryByRole('button', { name: `编辑 ${classicPalette.name}` })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '编辑 自定义' })).toBeVisible()
+  expect(screen.getByRole('button', { name: '复制 自定义' })).toBeVisible()
+  expect(screen.getByRole('button', { name: '删除 自定义' })).toBeVisible()
+})
+
 it('只展示两个新 Banner，不展示旧临时 Banner', () => {
   render(<TemplateLibrary onAdd={() => {}} />)
   expect(screen.getByRole('button', { name: '添加 常规 Banner' })).toBeVisible()

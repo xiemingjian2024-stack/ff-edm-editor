@@ -82,14 +82,15 @@ it('注册支持 1 至 4 个商品的 N×1 商品卡', () => {
   expect(template?.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '1', options: [{ label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }] })
   expect(template?.productSlots).toHaveLength(4)
   expect(template?.productSlotCountFieldId).toBe('productCount')
+  expect(template?.fields.filter(field => field.id.startsWith('cardBackground')).map(field => field.defaultValue)).toEqual(['#F6E2CC', '#E1DEE8', '#E3F1FF', '#FFDAD0'])
   expect(template?.themeColorFields).toBeUndefined()
 })
 
-it('N×1 商品卡按商品数量左右交替并统一卡片与图片背景', () => {
+it('N×1 商品卡按商品数量左右交替并为卡片与图片使用对应背景', () => {
   const entry = templateRegistry.find(item => item.definition.id === 'product-list-n-by-1')!
   const floor = {
     id: 'product-list', templateId: entry.definition.id,
-    values: { title: 'Title', description: 'Description', buttonText: 'See More', cardButtonText: 'Shop Now', productCount: '3', pricePrefix: 'From', background: '#FFFFFF', cardBackground: '#F5E1C9', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
+    values: { title: 'Title', description: 'Description', buttonText: 'See More', cardButtonText: 'Shop Now', productCount: '3', pricePrefix: 'From', background: '#FFFFFF', cardBackground1: '#F6E2CC', cardBackground2: '#E1DEE8', cardBackground3: '#E3F1FF', cardBackground4: '#FFDAD0', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
     products: {
       'product-1': { image: 'one.png', title: 'One', price: '£10', url: '/one' },
       'product-2': { image: 'two.png', title: 'Two', price: '£20', url: '/two' },
@@ -102,8 +103,10 @@ it('N×1 商品卡按商品数量左右交替并统一卡片与图片背景', ()
   expect(cards[0]).toHaveClass('is-image-left')
   expect(cards[1]).toHaveClass('is-image-right')
   expect(cards[2]).toHaveClass('is-image-left')
-  expect(cards[0]).toHaveStyle({ backgroundColor: '#F5E1C9' })
-  expect(screen.getAllByTestId('product-list-n-image')[0]).toHaveStyle({ backgroundColor: '#F5E1C9' })
+  expect(cards[0]).toHaveStyle({ backgroundColor: '#F6E2CC' })
+  expect(cards[1]).toHaveStyle({ backgroundColor: '#E1DEE8' })
+  expect(cards[2]).toHaveStyle({ backgroundColor: '#E3F1FF' })
+  expect(screen.getAllByTestId('product-list-n-image')[0]).toHaveStyle({ backgroundColor: '#F6E2CC' })
   expect(screen.getByText('From £10')).toBeVisible()
   expect(screen.getAllByText('Shop Now')).toHaveLength(3)
 })

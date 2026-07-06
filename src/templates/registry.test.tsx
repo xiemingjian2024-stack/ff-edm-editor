@@ -6,6 +6,15 @@ it('注册 HEAD、Banner、标题、信息、商品卡和页尾模板', () => {
   expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card', 'footer'])
 })
 
+it('信息和商品卡按运营使用顺序排列', () => {
+  expect(templateRegistry.filter(item => item.definition.category === 'information').map(item => item.definition.id)).toEqual([
+    'single-selling-point-information', 'selling-points-information', 'comparison-information', 'code-information',
+  ])
+  expect(templateRegistry.filter(item => item.definition.category === 'product-card').map(item => item.definition.id)).toEqual([
+    'product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3',
+  ])
+})
+
 it('注册支持 1 至 6 条链接且固定上下图片的页尾模板', () => {
   const entry = templateRegistry.find(item => item.definition.id === 'footer-links')!
   expect(entry.definition.name).toBe('页尾')

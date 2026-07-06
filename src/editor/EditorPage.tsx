@@ -19,7 +19,7 @@ export function EditorPage({ initialDraft, onBack, onSave }: { initialDraft?: Ed
   useEffect(() => { const timer = window.setTimeout(() => onSave?.(state.draft), 500); return () => window.clearTimeout(timer) }, [state.draft, onSave])
   const selected = state.draft.floors.find(item => item.id === state.selectedFloorId)
   return <div className="app-shell">
-    <EditorToolbar name={state.draft.name} zoom={zoom} onNameChange={name => dispatch({ type: 'renameDraft', name })} onBack={onBack} onPreview={() => setDialog('preview')} onExport={() => setDialog('export')}/>
+    <EditorToolbar name={state.draft.name} onNameChange={name => dispatch({ type: 'renameDraft', name })} onBack={onBack} onPreview={() => setDialog('preview')} onExport={() => setDialog('export')}/>
     <div className="workspace">
       <EditorRail onBack={onBack}/>
       <TemplateLibrary onAdd={templateId => dispatch({ type: 'addFloor', templateId })} paletteId={state.draft.themePaletteId} palettes={themePalettes} onPaletteChange={paletteId => dispatch({ type: 'changeThemePalette', paletteId })} />

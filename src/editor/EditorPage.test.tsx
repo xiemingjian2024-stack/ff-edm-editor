@@ -17,6 +17,14 @@ it('添加、编辑、复制并删除楼层', async () => {
   expect(screen.getAllByRole('heading', { name: 'Summer Picks' })).toHaveLength(1)
 })
 
+it('顶部将 EDM 标题居中且不再展示画布规格', () => {
+  render(<EditorPage />)
+  expect(screen.getByLabelText('EDM 名称').parentElement).toHaveClass('toolbar-project')
+  expect(screen.getByText('已保存到当前浏览器')).toBeVisible()
+  expect(screen.queryByText('375 PX')).not.toBeInTheDocument()
+  expect(screen.queryByText('100%', { selector: '.toolbar-viewport span' })).not.toBeInTheDocument()
+})
+
 it('不提供字号和位置编辑控件', async () => {
   const user = userEvent.setup()
   render(<EditorPage />)

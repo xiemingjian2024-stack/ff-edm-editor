@@ -16,5 +16,5 @@ import { footerLinks } from './footer-links'
 import './templateStyles.css'
 import './fonts.css'
 
-export const templateRegistry = [headBrandLogo, headCategoryNavigation, bannerRegular, bannerImageCopy, bannerSimple, titleCentered, comparisonInformation, singleSellingPointInformation, sellingPointsInformation, codeInformation, productGridNBy2, productListNBy1, productGridNBy3, footerLinks].map(entry => ({ ...entry, definition: parseTemplate(entry.definition) }))
+export const templateRegistry = [headBrandLogo, headCategoryNavigation, bannerRegular, bannerImageCopy, bannerSimple, titleCentered, singleSellingPointInformation, sellingPointsInformation, comparisonInformation, codeInformation, productListNBy1, productGridNBy2, productGridNBy3, footerLinks].map(entry => ({ ...entry, definition: parseTemplate(entry.definition) }))
 export const getTemplate = (id: string) => templateRegistry.find(item => item.definition.id === id)

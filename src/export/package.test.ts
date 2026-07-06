@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 import JSZip from 'jszip'
-import { addRenderedFloorsToZip, type RenderedFloor } from './package'
+import { addRenderedFloorsToZip, getAnimatedBannerFileName, isAnimatedBanner, type RenderedFloor } from './package'
 
 it('不把 includeFull=false 的整层 JPG 写入 ZIP', () => {
   const zip = new JSZip()
@@ -17,4 +17,12 @@ it('普通模板仍写入整层 JPG', () => {
   const floor: RenderedFloor = { fullName: '01-banner-full.jpg', full: new Blob(['full']), width: 750, height: 500, includeFull: true, regions: [] }
   addRenderedFloorsToZip(zip, [floor])
   expect(Object.keys(zip.files)).toEqual(['01-banner-full.jpg'])
+})
+
+it('只把启用且至少有两帧的 Banner 作为 GIF 导出', () => {
+  const floor = { templateId: 'banner-regular', animation: { enabled: true, intervalMs: 1000, frames: [{ image: 'a' }, { image: 'b' }] } }
+  expect(isAnimatedBanner(floor as never)).toBe(true)
+  expect(isAnimatedBanner({ ...floor, animation: { ...floor.animation, enabled: false } } as never)).toBe(false)
+  expect(isAnimatedBanner({ ...floor, templateId: 'title-centered' } as never)).toBe(false)
+  expect(getAnimatedBannerFileName(3)).toBe('03-banner-item-01.gif')
 })

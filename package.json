@@ -17,6 +17,7 @@
     "@dnd-kit/sortable": "latest",
     "@dnd-kit/utilities": "latest",
     "express": "latest",
+    "gifenc": "^1.0.3",
     "html-to-image": "latest",
     "idb": "latest",
     "jszip": "latest",

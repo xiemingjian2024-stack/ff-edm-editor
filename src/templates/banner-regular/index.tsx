@@ -36,7 +36,6 @@ export const bannerRegular: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#FFAC33' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#000000' },
     ],
-    themeColorFields: [],
     mediaConfig: {}, heightConfig: { fieldId: 'height', min: 250, max: 600, offset: 0 },
     productSlots: [], exportRegions: [{ id: 'full', name: '常规 Banner', x: 0, y: 0, width: 375, height: 375, mediaLink: true }],
   }, Renderer: BannerRegular,

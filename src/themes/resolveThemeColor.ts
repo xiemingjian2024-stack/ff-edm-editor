@@ -15,13 +15,37 @@ export function resolveThemeColor(
   return palette.slots[binding?.slot ?? defaultSlot] ?? fallback
 }
 
-export function resolveFloorForRender(floor: FloorInstance, template: FloorTemplate, palette: ThemePalette): FloorInstance {
+const fixedBackgroundTemplateIds = new Set(['head-brand-logo', 'head-category-navigation'])
+const hasColorField = (template: FloorTemplate, fieldId: string) => template.fields.some(field => field.id === fieldId && field.type === 'color')
+
+export function getFloorThemeFields(template: FloorTemplate, alternatingBackgroundSlot: ThemeSlot): Array<{ fieldId: string; defaultSlot: ThemeSlot }> {
+  const fields: Array<{ fieldId: string; defaultSlot: ThemeSlot }> = []
+  if (hasColorField(template, 'background')) fields.push({ fieldId: 'background', defaultSlot: fixedBackgroundTemplateIds.has(template.id) || template.category === 'banner' ? 'A' : alternatingBackgroundSlot })
+  if (hasColorField(template, 'buttonBackground')) fields.push({ fieldId: 'buttonBackground', defaultSlot: 'C' })
+  return fields
+}
+
+export function getThemeFieldsForFloors(floors: FloorInstance[], findTemplate: FindTemplate = getTemplate): Record<string, Array<{ fieldId: string; defaultSlot: ThemeSlot }>> {
+  let nextBackgroundSlot: ThemeSlot = 'A'
+  return Object.fromEntries(floors.map(floor => {
+    const template = findTemplate(floor.templateId)?.definition
+    if (!template) return [floor.id, []]
+    const fixedBackground = fixedBackgroundTemplateIds.has(template.id) || template.category === 'banner'
+    const fields = getFloorThemeFields(template, nextBackgroundSlot)
+    if (fixedBackground) nextBackgroundSlot = 'B'
+    else if (fields.some(field => field.fieldId === 'background')) nextBackgroundSlot = nextBackgroundSlot === 'A' ? 'B' : 'A'
+    return [floor.id, fields]
+  }))
+}
+
+export function resolveFloorForRender(floor: FloorInstance, template: FloorTemplate, palette: ThemePalette, themeFields = template.themeColorFields ?? []): FloorInstance {
   const values = { ...floor.values }
-  for (const themedField of template.themeColorFields ?? []) {
+  for (const themedField of themeFields) {
     const field = template.fields.find(item => item.id === themedField.fieldId && item.type === 'color')
     if (!field) continue
+    const binding = floor.themeColors?.[themedField.fieldId]
     values[themedField.fieldId] = resolveThemeColor(
-      floor.themeColors?.[themedField.fieldId],
+      binding?.mode === 'custom' ? binding : undefined,
       themedField.defaultSlot,
       palette,
       field.defaultValue,
@@ -31,8 +55,9 @@ export function resolveFloorForRender(floor: FloorInstance, template: FloorTempl
 }
 
 export function migrateDraftTheme(draft: LegacyEdmDraft, findTemplate: FindTemplate = getTemplate): EdmDraft {
+  const themeFields = getThemeFieldsForFloors(draft.floors, findTemplate)
   const floors = draft.floors.map(floor => {
-    const declarations = findTemplate(floor.templateId)?.definition.themeColorFields ?? []
+    const declarations = themeFields[floor.id] ?? []
     if (floor.themeColors || declarations.length === 0) return floor
     const themeColors = Object.fromEntries(declarations.map(({ fieldId, defaultSlot }) => {
       const existing = floor.values[fieldId]

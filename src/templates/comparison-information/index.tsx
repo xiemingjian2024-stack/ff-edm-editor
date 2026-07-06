@@ -42,7 +42,6 @@ export const comparisonInformation: RegisteredTemplate = {
       { id: 'background', type: 'color', label: '背景颜色', defaultValue: '#FFAC33' },
       { id: 'textColor', type: 'color', label: '文字颜色', defaultValue: '#000000' },
     ],
-    themeColorFields: [{ fieldId: 'background', defaultSlot: 'C' }],
     mediaSlots: [{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }],
     autoHeight: true,
     productSlots: [], exportRegions: [{ id: 'full', name: '对比信息', x: 0, y: 0, width: 375, height: 420 }],

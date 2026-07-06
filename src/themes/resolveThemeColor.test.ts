@@ -1,11 +1,48 @@
 import { describe, expect, it } from 'vitest'
 import { classicPalette } from './palettes'
-import { migrateDraftTheme, resolveThemeColor } from './resolveThemeColor'
+import { getFloorThemeFields, getThemeFieldsForFloors, migrateDraftTheme, resolveFloorForRender, resolveThemeColor } from './resolveThemeColor'
+import { getTemplate } from '../templates/registry'
 
 describe('主题颜色解析', () => {
+  it('经典套餐使用白、橙、黑三色', () => {
+    expect(classicPalette.slots).toEqual({ A: '#FFFFFF', B: '#FFAC33', C: '#000000' })
+  })
+
+  it('普通楼层背景按位置交替 A/B 且按钮固定使用 C', () => {
+    const template = getTemplate('title-centered')!.definition
+    expect(getFloorThemeFields(template, 'A')).toEqual([{ fieldId: 'background', defaultSlot: 'A' }, { fieldId: 'buttonBackground', defaultSlot: 'C' }])
+    expect(getFloorThemeFields(template, 'B')).toEqual([{ fieldId: 'background', defaultSlot: 'B' }, { fieldId: 'buttonBackground', defaultSlot: 'C' }])
+    const floor = { id: 'title', templateId: template.id, values: { background: '#eeeeee', buttonBackground: '#eeeeee' }, products: {} }
+    expect(resolveFloorForRender(floor, template, classicPalette, getFloorThemeFields(template, 'B')).values).toMatchObject({ background: '#FFAC33', buttonBackground: '#000000' })
+  })
+
+  it('Logo、分类导航和 Banner 背景固定使用 A', () => {
+    for (const id of ['head-brand-logo', 'head-category-navigation', 'banner-image-copy']) {
+      const template = getTemplate(id)!.definition
+      expect(getFloorThemeFields(template, 'B').find(field => field.fieldId === 'background')?.defaultSlot).toBe('A')
+    }
+  })
+
+  it('固定 A 的分类导航和 Banner 之后从 B 继续交替', () => {
+    const floors = [
+      { id: 'nav', templateId: 'head-category-navigation', values: {}, products: {} },
+      { id: 'title-1', templateId: 'title-centered', values: {}, products: {} },
+      { id: 'banner', templateId: 'banner-regular', values: {}, products: {} },
+      { id: 'title-2', templateId: 'title-centered', values: {}, products: {} },
+      { id: 'title-3', templateId: 'title-centered', values: {}, products: {} },
+    ]
+    const fields = getThemeFieldsForFloors(floors)
+    expect(floors.map(floor => fields[floor.id].find(field => field.fieldId === 'background')?.defaultSlot)).toEqual(['A', 'B', undefined, 'B', 'A'])
+  })
+
+  it('手动颜色覆盖动态背景与按钮色', () => {
+    const template = getTemplate('title-centered')!.definition
+    const floor = { id: 'title', templateId: template.id, values: { background: '#eeeeee', buttonBackground: '#eeeeee' }, products: {}, themeColors: { background: { mode: 'custom' as const, color: '#123456' }, buttonBackground: { mode: 'custom' as const, color: '#654321' } } }
+    expect(resolveFloorForRender(floor, template, classicPalette, getFloorThemeFields(template, 'B')).values).toMatchObject({ background: '#123456', buttonBackground: '#654321' })
+  })
   it('按自定义覆盖、套餐色位、字段默认值的顺序解析', () => {
     expect(resolveThemeColor({ mode: 'custom', color: '#123456' }, 'A', classicPalette, '#FFFFFF')).toBe('#123456')
-    expect(resolveThemeColor({ mode: 'theme', slot: 'C' }, 'A', classicPalette, '#FFFFFF')).toBe('#FFAC33')
+    expect(resolveThemeColor({ mode: 'theme', slot: 'C' }, 'A', classicPalette, '#FFFFFF')).toBe('#000000')
     expect(resolveThemeColor({ mode: 'theme', slot: 'D' }, 'A', classicPalette, '#ABCDEF')).toBe('#ABCDEF')
   })
 

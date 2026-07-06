@@ -15,6 +15,10 @@ it('信息和商品卡按运营使用顺序排列', () => {
   ])
 })
 
+it('模板不再声明固定主题色位', () => {
+  expect(templateRegistry.every(item => (item.definition.themeColorFields ?? []).length === 0)).toBe(true)
+})
+
 it('注册支持 1 至 6 条链接且固定上下图片的页尾模板', () => {
   const entry = templateRegistry.find(item => item.definition.id === 'footer-links')!
   expect(entry.definition.name).toBe('页尾')
@@ -33,7 +37,7 @@ it('注册支持 1 至 6 条链接且固定上下图片的页尾模板', () => {
   expect(screen.getByTestId('footer-copy')).toHaveAttribute('src', expect.stringContaining('footer-copy'))
 })
 
-it('注册只绑定背景色位的 CODE 信息模板', () => {
+it('注册不声明固定色位的 CODE 信息模板', () => {
   const template = templateRegistry.find(item => item.definition.id === 'code-information')?.definition
   expect(template?.name).toBe('CODE')
   expect(template?.category).toBe('information')
@@ -41,7 +45,7 @@ it('注册只绑定背景色位的 CODE 信息模板', () => {
   expect(template?.fields.map(field => field.id)).toEqual(['topText', 'actionText', 'noteText', 'background', 'accentColor'])
   expect(template?.productSlots).toEqual([])
   expect(template?.mediaSlots).toBeUndefined()
-  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template?.themeColorFields).toBeUndefined()
 })
 
 it('CODE 模板渲染三段结构并让行动元素共用强调色', () => {
@@ -69,7 +73,7 @@ it('用 N×2 商品卡替换旧双列商品卡', () => {
   expect(template?.productSlotCountFieldId).toBe('productCount')
   expect(template?.domExportRegions).toBe(true)
   expect(template?.exportRegions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'button'])
-  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template?.themeColorFields).toBeUndefined()
 })
 
 it('注册支持 1 至 4 个商品的 N×1 商品卡', () => {
@@ -78,7 +82,7 @@ it('注册支持 1 至 4 个商品的 N×1 商品卡', () => {
   expect(template?.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '1', options: [{ label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }] })
   expect(template?.productSlots).toHaveLength(4)
   expect(template?.productSlotCountFieldId).toBe('productCount')
-  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template?.themeColorFields).toBeUndefined()
 })
 
 it('N×1 商品卡按商品数量左右交替并统一卡片与图片背景', () => {
@@ -147,7 +151,7 @@ it('注册固定三槽位且隐藏价格的 N×3 商品卡', () => {
   ])
   expect(template?.productSlotCountFieldId).toBeUndefined()
   expect(template?.fields.some(field => field.id === 'pricePrefix')).toBe(false)
-  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template?.themeColorFields).toBeUndefined()
 })
 
 it('N×3 渲染三张卡、固定五星和单行标题', () => {
@@ -172,7 +176,7 @@ it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
   expect(template?.fields.find(field => field.id === 'itemCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '4 个卖点', value: '4' }] })
   expect(template?.mediaSlots?.map(slot => slot.id)).toEqual(['point1', 'point2', 'point3', 'point4'])
   expect(template?.mediaSlotCountFieldId).toBe('itemCount')
-  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template?.themeColorFields).toBeUndefined()
 })
 
 it('卖点信息按数量显示卖点并将按钮放在网格之后', () => {
@@ -197,7 +201,7 @@ it('注册单卖点信息模板及可调图片高度', () => {
   expect(template?.autoHeight).toBe(true)
   expect(template?.fields.find(field => field.id === 'imageHeight')).toMatchObject({ type: 'range', defaultValue: '200', min: 100, max: 300, step: 1, unit: 'px' })
   expect(template?.mediaSlots).toEqual([{ id: 'feature', label: '卖点图片' }])
-  expect(template?.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template?.themeColorFields).toBeUndefined()
   expect(template?.exportRegions).toEqual([{ id: 'full', name: '单卖点信息', x: 0, y: 0, width: 375, height: 390 }])
 })
 
@@ -216,11 +220,11 @@ it('单卖点信息按设置显示图片高度并将可选按钮放在图片之�
   expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.single-selling-point-button \{[^}]*margin-top: 20px;/)
 })
 
-it('分类导航固定为 375×46 且只有背景关联主题色位', () => {
+it('分类导航固定为 375×46 且不声明固定主题色位', () => {
   const template = templateRegistry.find(item => item.definition.id === 'head-category-navigation')!.definition
   expect(template.designHeight).toBe(46)
   expect(template.exportFullImage).toBe(false)
-  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template.themeColorFields).toBeUndefined()
   expect(template.navigationConfig?.defaultItems.slice(0, 3).map(item => item.text)).toEqual(['Home', 'Carrier & Travel', 'Couch Covers'])
 })
 
@@ -230,16 +234,16 @@ it('注册两个新 Banner 并保留隐藏的旧 Banner', () => {
   const legacy = templateRegistry.find(item => item.definition.id === 'banner-simple')!.definition
   expect(regular.designHeight).toBe(375)
   expect(regular.heightConfig).toEqual({ fieldId: 'height', min: 250, max: 600, offset: 0 })
-  expect(regular.themeColorFields).toEqual([])
+  expect(regular.themeColorFields).toBeUndefined()
   expect(imageCopy.heightConfig).toEqual({ fieldId: 'imageHeight', min: 200, max: 500, offset: 180 })
-  expect(imageCopy.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(imageCopy.themeColorFields).toBeUndefined()
   expect(legacy.hiddenInLibrary).toBe(true)
 })
 
-it('HEAD 品牌 Logo 使用固定尺寸和主题色位 A', () => {
+it('HEAD 品牌 Logo 使用固定尺寸且不声明固定主题色位', () => {
   const template = templateRegistry.find(item => item.definition.id === 'head-brand-logo')!.definition
   expect(template.designHeight).toBe(56)
-  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(template.themeColorFields).toBeUndefined()
   expect(template.exportRegions).toEqual([{ id: 'full', name: 'HEAD 品牌 Logo', x: 0, y: 0, width: 375, height: 56 }])
 })
 
@@ -248,7 +252,7 @@ it('标题文本常规模板包含内容、对齐、颜色和自适应高度配�
   expect(entry.definition.name).toBe('常规标题')
   expect(entry.definition.autoHeight).toBe(true)
   expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
-  expect(entry.definition.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'A' }])
+  expect(entry.definition.themeColorFields).toBeUndefined()
   expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.title-content \{[^}]*padding: 24px;/)
 })
 
@@ -284,7 +288,7 @@ it('注册固定尺寸的对比信息模板与双媒体槽位', () => {
   expect(template.designHeight).toBe(420)
   expect(template.autoHeight).toBe(true)
   expect(template.mediaSlots).toEqual([{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }])
-  expect(template.themeColorFields).toEqual([{ fieldId: 'background', defaultSlot: 'C' }])
+  expect(template.themeColorFields).toBeUndefined()
 })
 
 it('对比信息将文字颜色显式应用到标题、描述和结果文案', () => {

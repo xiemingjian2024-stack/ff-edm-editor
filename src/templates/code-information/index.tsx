@@ -28,7 +28,6 @@ export const codeInformation: RegisteredTemplate = {
       { id: 'background', type: 'color', label: '背景颜色', defaultValue: '#FFFFFF' },
       { id: 'accentColor', type: 'color', label: '强调颜色', defaultValue: '#FFAC33' },
     ],
-    themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }],
     exportFullImage: false,
     productSlots: [],
     exportRegions: [

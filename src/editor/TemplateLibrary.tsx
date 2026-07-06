@@ -18,6 +18,7 @@ import productGridThreeThumb from '../assets/thumbnails/缩略图-商品卡-Nx3�
 import footerThumb from '../assets/thumbnails/缩略图-页尾-页尾.svg'
 
 const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: '页尾' }
+const paletteSlotNames: Record<string, string> = { A: '背景间隔色 A', B: '背景间隔色 B', C: '按钮色 C' }
 const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'single-selling-point-information': singlePointThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb, 'footer-links': footerThumb }
 
 export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
@@ -27,10 +28,10 @@ export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes
   return <aside className="panel template-library">
     <div className="library-tabs"><button className={activeTab === 'floors' ? 'is-active' : ''} onClick={() => setActiveTab('floors')}>楼层</button><button className={activeTab === 'palettes' ? 'is-active' : ''} onClick={() => setActiveTab('palettes')}>配色</button></div>
     {activeTab === 'palettes' ? <div className="palette-library">
-      <header><h2>配色套餐</h2><p>选择后，关联主题色位的楼层会同步更新。</p></header>
+      <header><h2>配色套餐</h2><p>统一控制楼层间隔背景与按钮颜色。</p></header>
       {palettes.map(palette => <button className={`palette-card ${palette.id === paletteId ? 'is-selected' : ''}`} key={palette.id} onClick={() => onPaletteChange(palette.id)} aria-label={`应用配色套餐 ${palette.name}`}>
         <span className="palette-card-title"><strong>{palette.name}</strong>{palette.id === paletteId ? <em>使用中</em> : null}</span>
-        <span className="palette-slot-list">{Object.entries(palette.slots).map(([slot, color]) => <span className="palette-slot" key={slot}><i style={{ backgroundColor: color }} /><span><strong>主题色位 {slot}</strong><small>{color}</small></span></span>)}</span>
+        <span className="palette-slot-list">{Object.entries(palette.slots).map(([slot, color]) => <span className="palette-slot" key={slot}><i style={{ backgroundColor: color }} /><span><strong>{paletteSlotNames[slot] ?? `配色 ${slot}`}</strong><small>{color}</small></span></span>)}</span>
       </button>)}
     </div> : <>
     <label className="template-search"><Icon name="search"/><input aria-label="搜索楼层模板" placeholder="搜索楼层..." value={query} onChange={event => setQuery(event.target.value)}/></label>

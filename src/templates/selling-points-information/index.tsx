@@ -50,7 +50,6 @@ export const sellingPointsInformation: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#000000' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
-    themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }],
     mediaSlots: Array.from({ length: 4 }, (_, index) => ({ id: `point${index + 1}`, label: `卖点 ${index + 1} 图片` })),
     mediaSlotCountFieldId: 'itemCount', autoHeight: true, productSlots: [], exportRegions: [{ id: 'full', name: '多卖点信息', x: 0, y: 0, width: 375, height: 390 }],
   }, Renderer: SellingPointsInformation,

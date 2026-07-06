@@ -30,10 +30,10 @@ it('忽略模板未声明的字段', () => {
   expect(state.draft.floors[0].values.fontSize).toBeUndefined()
 })
 
-it('新增主题模板时建立默认色位关联', () => {
+it('新增模板时不写入固定色位关联', () => {
   const localReducer = createEditorReducer(() => 'head-1')
   const state = localReducer(initialEditorState, { type: 'addFloor', templateId: 'head-brand-logo' })
-  expect(state.draft.floors[0].themeColors?.background).toEqual({ mode: 'theme', slot: 'A' })
+  expect(state.draft.floors[0].themeColors?.background).toBeUndefined()
 })
 
 it('手动改色后脱离主题，并可重新关联', () => {

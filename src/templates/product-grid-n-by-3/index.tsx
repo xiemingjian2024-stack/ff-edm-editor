@@ -39,7 +39,6 @@ export const productGridNBy3: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#000000' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
-    themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }],
     productSlots, domExportRegions: true, autoHeight: true, exportFullImage: false,
     exportRegions: [
       { id: 'header', name: '标题与描述', x: 0, y: 0, width: 1, height: 1 },

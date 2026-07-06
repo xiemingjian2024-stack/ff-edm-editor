@@ -47,7 +47,6 @@ export const productListNBy1: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#000000' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
-    themeColorFields: [{ fieldId: 'background', defaultSlot: 'A' }],
     productSlots, productSlotCountFieldId: 'productCount', domExportRegions: true, autoHeight: true, exportFullImage: false, exportRegions,
   },
   Renderer: ProductListNBy1,

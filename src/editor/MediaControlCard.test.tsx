@@ -43,3 +43,10 @@ it('可以接入读取器从 Shopify 链接读取图片', async () => {
   await user.click(screen.getByRole('button', { name: '从链接获取 Banner 图片' }))
   expect(onChange).toHaveBeenCalledWith({ ...empty, image: 'first.jpg', url: 'https://shop/products/bed' })
 })
+
+it('上传图片时保存可持久化的数据地址', async () => {
+  const user = userEvent.setup(); const onChange = vi.fn()
+  render(<MediaControlCard label="卖点图片" value={empty} onChange={onChange} />)
+  await user.upload(screen.getByLabelText('上传 卖点图片'), new File(['image'], 'point.png', { type: 'image/png' }))
+  expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ image: expect.stringMatching(/^data:image\/png;base64,/), url: '' }))
+})

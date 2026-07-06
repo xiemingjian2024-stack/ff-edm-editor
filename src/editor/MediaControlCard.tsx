@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import type { MediaState, NormalizedProduct } from '../domain/edm'
+import { fileToDataUrl } from '../media/fileDataUrl'
 
 export function MediaControlCard({ label, value, onChange, reader, showTransformControls = true }: { label: string; value: MediaState; onChange: (value: MediaState) => void; reader?: (url: string) => Promise<NormalizedProduct>; showTransformControls?: boolean }) {
   const [url, setUrl] = useState(value.url)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const upload = (file?: File) => {
+  const upload = async (file?: File) => {
     if (!file) return
-    const image = URL.createObjectURL(file)
+    const image = await fileToDataUrl(file)
     setUrl('')
     onChange({ ...value, image, url: '' })
   }
@@ -19,7 +20,7 @@ export function MediaControlCard({ label, value, onChange, reader, showTransform
       if (!item || !type) return
       const image = await item.getType(type)
       setUrl('')
-      onChange({ ...value, image: URL.createObjectURL(image), url: '' })
+      onChange({ ...value, image: await fileToDataUrl(image), url: '' })
     } catch {
       return
     }

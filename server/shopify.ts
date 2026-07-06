@@ -18,8 +18,8 @@ export function buildProductJsonUrl(input: string) {
 const imageUrl = (value: string) => value.startsWith('//') ? `https:${value}` : value
 
 export function normalizeShopifyProduct(input: unknown, sourceUrl: string): NormalizedProduct {
-  const raw = rawProductSchema.parse(input); const requested = new URL(sourceUrl).searchParams.get('variant')
-  const variant = raw.variants.find(item => String(item.id) === requested) ?? raw.variants[0]
+  const raw = rawProductSchema.parse(input)
+  const variant = raw.variants.reduce((lowest, item) => Number(item.price) < Number(lowest.price) ? item : lowest)
   const price = typeof variant.price === 'number' ? (variant.price / 100).toFixed(2) : Number(variant.price).toFixed(2)
   const gallery = raw.images.map(imageUrl); const image = imageUrl(raw.featured_image ?? gallery[0] ?? '')
   return { title: raw.title, image, gallery, price, url: sourceUrl }

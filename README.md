@@ -4,14 +4,10 @@
 
 ## 本地运行
 
-需要 Node.js 20 或更高版本。打开两个终端：
+需要 Node.js 20 或更高版本：
 
 ```bash
 npm install
-npm run dev:server
-```
-
-```bash
 npm run dev
 ```
 
@@ -29,6 +25,6 @@ npm run test:e2e
 ## 原型限制
 
 - 草稿保存在当前浏览器的 IndexedDB 中，清理站点数据会删除草稿。
-- Shopify 自动读取需要同时启动本地商品服务。
+- Shopify 自动读取已集成到本地网页服务，无需单独启动商品服务。
 - JPG 本身不携带链接，请按 `link-manifest.csv` 在投放平台配置。
 - 原型不包含账号、云端同步、多人协作或正式部署。

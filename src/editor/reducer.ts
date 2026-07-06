@@ -22,7 +22,7 @@ export type EditorAction =
 const now = new Date().toISOString()
 export const initialEditorState: EditorState = { draft: { id: 'draft-local', name: '未命名 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: now, updatedAt: now }, selectedFloorId: null }
 
-function createFloor(templateId: string, id: string): FloorInstance {
+export function createFloorInstance(templateId: string, id: string): FloorInstance {
   const template = getTemplate(templateId)?.definition
   if (!template) throw new Error(`模板不存在：${templateId}`)
   return {
@@ -54,7 +54,7 @@ export function createEditorReducer(createId: () => string = () => crypto.random
     if (action.type === 'renameDraft') return { ...state, draft: { ...state.draft, name: action.name, updatedAt: new Date().toISOString() } }
     if (action.type === 'changeThemePalette') return { ...state, draft: { ...state.draft, themePaletteId: action.paletteId, updatedAt: new Date().toISOString() } }
     if (action.type === 'addFloor') {
-      const floor = createFloor(action.templateId, createId()); floors = [...floors, floor]; selectedFloorId = floor.id
+      const floor = createFloorInstance(action.templateId, createId()); floors = [...floors, floor]; selectedFloorId = floor.id
     } else if (action.type === 'duplicateFloor') {
       const index = floors.findIndex(item => item.id === action.floorId); if (index < 0) return state
       const copy = structuredClone(floors[index]); copy.id = createId(); floors = [...floors.slice(0, index + 1), copy, ...floors.slice(index + 1)]; selectedFloorId = copy.id

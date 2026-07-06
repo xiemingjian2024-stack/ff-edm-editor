@@ -55,9 +55,14 @@ export function createEditorReducer(createId: () => string = () => crypto.random
     if (action.type === 'renameDraft') return { ...state, draft: { ...state.draft, name: action.name, updatedAt: new Date().toISOString() } }
     if (action.type === 'changeThemePalette') return { ...state, draft: { ...state.draft, themePaletteId: action.paletteId, updatedAt: new Date().toISOString() } }
     if (action.type === 'addFloor') {
-      const floor = createFloorInstance(action.templateId, createId()); floors = [...floors, floor]; selectedFloorId = floor.id
+      if ((action.templateId === 'head-brand-logo' || action.templateId === 'footer-links') && floors.some(item => item.templateId === action.templateId)) return state
+      const floor = createFloorInstance(action.templateId, createId())
+      if (action.templateId === 'head-brand-logo') floors = [floor, ...floors]
+      else if (action.templateId === 'footer-links') floors = [...floors, floor]
+      else { const footerIndex = floors.findIndex(item => item.templateId === 'footer-links'); floors = footerIndex < 0 ? [...floors, floor] : [...floors.slice(0, footerIndex), floor, ...floors.slice(footerIndex)] }
+      selectedFloorId = floor.id
     } else if (action.type === 'duplicateFloor') {
-      const index = floors.findIndex(item => item.id === action.floorId); if (index < 0) return state
+      const index = floors.findIndex(item => item.id === action.floorId); if (index < 0 || floors[index].templateId === 'head-brand-logo' || floors[index].templateId === 'footer-links') return state
       const copy = structuredClone(floors[index]); copy.id = createId(); floors = [...floors.slice(0, index + 1), copy, ...floors.slice(index + 1)]; selectedFloorId = copy.id
     } else if (action.type === 'deleteFloor') {
       floors = floors.filter(item => item.id !== action.floorId); selectedFloorId = floors[0]?.id ?? null
@@ -65,6 +70,7 @@ export function createEditorReducer(createId: () => string = () => crypto.random
     else if (action.type === 'moveFloor') {
       const from = floors.findIndex(item => item.id === action.floorId); const to = from + action.direction
       if (from < 0 || to < 0 || to >= floors.length) return state
+      if (floors[from].templateId === 'head-brand-logo' || floors[from].templateId === 'footer-links' || floors[to].templateId === 'head-brand-logo' || floors[to].templateId === 'footer-links') return state
       floors = [...floors]; [floors[from], floors[to]] = [floors[to], floors[from]]
     } else if (action.type === 'updateField') {
       floors = floors.map(floor => {

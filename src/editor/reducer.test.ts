@@ -86,3 +86,26 @@ it('新增具名媒体模板并独立更新其中一个槽位', () => {
   expect(state.draft.floors[0].mediaSlots?.before.image).toBe('before.jpg')
   expect(state.draft.floors[0].mediaSlots?.after.image).toBe('')
 })
+
+it('Logo 固定首层、页尾固定末层，普通楼层新增在页尾之前', () => {
+  const localReducer = createEditorReducer(() => `id-${Math.random()}`)
+  let state = localReducer(initialEditorState, { type: 'addFloor', templateId: 'footer-links' })
+  state = localReducer(state, { type: 'addFloor', templateId: 'title-centered' })
+  state = localReducer(state, { type: 'addFloor', templateId: 'head-brand-logo' })
+  state = localReducer(state, { type: 'addFloor', templateId: 'product-grid-n-by-2' })
+  expect(state.draft.floors.map(floor => floor.templateId)).toEqual(['head-brand-logo', 'title-centered', 'product-grid-n-by-2', 'footer-links'])
+  const unchanged = localReducer(state, { type: 'moveFloor', floorId: state.draft.floors[1].id, direction: -1 })
+  expect(unchanged.draft.floors.map(floor => floor.templateId)).toEqual(state.draft.floors.map(floor => floor.templateId))
+})
+
+it('Logo 和页尾不可重复添加或复制但可以删除', () => {
+  const localReducer = createEditorReducer(() => `id-${Math.random()}`)
+  let state = localReducer(initialEditorState, { type: 'addFloor', templateId: 'head-brand-logo' })
+  state = localReducer(state, { type: 'addFloor', templateId: 'footer-links' })
+  const logoId = state.draft.floors[0].id
+  state = localReducer(state, { type: 'addFloor', templateId: 'head-brand-logo' })
+  state = localReducer(state, { type: 'duplicateFloor', floorId: logoId })
+  expect(state.draft.floors.filter(floor => floor.templateId === 'head-brand-logo')).toHaveLength(1)
+  state = localReducer(state, { type: 'deleteFloor', floorId: logoId })
+  expect(state.draft.floors.some(floor => floor.templateId === 'head-brand-logo')).toBe(false)
+})

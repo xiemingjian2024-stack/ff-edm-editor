@@ -27,6 +27,16 @@ it('启用 GIF 后默认创建两帧并支持增加到四帧', async () => {
   expect(onAnimationChange).toHaveBeenLastCalledWith(expect.objectContaining({ frames: expect.arrayContaining([expect.any(Object), expect.any(Object), expect.any(Object)]) }))
 })
 
+it('GIF 帧可排序且最少保留两帧', async () => {
+  const user = userEvent.setup(); const onAnimationChange = vi.fn()
+  const frames = ['one.jpg', 'two.jpg', 'three.jpg'].map(image => ({ image, url: '', scale: 1, offsetX: 0, offsetY: 0 }))
+  render(<BannerMediaEditor value={frames[0]} onChange={() => {}} animation={{ enabled: true, intervalMs: 1000, frames }} onAnimationChange={onAnimationChange} />)
+  await user.click(screen.getByRole('button', { name: '下移帧 1' }))
+  expect(onAnimationChange).toHaveBeenLastCalledWith(expect.objectContaining({ frames: [frames[1], frames[0], frames[2]] }))
+  await user.click(screen.getByRole('button', { name: '删除帧 3' }))
+  expect(onAnimationChange).toHaveBeenLastCalledWith(expect.objectContaining({ frames: [frames[0], frames[1]] }))
+})
+
 it('缩放和重置使用通用媒体状态', async () => {
   const user = userEvent.setup(); const onChange = vi.fn()
   render(<BannerMediaEditor value={{ ...empty, image: 'a.jpg', scale: 1.5, offsetX: 10, offsetY: 20 }} onChange={onChange} />)

@@ -15,7 +15,7 @@ import productsThumb from '../assets/thumbnails/缩略图-商品卡-Nx2商品卡
 import productListThumb from '../assets/thumbnails/缩略图-商品卡-Nx1商品卡.svg'
 import codeThumb from '../assets/thumbnails/缩略图-信息-CODE.svg'
 import productGridThreeThumb from '../assets/thumbnails/缩略图-商品卡-Nx3商品卡.svg'
-import footerThumb from '../assets/footer/footer-showcase.jpg'
+import footerThumb from '../assets/thumbnails/缩略图-页尾-页尾.svg'
 
 const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: '页尾' }
 const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'single-selling-point-information': singlePointThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb, 'footer-links': footerThumb }

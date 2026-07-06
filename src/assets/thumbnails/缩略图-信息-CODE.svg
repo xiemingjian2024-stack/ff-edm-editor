@@ -1,10 +1,7 @@
 <svg width="160" height="90" viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="160" height="90" rx="4" fill="#EFF1F5"/>
-  <rect x="14" y="8" width="132" height="74" fill="white"/>
-  <rect x="48" y="16" width="64" height="8" rx="2" fill="#D2D4E4"/>
-  <rect x="47" y="31" width="66" height="18" fill="white" stroke="#D2D4E4"/>
-  <rect x="27" y="61" width="33" height="1" fill="#FFAC33"/>
-  <rect x="100" y="61" width="33" height="1" fill="#FFAC33"/>
-  <rect x="66" y="57" width="28" height="8" rx="2" fill="#FFAC33"/>
-  <rect x="52" y="70" width="56" height="4" rx="2" fill="#D2D4E4"/>
+<rect width="160" height="90" rx="4" fill="#EFF1F5"/>
+<rect x="14" y="8" width="133" height="74" fill="white"/>
+<rect x="66" y="63" width="29" height="10" rx="3.4" fill="#EFF1F5"/>
+<rect x="48" y="19" width="64" height="10" rx="3.4" fill="#EFF1F5"/>
+<rect x="27.5" y="34.5" width="105" height="23" rx="2.9" stroke="#D2D4E4"/>
 </svg>

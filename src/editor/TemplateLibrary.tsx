@@ -10,13 +10,14 @@ import imageCopyBannerThumb from '../assets/thumbnails/缩略图-banner-常规ba
 import titleThumb from '../assets/thumbnails/缩略图-标题-常规标题.svg'
 import comparisonThumb from '../assets/thumbnails/缩略图-信息-对比信息.svg'
 import pointsThumb from '../assets/thumbnails/缩略图-信息-多卖点信息.svg'
+import singlePointThumb from '../assets/thumbnails/缩略图-信息-单卖点信息.svg'
 import productsThumb from '../assets/thumbnails/缩略图-商品卡-Nx2商品卡.svg'
 import productListThumb from '../assets/thumbnails/缩略图-商品卡-Nx1商品卡.svg'
 import codeThumb from '../assets/thumbnails/缩略图-信息-CODE.svg'
 import productGridThreeThumb from '../assets/thumbnails/缩略图-商品卡-Nx3商品卡.svg'
 
 const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: 'Footer' }
-const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb }
+const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'single-selling-point-information': singlePointThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb }
 
 export function TemplateLibrary({ onAdd, paletteId = classicPalette.id, palettes = themePalettes, onPaletteChange = () => {} }: { onAdd: (templateId: string) => void; paletteId?: string; palettes?: ThemePalette[]; onPaletteChange?: (paletteId: string) => void }) {
   const [query, setQuery] = useState(''); const deferredQuery = useDeferredValue(query.trim().toLowerCase())

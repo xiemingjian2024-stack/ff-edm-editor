@@ -36,7 +36,7 @@ export const bannerRegular: RegisteredTemplate = {
       { id: 'overlay', type: 'choice', label: '渐变遮罩', defaultValue: 'on', options: [{ label: '开启遮罩', value: 'on' }, { label: '关闭遮罩', value: 'off' }] },
       { id: 'textColor', type: 'color', label: '标题与描述颜色', defaultValue: '#FFFFFF' },
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#FFAC33' },
-      { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#000000' },
+      { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
     mediaConfig: {}, heightConfig: { fieldId: 'height', min: 250, max: 600, offset: 0 },
     productSlots: [], exportRegions: [{ id: 'full', name: '常规 Banner', x: 0, y: 0, width: 375, height: 375, mediaLink: true }],

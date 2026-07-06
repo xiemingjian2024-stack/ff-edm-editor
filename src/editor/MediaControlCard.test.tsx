@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, it, vi } from 'vitest'
 import { MediaControlCard } from './MediaControlCard'
@@ -48,5 +48,5 @@ it('上传图片时保存可持久化的数据地址', async () => {
   const user = userEvent.setup(); const onChange = vi.fn()
   render(<MediaControlCard label="卖点图片" value={empty} onChange={onChange} />)
   await user.upload(screen.getByLabelText('上传 卖点图片'), new File(['image'], 'point.png', { type: 'image/png' }))
-  expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ image: expect.stringMatching(/^data:image\/png;base64,/), url: '' }))
+  await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ image: expect.stringMatching(/^data:image\/png;base64,/), url: '' })))
 })

@@ -237,6 +237,7 @@ it('注册两个新 Banner 并保留隐藏的旧 Banner', () => {
   const legacy = templateRegistry.find(item => item.definition.id === 'banner-simple')!.definition
   expect(regular.designHeight).toBe(375)
   expect(regular.heightConfig).toEqual({ fieldId: 'height', min: 250, max: 600, offset: 0 })
+  expect(regular.fields.find(field => field.id === 'buttonTextColor')?.defaultValue).toBe('#FFFFFF')
   expect(regular.themeColorFields).toBeUndefined()
   expect(imageCopy.heightConfig).toEqual({ fieldId: 'imageHeight', min: 200, max: 500, offset: 180 })
   expect(imageCopy.themeColorFields).toBeUndefined()

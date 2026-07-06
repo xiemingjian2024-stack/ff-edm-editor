@@ -133,7 +133,9 @@ it('N×3 渲染三张卡、固定五星和单行标题', () => {
   expect(screen.getAllByText('★★★★★')).toHaveLength(3)
   expect(screen.getAllByText('SHOP NOW')).toHaveLength(3)
   expect(container.querySelector('.product-grid-n-by-3-stars')).toHaveStyle({ color: '#F59E0B' })
-  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.product-grid-n-by-3-title \{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis;/)
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.product-grid-n-by-3-copy \{[^}]*text-align: center;/)
+  expect(css).toMatch(/\.product-grid-n-by-3-title \{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis;/)
 })
 
 it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {

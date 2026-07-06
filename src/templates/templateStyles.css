@@ -83,7 +83,7 @@
 .product-grid-n-by-3-card { min-width: 0; overflow: hidden; border-radius: 4px; }
 .product-grid-n-by-3-image { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; }
 .product-grid-n-by-3-image .editable-image-frame { background: transparent; }
-.product-grid-n-by-3-copy { padding: 10px 10px 12px; }
+.product-grid-n-by-3-copy { padding: 10px 10px 12px; text-align: center; }
 .product-grid-n-by-3-stars { display: block; overflow: hidden; font-size: 15px; line-height: 1; letter-spacing: 1px; white-space: nowrap; }
 .product-grid-n-by-3-title { overflow: hidden; margin: 10px 0 0; font-size: 12px; font-weight: 400; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
 .product-grid-n-by-3-card-button { height: 30px; display: grid; place-items: center; overflow: hidden; margin-top: 12px; padding: 0 8px; font-size: 10px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }

@@ -25,6 +25,12 @@ it('顶部将 EDM 标题居中且不再展示画布规格', () => {
   expect(screen.queryByText('100%', { selector: '.toolbar-viewport span' })).not.toBeInTheDocument()
 })
 
+it('左侧工具栏不再展示底部返回按钮', () => {
+  render(<EditorPage />)
+  expect(screen.getByRole('button', { name: '返回草稿' })).toBeVisible()
+  expect(screen.queryByRole('button', { name: '返回草稿首页' })).not.toBeInTheDocument()
+})
+
 it('不提供字号和位置编辑控件', async () => {
   const user = userEvent.setup()
   render(<EditorPage />)

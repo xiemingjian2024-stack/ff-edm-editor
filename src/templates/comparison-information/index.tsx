@@ -43,7 +43,7 @@ export const comparisonInformation: RegisteredTemplate = {
       { id: 'textColor', type: 'color', label: '文字颜色', defaultValue: '#000000' },
     ],
     mediaSlots: [{ id: 'before', label: 'Before 图片' }, { id: 'after', label: 'After 图片' }],
-    autoHeight: true,
+    autoHeight: true, exportFullImage: false,
     productSlots: [], exportRegions: [{ id: 'full', name: '对比信息', x: 0, y: 0, width: 375, height: 420 }],
   }, Renderer: ComparisonInformation,
 }

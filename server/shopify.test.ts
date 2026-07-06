@@ -1,4 +1,4 @@
-import { buildProductJsonUrl, normalizeShopifyProduct } from './shopify'
+import { buildProductJsonUrl, normalizeShopifyProduct, readShopifyProduct } from './shopify'
 
 it('从商品页生成 Shopify JSON 地址', () => {
   expect(buildProductJsonUrl('https://shop.example.com/products/cloud-bed?variant=123').toString()).toBe('https://shop.example.com/products/cloud-bed.js?variant=123')
@@ -12,6 +12,22 @@ it('即使链接带有变体也读取商品最低价格', () => {
 it('没有指定变体时读取最低价格', () => {
   const result = normalizeShopifyProduct({ title: 'Cloud Bed', images: ['//cdn.example/a.jpg'], variants: [{ id: 1, price: 12900 }, { id: 2, price: 9900 }] }, 'https://shop.example.com/products/cloud-bed')
   expect(result.price).toBe('99.00')
+})
+
+it('把 Shopify 币种符号写入最低价格', () => {
+  const result = normalizeShopifyProduct({ title: 'Cloud Bed', images: ['//cdn.example/a.jpg'], variants: [{ id: 1, price: 9900 }] }, 'https://de.shop.example/products/cloud-bed', 'EUR')
+  expect(result.price).toBe('€99.00')
+})
+
+it('从同一 Shopify 站点读取购物车币种', async () => {
+  const fetcher = vi.fn(async (input: string | URL) => ({
+    ok: true,
+    json: async () => String(input).endsWith('/cart.js')
+      ? { currency: 'GBP' }
+      : { title: 'Cloud Bed', images: ['//cdn.example/a.jpg'], variants: [{ id: 1, price: 9900 }] },
+  })) as never
+  expect((await readShopifyProduct('https://uk.shop.example/products/cloud-bed', fetcher)).price).toBe('£99.00')
+  expect(fetcher).toHaveBeenCalledTimes(2)
 })
 
 it('拒绝 localhost', () => {

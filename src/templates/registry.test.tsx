@@ -244,6 +244,11 @@ it('注册两个新 Banner 并保留隐藏的旧 Banner', () => {
   expect(legacy.hiddenInLibrary).toBe(true)
 })
 
+it('整层型模板只导出一个楼层文件而不重复输出 full JPG', () => {
+  const ids = ['head-brand-logo', 'banner-regular', 'banner-image-copy', 'comparison-information', 'single-selling-point-information', 'selling-points-information', 'title-centered']
+  expect(ids.map(id => templateRegistry.find(item => item.definition.id === id)!.definition.exportFullImage)).toEqual(ids.map(() => false))
+})
+
 it('HEAD 品牌 Logo 使用固定尺寸且不声明固定主题色位', () => {
   const template = templateRegistry.find(item => item.definition.id === 'head-brand-logo')!.definition
   expect(template.designHeight).toBe(56)

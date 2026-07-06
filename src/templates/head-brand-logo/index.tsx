@@ -36,6 +36,7 @@ export const headBrandLogo: RegisteredTemplate = {
         ],
       },
     ],
+    exportFullImage: false,
     productSlots: [],
     exportRegions: [{ id: 'full', name: 'HEAD 品牌 Logo', x: 0, y: 0, width: 375, height: 56 }],
   },

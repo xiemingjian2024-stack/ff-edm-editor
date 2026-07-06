@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 import JSZip from 'jszip'
-import { addRenderedFloorsToZip, getAnimatedBannerFileName, isAnimatedBanner, type RenderedFloor } from './package'
+import { addRenderedFloorsToZip, getAnimatedBannerFileName, isAnimatedBanner, isWholeFloorRegion, type RenderedFloor } from './package'
 
 it('不把 includeFull=false 的整层 JPG 写入 ZIP', () => {
   const zip = new JSZip()
@@ -25,4 +25,9 @@ it('只把启用且至少有两帧的 Banner 作为 GIF 导出', () => {
   expect(isAnimatedBanner({ ...floor, animation: { ...floor.animation, enabled: false } } as never)).toBe(false)
   expect(isAnimatedBanner({ ...floor, templateId: 'title-centered' } as never)).toBe(false)
   expect(getAnimatedBannerFileName(3)).toBe('03-banner-item-01.gif')
+})
+
+it('识别覆盖完整楼层的切片以直接复用原始捕获图', () => {
+  expect(isWholeFloorRegion({ x: 0, y: 0, width: 750, height: 840 }, 840)).toBe(true)
+  expect(isWholeFloorRegion({ x: 0, y: 0, width: 750, height: 839 }, 840)).toBe(false)
 })

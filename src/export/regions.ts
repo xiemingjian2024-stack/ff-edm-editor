@@ -39,10 +39,30 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
 
 export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]): ExportRegion[] {
   const rootRect = root.getBoundingClientRect()
-  return regions.flatMap(region => {
+  const entries = regions.flatMap((region, index) => {
     const node = root.querySelector<HTMLElement>(`[data-export-region-id="${region.id}"]`)
     if (!node) return []
     const rect = node.getBoundingClientRect()
-    return [{ ...region, x: rect.left - rootRect.left, y: rect.top - rootRect.top, width: rect.width, height: rect.height }]
+    return [{ region, index, left: rect.left - rootRect.left, right: rect.right - rootRect.left, top: rect.top - rootRect.top, bottom: rect.bottom - rootRect.top }]
   })
+  const groups: Array<{ top: number; bottom: number; entries: typeof entries }> = []
+  ;[...entries].sort((a, b) => a.top - b.top || a.left - b.left).forEach(entry => {
+    const group = groups.find(candidate => Math.abs(candidate.top - entry.top) < 2)
+    if (group) { group.entries.push(entry); group.bottom = Math.max(group.bottom, entry.bottom) }
+    else groups.push({ top: entry.top, bottom: entry.bottom, entries: [entry] })
+  })
+  const tiled = new Map<number, ExportRegion>()
+  groups.forEach((group, groupIndex) => {
+    const previous = groups[groupIndex - 1], next = groups[groupIndex + 1]
+    const y = previous ? (previous.bottom + group.top) / 2 : 0
+    const bottom = next ? (group.bottom + next.top) / 2 : rootRect.height
+    const row = group.entries.sort((a, b) => a.left - b.left)
+    row.forEach((entry, columnIndex) => {
+      const previousEntry = row[columnIndex - 1], nextEntry = row[columnIndex + 1]
+      const x = previousEntry ? (previousEntry.right + entry.left) / 2 : 0
+      const right = nextEntry ? (entry.right + nextEntry.left) / 2 : rootRect.width
+      tiled.set(entry.index, { ...entry.region, x, y, width: right - x, height: bottom - y })
+    })
+  })
+  return regions.flatMap((_, index) => tiled.get(index) ?? [])
 }

@@ -35,6 +35,9 @@ export function isAnimatedBanner(floor: FloorInstance) {
 export function getAnimatedBannerFileName(floorNumber: number) {
   return `${String(floorNumber).padStart(2, '0')}-banner-item-01.gif`
 }
+export function isWholeFloorRegion(region: { x: number; y: number; width: number; height: number }, floorHeight: number) {
+  return region.x === 0 && region.y === 0 && region.width === 750 && region.height === floorHeight
+}
 
 async function blobToRgbaFrame(blob: Blob): Promise<RgbaFrame> {
   const bitmap = await createImageBitmap(blob)
@@ -84,8 +87,9 @@ export async function exportDraftFromDom(draft: EdmDraft) {
       continue
     }
     const full = await captureFloor(node)
-    const regions = await Promise.all(scaled.map(async (region, regionIndex) => { const name = names.regions[regionIndex]; rows.push({ floorNumber: index + 1, floorName: template.name, fileName: name, regionName: region.name, width: region.width, height: region.height, url: getRegionUrl(floor, region) }); return { name, blob: await cropJpeg(full, region) } }))
-    rendered.push({ fullName: names.full, full, width: 750, height: (template.autoHeight ? actualHeight : getFloorHeight(template, floor)) * 2, includeFull: template.exportFullImage !== false, regions })
+    const floorHeight = (template.autoHeight ? actualHeight : getFloorHeight(template, floor)) * 2
+    const regions = await Promise.all(scaled.map(async (region, regionIndex) => { const name = names.regions[regionIndex]; rows.push({ floorNumber: index + 1, floorName: template.name, fileName: name, regionName: region.name, width: region.width, height: region.height, url: getRegionUrl(floor, region) }); return { name, blob: isWholeFloorRegion(region, floorHeight) ? full : await cropJpeg(full, region) } }))
+    rendered.push({ fullName: names.full, full, width: 750, height: floorHeight, includeFull: template.exportFullImage !== false, regions })
   }
   const zip = await buildExportZip(rendered, rows); const url = URL.createObjectURL(zip); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `${draft.name || 'edm'}-export.zip`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

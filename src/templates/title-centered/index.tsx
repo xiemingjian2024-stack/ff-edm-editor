@@ -22,6 +22,6 @@ export const titleCentered: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#000000' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
-    autoHeight: true, productSlots: [], exportRegions: [{ id: 'full', name: '常规标题', x: 0, y: 0, width: 375, height: 200 }]
+    autoHeight: true, exportFullImage: false, productSlots: [], exportRegions: [{ id: 'full', name: '常规标题', x: 0, y: 0, width: 375, height: 200 }]
   }, Renderer: TitleCentered
 }

@@ -33,7 +33,7 @@ export const singleSellingPointInformation: RegisteredTemplate = {
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
     mediaSlots: [{ id: 'feature', label: '卖点图片' }],
-    autoHeight: true,
+    autoHeight: true, exportFullImage: false,
     productSlots: [], exportRegions: [{ id: 'full', name: '单卖点信息', x: 0, y: 0, width: 375, height: 390 }],
   },
   Renderer: SingleSellingPointInformation,

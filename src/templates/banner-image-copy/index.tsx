@@ -32,7 +32,7 @@ export const bannerImageCopy: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#000000' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
-    mediaConfig: { frameHeightFieldId: 'imageHeight' }, heightConfig: { fieldId: 'imageHeight', min: 200, max: 500, offset: 180 },
+    mediaConfig: { frameHeightFieldId: 'imageHeight' }, heightConfig: { fieldId: 'imageHeight', min: 200, max: 500, offset: 180 }, exportFullImage: false,
     productSlots: [], exportRegions: [{ id: 'full', name: '图文 Banner', x: 0, y: 0, width: 375, height: 480, mediaLink: true }],
   }, Renderer: BannerImageCopy,
 }

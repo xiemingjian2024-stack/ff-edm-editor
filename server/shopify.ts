@@ -17,17 +17,25 @@ export function buildProductJsonUrl(input: string) {
 }
 const imageUrl = (value: string) => value.startsWith('//') ? `https:${value}` : value
 
-export function normalizeShopifyProduct(input: unknown, sourceUrl: string): NormalizedProduct {
+const currencySymbols: Record<string, string> = { USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', JPY: '¥', CNY: '¥', HKD: 'HK$', SGD: 'S$' }
+const formatPrice = (value: number, currency?: string) => `${currency ? currencySymbols[currency.toUpperCase()] ?? `${currency.toUpperCase()} ` : ''}${value.toFixed(2)}`
+
+export function normalizeShopifyProduct(input: unknown, sourceUrl: string, currency?: string): NormalizedProduct {
   const raw = rawProductSchema.parse(input)
   const variant = raw.variants.reduce((lowest, item) => Number(item.price) < Number(lowest.price) ? item : lowest)
-  const price = typeof variant.price === 'number' ? (variant.price / 100).toFixed(2) : Number(variant.price).toFixed(2)
+  const price = formatPrice(typeof variant.price === 'number' ? variant.price / 100 : Number(variant.price), currency)
   const gallery = raw.images.map(imageUrl); const image = imageUrl(raw.featured_image ?? gallery[0] ?? '')
   return { title: raw.title, image, gallery, price, url: sourceUrl }
 }
 
 export async function readShopifyProduct(input: string, fetcher: typeof fetch = fetch) {
   const endpoint = buildProductJsonUrl(input)
-  const response = await fetcher(endpoint, { signal: AbortSignal.timeout(5000), headers: { accept: 'application/json' } })
+  const cartEndpoint = new URL('/cart.js', endpoint.origin)
+  const [response, cartResponse] = await Promise.all([
+    fetcher(endpoint, { signal: AbortSignal.timeout(5000), headers: { accept: 'application/json' } }),
+    fetcher(cartEndpoint, { signal: AbortSignal.timeout(5000), headers: { accept: 'application/json' } }),
+  ])
   if (!response.ok) throw new Error(`商品读取失败（${response.status}）`)
-  return normalizeShopifyProduct(await response.json(), input)
+  const cart = cartResponse.ok ? await cartResponse.json() as { currency?: string } : {}
+  return normalizeShopifyProduct(await response.json(), input, cart.currency)
 }

@@ -58,18 +58,39 @@ it('内容自适应模板按实际 DOM 高度生成完整导出区域', () => {
   expect(getFloorExportRegions(adaptive, current, 224)[0]).toMatchObject({ width: 375, height: 224 })
 })
 
-it('按商品数量截取链接区域并用 DOM 实际矩形覆盖坐标', () => {
+it('按商品数量截取链接区域并把 DOM 间距分配给相邻切片', () => {
   const adaptive = getTemplate('product-grid-n-by-2')!.definition
   const current: FloorInstance = { id: 'products', templateId: adaptive.id, values: { productCount: '2' }, products: {} }
   const regions = getFloorExportRegions(adaptive, current, 600)
   expect(regions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'button'])
   const root = document.createElement('section')
-  const card = document.createElement('article')
-  card.dataset.exportRegionId = 'item-1'
-  root.appendChild(card)
+  const header = document.createElement('header'); header.dataset.exportRegionId = 'header'
+  const card = document.createElement('article'); card.dataset.exportRegionId = 'item-1'
+  const card2 = document.createElement('article'); card2.dataset.exportRegionId = 'item-2'
+  const button = document.createElement('div'); button.dataset.exportRegionId = 'button'
+  root.append(header, card, card2, button)
   root.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 475, bottom: 650, width: 375, height: 600, toJSON() {} })
+  header.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 475, bottom: 150, width: 375, height: 100, toJSON() {} })
   card.getBoundingClientRect = () => ({ x: 112, y: 180, left: 112, top: 180, right: 287, bottom: 460, width: 175, height: 280, toJSON() {} })
-  expect(getDomExportRegions(root, regions)).toEqual([expect.objectContaining({ id: 'item-1', x: 12, y: 130, width: 175, height: 280 })])
+  card2.getBoundingClientRect = () => ({ x: 300, y: 180, left: 300, top: 180, right: 475, bottom: 460, width: 175, height: 280, toJSON() {} })
+  button.getBoundingClientRect = () => ({ x: 190, y: 500, left: 190, top: 500, right: 385, bottom: 550, width: 195, height: 50, toJSON() {} })
+  const tiled = getDomExportRegions(root, regions)
+  expect(tiled).toEqual([
+    expect.objectContaining({ id: 'header', x: 0, y: 0, width: 375, height: 115 }),
+    expect.objectContaining({ id: 'item-1', x: 0, y: 115, width: 193.5, height: 315 }),
+    expect.objectContaining({ id: 'item-2', x: 193.5, y: 115, width: 181.5, height: 315 }),
+    expect.objectContaining({ id: 'button', x: 0, y: 430, width: 375, height: 170 }),
+  ])
+})
+
+it('N×1 每张商品卡切片都覆盖整行宽度并保留上下间距', () => {
+  const regions = ['header', 'item-1', 'item-2', 'button'].map(id => ({ id, name: id, x: 0, y: 0, width: 1, height: 1 }))
+  const root = document.createElement('section'); root.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, right: 375, bottom: 500, width: 375, height: 500, toJSON() {} })
+  const rects = [[0, 0, 375, 100], [0, 112, 363, 160], [12, 284, 363, 160], [96, 464, 183, 30]]
+  regions.forEach((region, index) => { const node = document.createElement('div'); node.dataset.exportRegionId = region.id; const [left, top, width, height] = rects[index]; node.getBoundingClientRect = () => ({ x: left, y: top, left, top, right: left + width, bottom: top + height, width, height, toJSON() {} }); root.append(node) })
+  const tiled = getDomExportRegions(root, regions)
+  expect(tiled.map(region => [region.x, region.width])).toEqual([[0, 375], [0, 375], [0, 375], [0, 375]])
+  expect(tiled[0].height + tiled[1].height + tiled[2].height + tiled[3].height).toBe(500)
 })
 
 it('N×1 商品卡只导出当前商品并关联各自 Shopify 链接', () => {

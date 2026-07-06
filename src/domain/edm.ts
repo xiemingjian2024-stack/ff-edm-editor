@@ -15,6 +15,7 @@ export interface ProductSlotDefinition { id: string; label: string; showPrice?: 
 export interface NavigationItem { text: string; url: string }
 export interface NavigationConfig { minItems: number; maxItems: number; defaultItems: NavigationItem[] }
 export interface MediaState { image: string; url: string; scale: number; offsetX: number; offsetY: number }
+export interface BannerAnimation { enabled: boolean; intervalMs: number; frames: MediaState[] }
 export interface MediaConfig { frameHeightFieldId?: string; fixedFrameHeight?: number }
 export interface MediaSlotDefinition { id: string; label: string }
 export interface HeightConfig { fieldId: string; min: number; max: number; offset: number }
@@ -26,7 +27,7 @@ export interface FloorTemplate {
   navigationConfig?: NavigationConfig; exportFullImage?: boolean; mediaConfig?: MediaConfig; mediaSlots?: MediaSlotDefinition[]; mediaSlotCountFieldId?: string; productSlotCountFieldId?: string; domExportRegions?: boolean; heightConfig?: HeightConfig; autoHeight?: boolean; hiddenInLibrary?: boolean
 }
 export interface ProductValue { image: string; title: string; price: string; url: string; gallery?: string[]; imageScale?: number; imageOffsetX?: number; imageOffsetY?: number }
-export interface FloorInstance { id: string; templateId: string; values: Record<string, string>; products: Record<string, ProductValue>; themeColors?: Record<string, ThemeColorBinding>; navigationItems?: NavigationItem[]; media?: MediaState; mediaSlots?: Record<string, MediaState> }
+export interface FloorInstance { id: string; templateId: string; values: Record<string, string>; products: Record<string, ProductValue>; themeColors?: Record<string, ThemeColorBinding>; navigationItems?: NavigationItem[]; media?: MediaState; mediaSlots?: Record<string, MediaState>; animation?: BannerAnimation }
 export interface EdmDraft { id: string; name: string; floors: FloorInstance[]; themePaletteId: string; createdAt: string; updatedAt: string }
 export interface ExportRecord { id: string; draft: EdmDraft; exportedAt: string }
 export interface NormalizedProduct { title: string; image: string; gallery: string[]; price: string; url: string }

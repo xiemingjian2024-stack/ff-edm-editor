@@ -17,6 +17,7 @@ export type EditorAction =
   | { type: 'relinkThemeColor'; floorId: string; fieldId: string; slot: ThemeSlot }
   | { type: 'updateNavigationItem'; floorId: string; index: number; value: NavigationItem }
   | { type: 'updateMedia'; floorId: string; value: MediaState }
+  | { type: 'updateBannerAnimation'; floorId: string; value: import('../domain/edm').BannerAnimation }
   | { type: 'updateMediaSlot'; floorId: string; slotId: string; value: MediaState }
 
 const now = new Date().toISOString()
@@ -94,6 +95,8 @@ export function createEditorReducer(createId: () => string = () => crypto.random
       })
     } else if (action.type === 'updateMedia') {
       floors = floors.map(floor => floor.id === action.floorId ? { ...floor, media: action.value } : floor)
+    } else if (action.type === 'updateBannerAnimation') {
+      floors = floors.map(floor => floor.id === action.floorId ? { ...floor, animation: action.value } : floor)
     } else if (action.type === 'updateMediaSlot') {
       floors = floors.map(floor => floor.id === action.floorId && floor.mediaSlots?.[action.slotId] ? { ...floor, mediaSlots: { ...floor.mediaSlots, [action.slotId]: action.value } } : floor)
     }

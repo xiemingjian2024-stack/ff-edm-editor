@@ -1,12 +1,14 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getFloorHeight } from '../floorGeometry'
+import { useBannerFrame } from '../useBannerFrame'
 
 function BannerRegular({ floor, template, onMediaChange }: FloorRenderProps) {
   const height = getFloorHeight(template, floor)
   const position = floor.values.copyPosition === 'top' ? 'top' : 'bottom'
+  const media = useBannerFrame(floor.animation, floor.media!)
   return <section className="floor-render banner-regular" data-testid="banner-regular" style={{ height }}>
-    {floor.media ? <EditableImageFrame value={floor.media} onChange={onMediaChange} ariaLabel="常规 Banner 图片" /> : null}
+    {floor.media ? <EditableImageFrame value={media} onChange={floor.animation?.enabled ? undefined : onMediaChange} ariaLabel="常规 Banner 图片" /> : null}
     {floor.values.overlay === 'on' ? <div className={`banner-gradient banner-gradient--${position}`} data-testid="banner-overlay" /> : null}
     <BannerCopy floor={floor} position={position} />
   </section>

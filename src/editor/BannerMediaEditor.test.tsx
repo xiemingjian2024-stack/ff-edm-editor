@@ -14,6 +14,19 @@ it('Shopify 读取首图并保留同一链接', async () => {
   expect(onChange).toHaveBeenLastCalledWith({ ...empty, image: 'first.jpg', url: 'https://shop/products/bed' })
 })
 
+it('启用 GIF 后默认创建两帧并支持增加到四帧', async () => {
+  const user = userEvent.setup(); const onAnimationChange = vi.fn()
+  const value = { image: 'one.jpg', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const { rerender } = render(<BannerMediaEditor value={value} onChange={() => {}} onAnimationChange={onAnimationChange} />)
+  await user.click(screen.getByRole('button', { name: 'GIF 动画' }))
+  expect(onAnimationChange).toHaveBeenCalledWith(expect.objectContaining({ enabled: true, intervalMs: 1000, frames: [value, expect.objectContaining({ image: '' })] }))
+  const animation = onAnimationChange.mock.calls[0][0]
+  rerender(<BannerMediaEditor value={value} onChange={() => {}} animation={animation} onAnimationChange={onAnimationChange} />)
+  expect(screen.getByText('帧 1')).toBeVisible(); expect(screen.getByText('帧 2')).toBeVisible()
+  await user.click(screen.getByRole('button', { name: '添加帧' }))
+  expect(onAnimationChange).toHaveBeenLastCalledWith(expect.objectContaining({ frames: expect.arrayContaining([expect.any(Object), expect.any(Object), expect.any(Object)]) }))
+})
+
 it('缩放和重置使用通用媒体状态', async () => {
   const user = userEvent.setup(); const onChange = vi.fn()
   render(<BannerMediaEditor value={{ ...empty, image: 'a.jpg', scale: 1.5, offsetX: 10, offsetY: 20 }} onChange={onChange} />)

@@ -28,6 +28,7 @@ export interface FloorTemplate {
 export interface ProductValue { image: string; title: string; price: string; url: string; gallery?: string[]; imageScale?: number; imageOffsetX?: number; imageOffsetY?: number }
 export interface FloorInstance { id: string; templateId: string; values: Record<string, string>; products: Record<string, ProductValue>; themeColors?: Record<string, ThemeColorBinding>; navigationItems?: NavigationItem[]; media?: MediaState; mediaSlots?: Record<string, MediaState> }
 export interface EdmDraft { id: string; name: string; floors: FloorInstance[]; themePaletteId: string; createdAt: string; updatedAt: string }
+export interface ExportRecord { id: string; draft: EdmDraft; exportedAt: string }
 export interface NormalizedProduct { title: string; image: string; gallery: string[]; price: string; url: string }
 export interface FloorRenderProps { floor: FloorInstance; template: FloorTemplate; onMediaChange?: (value: MediaState) => void; onMediaSlotChange?: (slotId: string, value: MediaState) => void; onProductChange?: (slotId: string, value: ProductValue) => void }
 export interface RegisteredTemplate { definition: FloorTemplate; Renderer: ComponentType<FloorRenderProps> }

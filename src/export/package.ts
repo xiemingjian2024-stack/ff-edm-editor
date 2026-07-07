@@ -86,11 +86,16 @@ export async function captureAnimatedBanner(node: HTMLElement, frames: MediaStat
   }
 }
 
+export function getExportFloorNode(floorId: string, root: ParentNode = document) {
+  return root.querySelector(`.edm-canvas [data-floor-id="${floorId}"] .floor-render`) as HTMLElement | null
+    ?? root.querySelector(`[data-floor-id="${floorId}"] .floor-render`) as HTMLElement | null
+}
+
 export async function exportDraftFromDom(draft: EdmDraft) {
   const rendered: RenderedFloor[] = []; const rows: ManifestRow[] = []
   for (let index = 0; index < draft.floors.length; index++) {
     const floor = draft.floors[index], template = getTemplate(floor.templateId)?.definition
-    const node = document.querySelector(`[data-floor-id="${floor.id}"] .floor-render`) as HTMLElement | null
+    const node = getExportFloorNode(floor.id)
     if (!template || !node) throw new Error(`楼层 ${index + 1} 无法渲染`)
     const actualHeight = node.clientHeight
     const baseRegions = getFloorExportRegions(template, floor, actualHeight)

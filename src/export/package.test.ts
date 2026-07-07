@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest'
 import JSZip from 'jszip'
-import { addRenderedFloorsToZip, captureAnimatedBanner, getAnimatedBannerFileName, isAnimatedBanner, isWholeFloorRegion, type RenderedFloor } from './package'
+import { addRenderedFloorsToZip, captureAnimatedBanner, getAnimatedBannerFileName, getExportFloorNode, isAnimatedBanner, isWholeFloorRegion, type RenderedFloor } from './package'
 
 it('不把 includeFull=false 的整层 JPG 写入 ZIP', () => {
   const zip = new JSZip()
@@ -30,6 +30,18 @@ it('只把启用且至少有两帧的 Banner 作为 GIF 导出', () => {
 it('识别覆盖完整楼层的切片以直接复用原始捕获图', () => {
   expect(isWholeFloorRegion({ x: 0, y: 0, width: 750, height: 840 }, 840)).toBe(true)
   expect(isWholeFloorRegion({ x: 0, y: 0, width: 750, height: 839 }, 840)).toBe(false)
+})
+
+it('导出优先使用编辑画布中的楼层节点', () => {
+  document.body.innerHTML = `
+    <div class="dialog-backdrop">
+      <div data-floor-id="same"><section class="floor-render" data-source="preview"></section></div>
+    </div>
+    <main class="edm-canvas">
+      <div data-floor-id="same"><section class="floor-render" data-source="canvas"></section></div>
+    </main>
+  `
+  expect(getExportFloorNode('same')?.dataset.source).toBe('canvas')
 })
 
 it('GIF Banner 使用真实楼层逐帧截图并在完成后恢复图片状态', async () => {

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { vi } from 'vitest'
 import { ExportDialog } from './ExportDialog'
+import { classicPalette } from '../themes/palettes'
 
 it('显示导出规格和检查结果', () => {
   render(<ExportDialog draft={{ id: 'a', name: '测试', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: '', updatedAt: '' }} onClose={() => {}} onExport={async () => {}} />)
@@ -16,6 +17,15 @@ it('完整预览使用解析后的主题颜色', () => {
     floors: [{ id: 'head-1', templateId: 'head-brand-logo', values: { background: '#123456', logoColor: '#000000' }, products: {}, themeColors: { background: { mode: 'theme', slot: 'A' } } }],
   }} previewOnly onClose={() => {}} onExport={async () => {}} />)
   expect(screen.getByTestId('head-brand-logo')).toHaveStyle({ backgroundColor: '#FFFFFF' })
+})
+
+it('完整预览支持自创建的配色套餐', () => {
+  const customPalette = { id: 'custom-palette', name: '自定义套餐', slots: { A: '#123456', B: '#ABCDEF', C: '#222222' } }
+  render(<ExportDialog draft={{
+    id: 'a', name: '自定义预览', themePaletteId: customPalette.id, createdAt: '', updatedAt: '',
+    floors: [{ id: 'head-1', templateId: 'head-brand-logo', values: { background: '#FFFFFF', logoColor: '#000000' }, products: {}, themeColors: { background: { mode: 'theme', slot: 'A' } } }],
+  }} palettes={[classicPalette, customPalette]} previewOnly onClose={() => {}} onExport={async () => {}} />)
+  expect(screen.getByTestId('head-brand-logo')).toHaveStyle({ backgroundColor: '#123456' })
 })
 
 it('弹窗外壳样式不会覆盖模板内部的标题与描述字号', () => {

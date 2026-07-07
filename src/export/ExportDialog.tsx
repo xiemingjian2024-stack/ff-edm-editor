@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import type { EdmDraft } from '../domain/edm'
+import type { EdmDraft, ThemePalette } from '../domain/edm'
 import { Icon } from '../ui/Icon'
-import { getThemePalette } from '../themes/palettes'
+import { classicPalette } from '../themes/palettes'
 import { getThemeFieldsForFloors, resolveFloorForRender } from '../themes/resolveThemeColor'
 import { getTemplate as getTemplateForDialog } from '../templates/registry'
 import { validateDraft } from './validate'
 
-export function ExportDialog({ draft, previewOnly = false, onClose, onExport }: { draft: EdmDraft; previewOnly?: boolean; onClose: () => void; onExport: () => Promise<void> }) {
+export function ExportDialog({ draft, palettes = [classicPalette], previewOnly = false, onClose, onExport }: { draft: EdmDraft; palettes?: ThemePalette[]; previewOnly?: boolean; onClose: () => void; onExport: () => Promise<void> }) {
   const issues = validateDraft(draft)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const palette = getThemePalette(draft.themePaletteId)
+  const palette = palettes.find(item => item.id === draft.themePaletteId) ?? classicPalette
   const themeFields = getThemeFieldsForFloors(draft.floors)
   const run = async () => { setBusy(true); setError(''); try { await onExport() } catch (reason) { setError(reason instanceof Error ? reason.message : '导出失败') } finally { setBusy(false) } }
   return <div className="dialog-backdrop" role="dialog" aria-label={previewOnly ? '完整预览' : '导出切图'}><div className="export-dialog">

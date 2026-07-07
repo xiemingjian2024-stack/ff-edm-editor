@@ -1,14 +1,12 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
-import { getFloorHeight } from '../floorGeometry'
 import { useBannerFrame } from '../useBannerFrame'
 
 function BannerImageCopy({ floor, template, onMediaChange }: FloorRenderProps) {
   const imageHeight = Math.min(500, Math.max(200, Number(floor.values.imageHeight) || 300))
-  const height = getFloorHeight(template, floor)
   const alignment = floor.values.alignment || 'center'
   const media = useBannerFrame(floor.animation, floor.media!)
-  return <section className="floor-render banner-image-copy" data-testid="banner-image-copy" style={{ height, backgroundColor: floor.values.background }}>
+  return <section className="floor-render banner-image-copy" data-testid="banner-image-copy" style={{ backgroundColor: floor.values.background }}>
     <div className="banner-image-stage" data-testid="banner-image-stage" style={{ height: imageHeight }}>{floor.media ? <EditableImageFrame value={media} onChange={floor.animation?.enabled ? undefined : onMediaChange} ariaLabel="图文 Banner 图片" /> : null}</div>
     <div className="banner-copy banner-copy--panel" data-testid="banner-copy" style={{ textAlign: alignment as 'left' | 'center' | 'right' }}>
       <h2 style={{ color: floor.values.textColor }}>{floor.values.title}</h2>
@@ -32,7 +30,7 @@ export const bannerImageCopy: RegisteredTemplate = {
       { id: 'buttonBackground', type: 'color', label: '按钮背景颜色', defaultValue: '#000000' },
       { id: 'buttonTextColor', type: 'color', label: '按钮文字颜色', defaultValue: '#FFFFFF' },
     ],
-    mediaConfig: { frameHeightFieldId: 'imageHeight' }, heightConfig: { fieldId: 'imageHeight', min: 200, max: 500, offset: 180 }, exportFullImage: false,
+    mediaConfig: { frameHeightFieldId: 'imageHeight' }, heightConfig: { fieldId: 'imageHeight', min: 200, max: 500, offset: 180 }, autoHeight: true, exportFullImage: false,
     productSlots: [], exportRegions: [{ id: 'full', name: '图文 Banner', x: 0, y: 0, width: 375, height: 480, mediaLink: true }],
   }, Renderer: BannerImageCopy,
 }

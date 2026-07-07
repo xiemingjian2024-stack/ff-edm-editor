@@ -241,6 +241,9 @@ it('注册两个新 Banner 并保留隐藏的旧 Banner', () => {
   expect(regular.themeColorFields).toBeUndefined()
   expect(imageCopy.heightConfig).toEqual({ fieldId: 'imageHeight', min: 200, max: 500, offset: 180 })
   expect(imageCopy.themeColorFields).toBeUndefined()
+  expect(imageCopy.autoHeight).toBe(true)
+  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.banner-copy--panel \{[^}]*min-height: 180px;/)
+  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.banner-copy h2 \{[^}]*line-height: 1\.2;/)
   expect(legacy.hiddenInLibrary).toBe(true)
 })
 

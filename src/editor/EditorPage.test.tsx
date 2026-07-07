@@ -144,12 +144,11 @@ it('常规 Banner 支持动态高度、文案位置、对齐和遮罩', async ()
   expect(screen.queryByTestId('banner-overlay')).not.toBeInTheDocument()
 })
 
-it('图文 Banner 图片区高度变化时总高度同步变化', async () => {
+it('图文 Banner 图片区高度变化且文案区自适应撑开', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
   await user.click(screen.getByRole('button', { name: '添加 图文 Banner' }))
-  expect(screen.getByTestId('banner-image-copy')).toHaveStyle({ height: '480px' })
+  expect(screen.getByTestId('banner-image-copy')).not.toHaveStyle({ height: '480px' })
   fireEvent.change(screen.getByLabelText('图片区域高度'), { target: { value: '360' } })
-  expect(screen.getByTestId('banner-image-copy')).toHaveStyle({ height: '540px' })
   expect(screen.getByTestId('banner-image-stage')).toHaveStyle({ height: '360px' })
 })
 

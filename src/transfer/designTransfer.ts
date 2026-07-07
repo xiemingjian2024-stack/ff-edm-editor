@@ -54,6 +54,6 @@ export async function parseTransferCode(code: string) {
 }
 
 export function createTransferFileName(name: string) {
-  const safe = name.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '').slice(0, 60)
+  const safe = name.trim().replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').slice(0, 120).trim()
   return `${safe || 'EDM-DESIGN'}.edm`
 }

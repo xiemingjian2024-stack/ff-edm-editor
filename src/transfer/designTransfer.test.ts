@@ -34,6 +34,7 @@ describe('design transfer', () => {
   })
 
   it('生成安全的 edm 文件名', () => {
-    expect(createTransferFileName('【US 7-4】 Protect / Sofa')).toBe('US-7-4-Protect-Sofa.edm')
+    expect(createTransferFileName('【US 7-4】 Protect Your Sofa')).toBe('【US 7-4】 Protect Your Sofa.edm')
+    expect(createTransferFileName('US/DE: Sofa*Sale?')).toBe('US-DE- Sofa-Sale-.edm')
   })
 })

@@ -55,7 +55,7 @@ it('创建自定义配色并校验十六进制颜色', async () => {
   await user.type(screen.getByLabelText('配色名称'), '暖秋')
   await user.clear(screen.getByLabelText('背景间隔色 A 色值')); await user.type(screen.getByLabelText('背景间隔色 A 色值'), '错误')
   expect(screen.getByRole('button', { name: '保存配色' })).toBeDisabled()
-  await user.clear(screen.getByLabelText('背景间隔色 A 色值')); await user.type(screen.getByLabelText('背景间隔色 A 色值'), '#FFF7EA')
+  await user.clear(screen.getByLabelText('背景间隔色 A 色值')); await user.type(screen.getByLabelText('背景间隔色 A 色值'), 'FFF7EA')
   await user.click(screen.getByRole('button', { name: '保存配色' }))
   expect(onPaletteSave).toHaveBeenCalledWith(expect.objectContaining({ name: '暖秋', slots: { A: '#FFF7EA', B: '#FFAC33', C: '#000000' } }))
 })

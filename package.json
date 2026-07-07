@@ -3,15 +3,18 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "main": "electron/main.mjs",
   "scripts": {
     "dev": "vite",
     "start": "node server/local-app.mjs",
+    "desktop": "npm run build && electron .",
     "dev:server": "tsx server/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build",
     "package:local": "node scripts/package-local.mjs",
+    "package:desktop:win": "node scripts/package-desktop.mjs win32 x64",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -29,6 +32,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@electron/packager": "^20.0.2",
     "@playwright/test": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
@@ -39,6 +43,7 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
+    "electron": "^43.0.0",
     "fake-indexeddb": "latest",
     "jsdom": "latest",
     "tsx": "latest",

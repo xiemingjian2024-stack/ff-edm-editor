@@ -8,6 +8,13 @@ const shopifyMiddleware = () => {
 }
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[hash][extname]',
+      },
+    },
+  },
   plugins: [react(), {
     name: 'shopify-product-reader',
     configureServer(server) { server.middlewares.use(shopifyMiddleware()) },

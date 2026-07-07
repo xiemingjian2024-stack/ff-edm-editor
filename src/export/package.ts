@@ -46,7 +46,7 @@ async function blobToRgbaFrame(blob: Blob): Promise<RgbaFrame> {
   return { width: canvas.width, height: canvas.height, data: context.getImageData(0, 0, canvas.width, canvas.height).data }
 }
 
-function applyFrameToClone(root: HTMLElement, frame: MediaState) {
+function applyFrameToNode(root: HTMLElement, frame: MediaState) {
   const holder = root.querySelector('.editable-image-frame') as HTMLElement | null
   if (!holder) throw new Error('GIF Banner 图片区域不存在')
   if (!frame.image) throw new Error('GIF 帧图片不能为空')
@@ -61,18 +61,29 @@ function applyFrameToClone(root: HTMLElement, frame: MediaState) {
 
 const waitForAnimationFrame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
 
-async function captureAnimatedBanner(node: HTMLElement, frames: MediaState[], delayMs: number) {
-  const clone = node.cloneNode(true) as HTMLElement
-  Object.assign(clone.style, { position: 'fixed', left: '-10000px', top: '0', width: '375px', pointerEvents: 'none' })
-  document.body.append(clone)
+export async function captureAnimatedBanner(node: HTMLElement, frames: MediaState[], delayMs: number, capture: typeof captureFloor = captureFloor) {
+  const holder = node.querySelector('.editable-image-frame') as HTMLElement | null
+  if (!holder) throw new Error('GIF Banner 图片区域不存在')
+  let image = holder.querySelector('img')
+  if (!image) { image = document.createElement('img'); image.alt = ''; holder.append(image) }
+  const original = { src: image.getAttribute('src'), transform: image.style.transform, crossOrigin: image.crossOrigin, decoding: image.decoding, loading: image.loading }
   try {
     const captures: Blob[] = []
-    for (const frame of frames) { applyFrameToClone(clone, frame); await waitForAnimationFrame(); captures.push(await captureFloor(clone)) }
+    for (const frame of frames) { applyFrameToNode(node, frame); await waitForAnimationFrame(); captures.push(await capture(node)) }
     const rgbaFrames = await Promise.all(captures.map(blobToRgbaFrame))
     const bytes = encodeGifFrames(rgbaFrames, delayMs)
     const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
     return { preview: captures[0], gif: new Blob([buffer], { type: 'image/gif' }) }
-  } finally { clone.remove() }
+  } finally {
+    if (original.src === null) image.remove()
+    else {
+      image.src = original.src
+      image.style.transform = original.transform
+      image.crossOrigin = original.crossOrigin
+      image.decoding = original.decoding
+      image.loading = original.loading
+    }
+  }
 }
 
 export async function exportDraftFromDom(draft: EdmDraft) {

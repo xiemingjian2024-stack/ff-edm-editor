@@ -8,10 +8,14 @@ export function scaleRegion(region: ExportRegion): PixelRegion {
 }
 export const scaleRegions = (regions: ExportRegion[]) => regions.map(scaleRegion)
 const dataUrlToBlob = async (url: string) => (await fetch(url)).blob()
+function getCaptureBackgroundColor(node: HTMLElement) {
+  const color = getComputedStyle(node).backgroundColor
+  return !color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)' ? '#ffffff' : color
+}
 export async function captureFloor(node: HTMLElement) {
   await document.fonts?.ready
   await Promise.all([...node.querySelectorAll('img')].map(image => image.decode().catch(() => { throw new Error(`图片无法加载：${image.alt || image.src}`) })))
-  return dataUrlToBlob(await toJpeg(node, { pixelRatio: 2, quality: .92, backgroundColor: '#ffffff', cacheBust: true }))
+  return dataUrlToBlob(await toJpeg(node, { pixelRatio: 2, quality: .92, backgroundColor: getCaptureBackgroundColor(node), cacheBust: true }))
 }
 export async function cropJpeg(source: Blob, region: PixelRegion) {
   const bitmap = await createImageBitmap(source); const canvas = document.createElement('canvas'); canvas.width = region.width; canvas.height = region.height

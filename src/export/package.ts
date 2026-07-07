@@ -49,11 +49,17 @@ async function blobToRgbaFrame(blob: Blob): Promise<RgbaFrame> {
 function applyFrameToClone(root: HTMLElement, frame: MediaState) {
   const holder = root.querySelector('.editable-image-frame') as HTMLElement | null
   if (!holder) throw new Error('GIF Banner 图片区域不存在')
+  if (!frame.image) throw new Error('GIF 帧图片不能为空')
   let image = holder.querySelector('img')
   if (!image) { image = document.createElement('img'); image.alt = ''; holder.append(image) }
+  image.crossOrigin = 'anonymous'
+  image.decoding = 'sync'
+  image.loading = 'eager'
   image.src = frame.image
   image.style.transform = `translate(-50%, -50%) translate(${frame.offsetX}px, ${frame.offsetY}px) scale(${frame.scale})`
 }
+
+const waitForAnimationFrame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
 
 async function captureAnimatedBanner(node: HTMLElement, frames: MediaState[], delayMs: number) {
   const clone = node.cloneNode(true) as HTMLElement
@@ -61,10 +67,11 @@ async function captureAnimatedBanner(node: HTMLElement, frames: MediaState[], de
   document.body.append(clone)
   try {
     const captures: Blob[] = []
-    for (const frame of frames) { applyFrameToClone(clone, frame); captures.push(await captureFloor(clone)) }
+    for (const frame of frames) { applyFrameToClone(clone, frame); await waitForAnimationFrame(); captures.push(await captureFloor(clone)) }
     const rgbaFrames = await Promise.all(captures.map(blobToRgbaFrame))
     const bytes = encodeGifFrames(rgbaFrames, delayMs)
-    return { preview: captures[0], gif: new Blob([new Uint8Array(bytes).buffer], { type: 'image/gif' }) }
+    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
+    return { preview: captures[0], gif: new Blob([buffer], { type: 'image/gif' }) }
   } finally { clone.remove() }
 }
 

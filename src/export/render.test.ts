@@ -1,6 +1,12 @@
-import { scaleRegion, scaleRegions } from './render'
+import { expect, it, vi } from 'vitest'
+import { toJpeg } from 'html-to-image'
+import { captureFloor, scaleRegion, scaleRegions } from './render'
 import { getTemplate } from '../templates/registry'
 import { getFloorExportRegions } from './regions'
+
+vi.mock('html-to-image', () => ({
+  toJpeg: vi.fn(async () => 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2w=='),
+}))
 
 it('将设计坐标转换为 2 倍导出坐标', () => {
   expect(scaleRegion({ id: 'r', name: '右侧', x: 187.5, y: 0, width: 187.5, height: 240 })).toMatchObject({ x: 375, y: 0, width: 375, height: 480 })
@@ -28,4 +34,17 @@ it('CODE 模板只将顶部和底部缩放为两张独立切图', () => {
   const template = getTemplate('code-information')!.definition
   expect(template.exportRegions.map(region => region.id)).toEqual(['top', 'bottom'])
   expect(scaleRegions(template.exportRegions).map(region => ({ width: region.width, height: region.height }))).toEqual([{ width: 750, height: 120 }, { width: 750, height: 168 }])
+})
+
+it('截图导出使用楼层自身背景色而不是固定白色', async () => {
+  const node = document.createElement('section')
+  node.style.backgroundColor = 'rgb(255, 172, 51)'
+  await captureFloor(node)
+  expect(toJpeg).toHaveBeenCalledWith(node, expect.objectContaining({ backgroundColor: 'rgb(255, 172, 51)' }))
+})
+
+it('透明楼层截图仍使用白色兜底背景', async () => {
+  const node = document.createElement('section')
+  await captureFloor(node)
+  expect(toJpeg).toHaveBeenCalledWith(node, expect.objectContaining({ backgroundColor: '#ffffff' }))
 })

@@ -10,20 +10,21 @@ const defaults = [
 ]
 
 export function SellingPointsInformation({ floor, onMediaSlotChange }: FloorRenderProps) {
-  const count = floor.values.itemCount === '4' ? 4 : 2
+  const count = floor.values.itemCount === '4' ? 4 : floor.values.itemCount === '3' ? 3 : 2
   const textColor = floor.values.textColor || '#000000'
   return <section className="floor-render selling-points-information" data-testid="selling-points-information" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
     <header className="selling-points-heading">
       <h2 style={{ color: textColor }}>{floor.values.title || 'A Better Spot for Every Ride'}</h2>
       {floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}
     </header>
-    <div className="selling-points-grid">
+    <div className={`selling-points-grid${count === 3 ? ' selling-points-grid--three' : ''}`}>
       {Array.from({ length: count }, (_, index) => {
         const id = `point${index + 1}`
         const media = floor.mediaSlots?.[id] ?? emptyMedia
-        return <article className="selling-point" data-testid="selling-point" key={id}>
-          <div className="selling-point-media" data-testid="selling-point-media"><EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange(id, value) : undefined} ariaLabel={`卖点 ${index + 1} 图片`} designWidth={184} /></div>
-          <div className="selling-point-copy"><h3 style={{ color: textColor }}>{floor.values[`${id}Title`]}</h3><p style={{ color: textColor }}>{floor.values[`${id}Description`]}</p></div>
+        const featured = count === 3 && index === 0
+        return <article className={`selling-point${featured ? ' selling-point--featured' : ''}`} data-testid={featured ? 'selling-point-featured' : 'selling-point'} key={id}>
+          <div className="selling-point-media" data-testid="selling-point-media"><EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange(id, value) : undefined} ariaLabel={`卖点 ${index + 1} 图片`} designWidth={featured ? 375 : 184} /></div>
+          <div className="selling-point-copy"><h3 style={{ color: textColor }}>{floor.values[`${id}Title`]}</h3>{featured ? null : <p style={{ color: textColor }}>{floor.values[`${id}Description`]}</p>}</div>
         </article>
       })}
     </div>
@@ -43,7 +44,7 @@ export const sellingPointsInformation: RegisteredTemplate = {
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'Shop Now' },
-      { id: 'itemCount', type: 'choice', label: '卖点数量', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '4 个卖点', value: '4' }] },
+      { id: 'itemCount', type: 'choice', label: '卖点数量', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '3 个卖点', value: '3' }, { label: '4 个卖点', value: '4' }] },
       ...pointFields,
       { id: 'background', type: 'color', label: '背景颜色', defaultValue: '#FFFFFF' },
       { id: 'textColor', type: 'color', label: '文字颜色', defaultValue: '#000000' },

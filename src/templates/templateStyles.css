@@ -41,6 +41,11 @@
 .selling-point-copy { padding: 12px 12px 0; text-align: center; }
 .selling-point-copy h3 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 14px; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .selling-point-copy p { display: -webkit-box; overflow: hidden; margin: 7px 0 0; font-size: 12px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
+.selling-points-grid--three { gap: 0 8px; }
+.selling-point--featured { grid-column: 1 / -1; margin-bottom: 16px; }
+.selling-point--featured .selling-point-media { aspect-ratio: auto; height: 203px; }
+.selling-point--featured .selling-point-copy { padding: 14px 20px 0; }
+.selling-point--featured .selling-point-copy h3 { font-size: 14px; line-height: 1.25; -webkit-line-clamp: 3; }
 .selling-points-button { text-align: center; }
 .single-selling-point-information { display: flex; flex-direction: column; padding-bottom: 24px; }
 .single-selling-point-media { position: relative; width: 100%; overflow: hidden; }

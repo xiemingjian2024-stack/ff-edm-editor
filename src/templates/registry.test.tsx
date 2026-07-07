@@ -172,11 +172,11 @@ it('N×3 渲染三张卡、固定五星和单行标题', () => {
   expect(css).toMatch(/\.product-grid-n-by-3-title \{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis;/)
 })
 
-it('注册支持 2/4 项与四个媒体槽位的卖点信息模板', () => {
+it('注册支持 2/3/4 项与四个媒体槽位的卖点信息模板', () => {
   const template = templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition
   expect(template?.category).toBe('information')
   expect(template?.autoHeight).toBe(true)
-  expect(template?.fields.find(field => field.id === 'itemCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '4 个卖点', value: '4' }] })
+  expect(template?.fields.find(field => field.id === 'itemCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个卖点', value: '2' }, { label: '3 个卖点', value: '3' }, { label: '4 个卖点', value: '4' }] })
   expect(template?.mediaSlots?.map(slot => slot.id)).toEqual(['point1', 'point2', 'point3', 'point4'])
   expect(template?.mediaSlotCountFieldId).toBe('itemCount')
   expect(template?.themeColorFields).toBeUndefined()
@@ -194,6 +194,20 @@ it('卖点信息按数量显示卖点并将按钮放在网格之后', () => {
   const button = screen.getByText('Shop Now')
   expect(button).toHaveClass('selling-points-button')
   expect(button.parentElement?.lastElementChild).toBe(button)
+})
+
+it('卖点信息 3 项时第一个卖点使用通栏图片并限制下方文案为 3 行', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'selling-points-information')!
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const floor = { id: 'points', templateId: entry.definition.id, values: { title: 'Title', description: '', buttonText: 'Shop Now', itemCount: '3', point1Title: 'Long featured copy line one line two line three line four', point1Description: 'Hidden copy', point2Title: 'Two', point2Description: 'Second', point3Title: 'Three', point3Description: 'Third', point4Title: 'Four', point4Description: 'Fourth', background: '#FFFFFF', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' }, products: {}, mediaSlots: { point1: media, point2: media, point3: media, point4: media } }
+  const { container } = render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getAllByTestId('selling-point')).toHaveLength(2)
+  expect(container.querySelector('.selling-points-grid')).toHaveClass('selling-points-grid--three')
+  expect(screen.getByTestId('selling-point-featured')).toHaveClass('selling-point--featured')
+  expect(screen.queryByText('Hidden copy')).not.toBeInTheDocument()
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.selling-point--featured \.selling-point-media \{[^}]*height: 203px;/)
+  expect(css).toMatch(/\.selling-point--featured \.selling-point-copy h3 \{[^}]*-webkit-line-clamp: 3;/)
 })
 
 it('注册单卖点信息模板及可调图片高度', () => {

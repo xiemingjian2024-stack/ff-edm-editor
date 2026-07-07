@@ -29,7 +29,7 @@ const ignoredPaths = [
   /^\/tsconfig\.json$/,
 ]
 
-const usage = `EDM EDITOR 桌面试用版
+const windowsUsage = `EDM EDITOR 桌面试用版
 
 Windows 使用方式：
 1. 解压整个文件夹，不要只拖出 exe。
@@ -39,6 +39,20 @@ Windows 使用方式：
 说明：
 - 不需要安装 Node.js。
 - 草稿仍保存在当前电脑的应用数据中。
+- Shopify 商品读取需要电脑能正常访问商品页。
+- 导出文件会下载到系统默认下载目录。
+`
+
+const macUsage = `EDM EDITOR Mac 测试版
+
+Mac 使用方式：
+1. 解压整个 zip。
+2. 双击「EDM EDITOR.app」。
+3. 如果提示无法验证开发者，请右键点击「EDM EDITOR.app」，选择“打开”，再确认打开。
+
+说明：
+- 不需要安装 Node.js。
+- 草稿保存在当前电脑的应用数据中。
 - Shopify 商品读取需要电脑能正常访问商品页。
 - 导出文件会下载到系统默认下载目录。
 `
@@ -63,7 +77,7 @@ const appPaths = await packager({
 })
 
 const appPath = appPaths[0]
-await writeFile(join(appPath, 'README-WINDOWS.txt'), usage)
+await writeFile(join(appPath, platform === 'darwin' ? 'README-MAC.txt' : 'README-WINDOWS.txt'), platform === 'darwin' ? macUsage : windowsUsage)
 const zipName = `EDM-EDITOR-${platform}-${arch}.zip`
 const zipPath = join(releaseRoot, zipName)
 await rm(zipPath, { force: true })

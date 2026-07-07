@@ -24,15 +24,18 @@ it('在草稿与最近导出之间切换并可复制为草稿', async () => {
   expect(onDuplicate).toHaveBeenCalledTimes(2)
 })
 
-it('可以生成设计稿编码并接收设计稿编码', async () => {
+it('通过 edm 文件发送和接收设计稿', async () => {
   const user = userEvent.setup()
   const onReceiveTransferCode = vi.fn(async () => {})
   render(<DraftHome drafts={[draft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-abc'} onReceiveTransferCode={onReceiveTransferCode} />)
   await user.click(screen.getByRole('button', { name: '发送 夏日 EDM' }))
-  expect(await screen.findByDisplayValue('FFEDM1-abc')).toBeVisible()
+  expect(await screen.findByRole('button', { name: '下载 .edm 文件' })).toBeVisible()
+  expect(screen.queryByLabelText('设计稿编码')).not.toBeInTheDocument()
   await user.click(screen.getByRole('button', { name: '关闭' }))
   await user.click(screen.getByRole('button', { name: '接收设计稿' }))
-  await user.type(screen.getByLabelText('设计稿编码'), 'FFEDM1-abc')
-  await user.click(screen.getByRole('button', { name: '生成新草稿' }))
+  expect(screen.getByText('导入 .edm 文件')).toBeVisible()
+  expect(screen.queryByLabelText('设计稿编码')).not.toBeInTheDocument()
+  const file = new File(['FFEDM1-abc'], '夏日.edm', { type: 'text/plain' })
+  await user.upload(screen.getByLabelText('导入 .edm 文件'), file)
   expect(onReceiveTransferCode).toHaveBeenCalledWith('FFEDM1-abc')
 })

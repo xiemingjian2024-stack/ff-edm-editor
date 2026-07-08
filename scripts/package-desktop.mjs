@@ -1,6 +1,7 @@
 import { packager } from '@electron/packager'
 import { execFileSync } from 'node:child_process'
 import { chmod, mkdir, rm, writeFile } from 'node:fs/promises'
+import { readFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -10,6 +11,7 @@ const desktopRoot = join(releaseRoot, 'desktop')
 const appName = 'EDM EDITOR'
 const platform = process.argv[2] || 'win32'
 const arch = process.argv[3] || 'x64'
+const appVersion = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version
 
 const ignoredPaths = [
   /^\/\.git($|\/)/,
@@ -72,13 +74,13 @@ const appPaths = await packager({
   asar: false,
   prune: true,
   ignore: ignoredPaths,
-  appVersion: '0.1.0',
+  appVersion,
   executableName: 'EDM EDITOR',
 })
 
 const appPath = appPaths[0]
 await writeFile(join(appPath, platform === 'darwin' ? 'README-MAC.txt' : 'README-WINDOWS.txt'), platform === 'darwin' ? macUsage : windowsUsage)
-const zipName = `EDM-EDITOR-${platform}-${arch}.zip`
+const zipName = `EDM-EDITOR-v${appVersion}-${platform}-${arch}.zip`
 const zipPath = join(releaseRoot, zipName)
 await rm(zipPath, { force: true })
 execFileSync('zip', ['-qr', zipPath, basename(appPath)], { cwd: dirname(appPath), stdio: 'inherit' })

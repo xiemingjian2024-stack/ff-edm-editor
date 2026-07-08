@@ -78,7 +78,18 @@ it('作品卡片使用数字色块、满幅封面和悬浮更多菜单', async (
   const css = readFileSync('src/editor/editor.css', 'utf8')
   expect(css).toMatch(/\.draft-preview \{[^}]*padding: 0;[^}]*overflow: hidden;/)
   expect(css).toMatch(/\.draft-cover-image \{[^}]*width: 100%;[^}]*object-fit: cover;/)
-  expect(css).toMatch(/\.draft-count-badge \{[^}]*background: #FFAC33;[^}]*color: #fff;/)
+  expect(css).toMatch(/\.draft-count-badge \{[^}]*background: var\(--draft-count-bg, #FFAC33\);[^}]*color: #fff;/)
   expect(css).toMatch(/\.draft-more \{[^}]*opacity: 0;/)
   expect(css).toMatch(/\.draft-action-menu button \{[^}]*color: #FFAC33;/)
+})
+
+it('楼层数字标签按楼层数量使用不同颜色', () => {
+  const oneFloorDraft = { ...draft, id: 'one', name: '1 层 EDM', floors: [{ id: 'f1', templateId: 'title-centered', values: {}, products: {} }] }
+  const twoFloorDraft = { ...draft, id: 'two', name: '2 层 EDM', floors: [
+    { id: 'f1', templateId: 'title-centered', values: {}, products: {} },
+    { id: 'f2', templateId: 'title-centered', values: {}, products: {} },
+  ] }
+  render(<DraftHome drafts={[oneFloorDraft, twoFloorDraft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  expect(screen.getByLabelText('1 个楼层')).toHaveStyle({ '--draft-count-bg': '#FFAC33' })
+  expect(screen.getByLabelText('2 个楼层')).toHaveStyle({ '--draft-count-bg': '#5B8DEF' })
 })

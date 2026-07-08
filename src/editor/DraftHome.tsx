@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import edmEditorLogo from '../assets/edm-editor-logo.svg'
 import emptyOrderImage from '../assets/empty-order.png'
 import type { EdmDraft, ExportRecord } from '../domain/edm'
@@ -7,6 +7,7 @@ import { Icon } from '../ui/Icon'
 import { createTransferFileName } from '../transfer/designTransfer'
 
 const bannerTemplateIds = new Set(['banner-regular', 'banner-image-copy'])
+const floorCountBadgeColors = ['#FFAC33', '#5B8DEF', '#58B368', '#A66CFF', '#F56C6C', '#2FB8AC']
 
 function getDraftCoverImage(draft: EdmDraft) {
   for (const floor of draft.floors) {
@@ -16,6 +17,11 @@ function getDraftCoverImage(draft: EdmDraft) {
     if (image) return image
   }
   return emptyOrderImage
+}
+
+function getFloorCountBadgeColor(count: number) {
+  const normalizedCount = Math.max(1, count)
+  return floorCountBadgeColors[(normalizedCount - 1) % floorCountBadgeColors.length]
 }
 
 export function DraftHome({ drafts, exports, onCreate, onOpen, onDelete, onDuplicate, onMakeTransferCode, onReceiveTransferCode, onDeleteExport = () => {} }: { drafts: EdmDraft[]; exports: ExportRecord[]; onCreate: () => void; onOpen: (draft: EdmDraft) => void; onDelete: (id: string) => void; onDuplicate: (draft: EdmDraft) => void; onMakeTransferCode: (draft: EdmDraft) => Promise<string>; onReceiveTransferCode: (code: string) => Promise<void>; onDeleteExport?: (id: string) => void }) {
@@ -29,7 +35,7 @@ export function DraftHome({ drafts, exports, onCreate, onOpen, onDelete, onDupli
   const formatTime = (value: string) => value ? new Intl.DateTimeFormat('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : '刚刚'
   const sheet = (draft: EdmDraft) => <div className="draft-sheet"><img className="draft-cover-image" src={getDraftCoverImage(draft)} alt={`${draft.name} 封面`} /></div>
   const meta = (draft: EdmDraft, timeLabel: string, menuId: string, children: ReactNode) => <div className="draft-meta" data-testid="draft-card-meta">
-    <div className="draft-title-row"><span className="draft-count-badge" aria-label={`${draft.floors.length} 个楼层`}>{draft.floors.length}</span><strong>{draft.name}</strong><button className="draft-more" aria-label={`更多操作 ${draft.name}`} aria-expanded={openMenuId === menuId} onClick={() => setOpenMenuId(openMenuId === menuId ? null : menuId)}>…</button></div>
+    <div className="draft-title-row"><span className="draft-count-badge" aria-label={`${draft.floors.length} 个楼层`} style={{ '--draft-count-bg': getFloorCountBadgeColor(draft.floors.length) } as CSSProperties}>{draft.floors.length}</span><strong>{draft.name}</strong><button className="draft-more" aria-label={`更多操作 ${draft.name}`} aria-expanded={openMenuId === menuId} onClick={() => setOpenMenuId(openMenuId === menuId ? null : menuId)}>…</button></div>
     <small>{timeLabel}</small>
     {openMenuId === menuId ? <div className="draft-action-menu" role="menu">{children}</div> : null}
   </div>

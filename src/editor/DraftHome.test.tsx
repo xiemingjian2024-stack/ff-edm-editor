@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { readFileSync } from 'node:fs'
 import { DraftHome } from './DraftHome'
 
 const draft = { id: 'a', name: '夏日 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: '2026-07-01T09:00:00.000Z', updatedAt: '2026-07-01T10:30:00.000Z' }
@@ -13,6 +14,7 @@ it('草稿卡显示名称、楼层数量和修改时间', () => {
   expect(screen.getByText(/修改于/)).toBeVisible()
   expect(screen.getByRole('button', { name: '打开 夏日 EDM' })).toBeVisible()
   expect(screen.getByRole('img', { name: '夏日 EDM 封面' })).toBeVisible()
+  expect(screen.getByTestId('draft-card-meta')).toHaveTextContent(/夏日 EDM.*修改于.*发送.*复制.*删除/s)
 })
 
 it('作品封面优先展示第一个 Banner 图片', () => {
@@ -61,4 +63,14 @@ it('通过 edm 文件发送和接收设计稿', async () => {
   const file = new File(['FFEDM1-abc'], '夏日.edm', { type: 'text/plain' })
   await user.upload(screen.getByLabelText('导入 .edm 文件'), file)
   expect(onReceiveTransferCode).toHaveBeenCalledWith('FFEDM1-abc')
+})
+
+it('作品卡片使用黑底白字楼层标签、满幅封面和橙色操作文字', () => {
+  render(<DraftHome drafts={[draft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  expect(screen.getByText('0 个楼层')).toHaveClass('draft-floor-count')
+  const css = readFileSync('src/editor/editor.css', 'utf8')
+  expect(css).toMatch(/\.draft-preview \{[^}]*padding: 0;[^}]*overflow: hidden;/)
+  expect(css).toMatch(/\.draft-cover-image \{[^}]*width: 100%;[^}]*object-fit: cover;/)
+  expect(css).toMatch(/\.draft-floor-count \{[^}]*background: rgba\(0,0,0,\.58\);[^}]*color: #fff;/)
+  expect(css).toMatch(/\.draft-actions button \{[^}]*color: #FFAC33;/)
 })

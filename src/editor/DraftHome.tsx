@@ -1,8 +1,21 @@
 import { useState } from 'react'
 import edmEditorLogo from '../assets/edm-editor-logo.svg'
+import emptyOrderImage from '../assets/empty-order.png'
 import type { EdmDraft, ExportRecord } from '../domain/edm'
 import { Icon } from '../ui/Icon'
 import { createTransferFileName } from '../transfer/designTransfer'
+
+const bannerTemplateIds = new Set(['banner-regular', 'banner-image-copy'])
+
+function getDraftCoverImage(draft: EdmDraft) {
+  for (const floor of draft.floors) {
+    if (!bannerTemplateIds.has(floor.templateId)) continue
+    const animatedImage = floor.animation?.enabled ? floor.animation.frames.find(frame => frame.image)?.image : ''
+    const image = animatedImage || floor.media?.image
+    if (image) return image
+  }
+  return emptyOrderImage
+}
 
 export function DraftHome({ drafts, exports, onCreate, onOpen, onDelete, onDuplicate, onMakeTransferCode, onReceiveTransferCode, onDeleteExport = () => {} }: { drafts: EdmDraft[]; exports: ExportRecord[]; onCreate: () => void; onOpen: (draft: EdmDraft) => void; onDelete: (id: string) => void; onDuplicate: (draft: EdmDraft) => void; onMakeTransferCode: (draft: EdmDraft) => Promise<string>; onReceiveTransferCode: (code: string) => Promise<void>; onDeleteExport?: (id: string) => void }) {
   const [tab, setTab] = useState<'drafts' | 'exports'>('drafts')
@@ -12,7 +25,7 @@ export function DraftHome({ drafts, exports, onCreate, onOpen, onDelete, onDupli
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const formatTime = (value: string) => value ? new Intl.DateTimeFormat('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : '刚刚'
-  const sheet = (draft: EdmDraft) => <div className="draft-sheet"><span>{draft.floors.length} 个楼层</span><i/><i/><i/></div>
+  const sheet = (draft: EdmDraft) => <div className="draft-sheet"><img className="draft-cover-image" src={getDraftCoverImage(draft)} alt={`${draft.name} 封面`} /><span>{draft.floors.length} 个楼层</span></div>
   const openSend = async (draft: EdmDraft) => {
     setSendDraft(draft); setSendCode(''); setMessage(''); setBusy(true)
     try { setSendCode(await onMakeTransferCode(draft)) } catch (error) { setMessage(error instanceof Error ? error.message : '设计稿编码生成失败') } finally { setBusy(false) }

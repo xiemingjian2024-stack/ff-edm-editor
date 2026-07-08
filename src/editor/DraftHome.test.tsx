@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { DraftHome } from './DraftHome'
 
 const draft = { id: 'a', name: '夏日 EDM', floors: [], themePaletteId: 'funnyfuzzy-classic', createdAt: '2026-07-01T09:00:00.000Z', updatedAt: '2026-07-01T10:30:00.000Z' }
+const media = { image: 'banner-cover.jpg', url: '', scale: 1, offsetX: 0, offsetY: 0 }
 
 it('草稿卡显示名称、楼层数量和修改时间', () => {
   render(<DraftHome drafts={[draft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
@@ -11,6 +12,28 @@ it('草稿卡显示名称、楼层数量和修改时间', () => {
   expect(screen.getByText('0 个楼层')).toBeVisible()
   expect(screen.getByText(/修改于/)).toBeVisible()
   expect(screen.getByRole('button', { name: '打开 夏日 EDM' })).toBeVisible()
+  expect(screen.getByRole('img', { name: '夏日 EDM 封面' })).toBeVisible()
+})
+
+it('作品封面优先展示第一个 Banner 图片', () => {
+  const draftWithBanner = { ...draft, floors: [
+    { id: 'title', templateId: 'title-centered', values: {}, products: {} },
+    { id: 'banner', templateId: 'banner-image-copy', values: {}, products: {}, media },
+    { id: 'banner-2', templateId: 'banner-regular', values: {}, products: {}, media: { ...media, image: 'second-banner.jpg' } },
+  ] }
+  render(<DraftHome drafts={[draftWithBanner]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  expect(screen.getByRole('img', { name: '夏日 EDM 封面' })).toHaveAttribute('src', 'banner-cover.jpg')
+})
+
+it('GIF Banner 优先使用第一张有效帧作为作品封面', () => {
+  const draftWithGifBanner = { ...draft, floors: [{ id: 'banner', templateId: 'banner-regular', values: {}, products: {}, media: { ...media, image: 'static.jpg' }, animation: { enabled: true, intervalMs: 1000, frames: [{ ...media, image: '' }, { ...media, image: 'gif-frame.jpg' }] } }] }
+  render(<DraftHome drafts={[draftWithGifBanner]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  expect(screen.getByRole('img', { name: '夏日 EDM 封面' })).toHaveAttribute('src', 'gif-frame.jpg')
+})
+
+it('没有 Banner 图片时作品封面展示默认图', () => {
+  render(<DraftHome drafts={[draft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  expect(screen.getByRole('img', { name: '夏日 EDM 封面' })).toHaveAttribute('src', expect.stringContaining('empty-order'))
 })
 
 it('在草稿与最近导出之间切换并可复制为草稿', async () => {

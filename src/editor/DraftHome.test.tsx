@@ -77,6 +77,7 @@ it('作品卡片使用数字色块、满幅封面和悬浮更多菜单', async (
   expect(screen.getByRole('menu')).toBeVisible()
   const css = readFileSync('src/editor/editor.css', 'utf8')
   expect(css).toMatch(/\.draft-preview \{[^}]*padding: 0;[^}]*overflow: hidden;/)
+  expect(css).toMatch(/\.draft-preview \{[^}]*aspect-ratio: 1 \/ 1;/)
   expect(css).toMatch(/\.draft-cover-image \{[^}]*width: 100%;[^}]*object-fit: cover;/)
   expect(css).toMatch(/\.draft-count-badge \{[^}]*background: var\(--draft-count-bg, #FFAC33\);[^}]*color: #fff;/)
   expect(css).toMatch(/\.draft-more \{[^}]*opacity: 0;/)

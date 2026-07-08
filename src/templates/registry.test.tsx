@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题、信息、商品卡和页尾模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card', 'footer'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card', 'footer'])
 })
 
 it('信息和商品卡按运营使用顺序排列', () => {
@@ -271,6 +271,25 @@ it('HEAD 品牌 Logo 使用固定尺寸且不声明固定主题色位', () => {
   expect(template.designHeight).toBe(56)
   expect(template.themeColorFields).toBeUndefined()
   expect(template.exportRegions).toEqual([{ id: 'full', name: 'HEAD 品牌 Logo', x: 0, y: 0, width: 375, height: 56 }])
+})
+
+it('HEAD 顶部横幅支持上传图片并可在默认高度上下 100px 调整', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'head-top-banner')!
+  expect(templateRegistry.filter(item => item.definition.category === 'head').map(item => item.definition.id)).toEqual(['head-brand-logo', 'head-category-navigation', 'head-top-banner'])
+  expect(entry.definition.name).toBe('顶部横幅')
+  expect(entry.definition.designHeight).toBe(150)
+  expect(entry.definition.mediaSlots).toEqual([{ id: 'banner', label: '顶部横幅图片' }])
+  expect(entry.definition.fields).toEqual([
+    expect.objectContaining({ id: 'height', type: 'range', defaultValue: '150', min: 50, max: 250, step: 1, unit: 'px' }),
+    expect.objectContaining({ id: 'background', type: 'color', defaultValue: '#FFFFFF' }),
+  ])
+  expect(entry.definition.heightConfig).toEqual({ fieldId: 'height', min: 50, max: 250, offset: 0 })
+  expect(entry.definition.exportRegions).toEqual([{ id: 'full', name: 'HEAD 顶部横幅', x: 0, y: 0, width: 375, height: 150 }])
+  const media = { image: 'banner.png', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const floor = { id: 'top', templateId: entry.definition.id, values: { height: '180', background: '#F7F7F7' }, products: {}, mediaSlots: { banner: media } }
+  render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.getByTestId('head-top-banner')).toHaveStyle({ height: '180px', backgroundColor: '#F7F7F7' })
+  expect(screen.getByLabelText('顶部横幅图片')).toBeVisible()
 })
 
 it('标题文本常规模板包含内容、对齐、颜色和自适应高度配置', () => {

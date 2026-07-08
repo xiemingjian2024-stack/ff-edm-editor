@@ -16,8 +16,8 @@ describe('主题颜色解析', () => {
     expect(resolveFloorForRender(floor, template, classicPalette, getFloorThemeFields(template, 'B')).values).toMatchObject({ background: '#FFAC33', buttonBackground: '#000000' })
   })
 
-  it('Logo、分类导航和 Banner 背景固定使用 A', () => {
-    for (const id of ['head-brand-logo', 'head-category-navigation', 'banner-image-copy']) {
+  it('Logo、分类导航、顶部横幅和 Banner 背景固定使用 A', () => {
+    for (const id of ['head-brand-logo', 'head-category-navigation', 'head-top-banner', 'banner-image-copy']) {
       const template = getTemplate(id)!.definition
       expect(getFloorThemeFields(template, 'B').find(field => field.fieldId === 'background')?.defaultSlot).toBe('A')
     }

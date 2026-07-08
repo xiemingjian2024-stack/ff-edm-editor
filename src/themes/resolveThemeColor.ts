@@ -15,7 +15,7 @@ export function resolveThemeColor(
   return palette.slots[binding?.slot ?? defaultSlot] ?? fallback
 }
 
-const fixedBackgroundTemplateIds = new Set(['head-brand-logo', 'head-category-navigation'])
+const fixedBackgroundTemplateIds = new Set(['head-brand-logo', 'head-category-navigation', 'head-top-banner'])
 const hasColorField = (template: FloorTemplate, fieldId: string) => template.fields.some(field => field.id === fieldId && field.type === 'color')
 
 export function getFloorThemeFields(template: FloorTemplate, alternatingBackgroundSlot: ThemeSlot): Array<{ fieldId: string; defaultSlot: ThemeSlot }> {

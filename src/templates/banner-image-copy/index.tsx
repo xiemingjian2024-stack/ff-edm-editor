@@ -23,7 +23,7 @@ export const bannerImageCopy: RegisteredTemplate = {
       { id: 'imageHeight', type: 'range', label: '图片区域高度', defaultValue: '300', min: 200, max: 500, step: 1, unit: 'px' },
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
-      { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'SHOP NOW' },
+      { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'Shop Now' },
       { id: 'alignment', type: 'choice', label: '对齐方式', defaultValue: 'center', options: [{ label: '左对齐', value: 'left' }, { label: '居中', value: 'center' }, { label: '右对齐', value: 'right' }] },
       { id: 'background', type: 'color', label: '文案区背景颜色', defaultValue: '#FFFFFF' },
       { id: 'textColor', type: 'color', label: '标题与描述颜色', defaultValue: '#000000' },

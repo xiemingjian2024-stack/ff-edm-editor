@@ -30,7 +30,7 @@ export const bannerRegular: RegisteredTemplate = {
       { id: 'height', type: 'range', label: '楼层高度', defaultValue: '375', min: 250, max: 600, step: 1, unit: 'px' },
       { id: 'title', type: 'text', label: '标题', defaultValue: 'Spend Less Time Cleaning' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Protect your sofa from spills, scratches and everyday mess' },
-      { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'SHOP NOW' },
+      { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'Shop Now' },
       { id: 'copyPosition', type: 'choice', label: '文案位置', defaultValue: 'bottom', options: [{ label: '顶部', value: 'top' }, { label: '底部', value: 'bottom' }] },
       { id: 'alignment', type: 'choice', label: '对齐方式', defaultValue: 'center', options: [{ label: '左对齐', value: 'left' }, { label: '居中', value: 'center' }, { label: '右对齐', value: 'right' }] },
       { id: 'overlay', type: 'choice', label: '渐变遮罩', defaultValue: 'on', options: [{ label: '开启遮罩', value: 'on' }, { label: '关闭遮罩', value: 'off' }] },

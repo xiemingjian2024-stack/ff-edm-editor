@@ -119,6 +119,14 @@ it('N×1 奇偶商品卡分别贴左右边且使用紧凑卡内按钮', () => {
   expect(css).toMatch(/\.product-list-n-card-button \{[^}]*width: 112px;[^}]*height: 28px;/)
 })
 
+it('多行文本保留手动换行', () => {
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  for (const selector of ['.banner-copy h2', '.title-content p', '.comparison-result p', '.selling-point-copy h3', '.product-grid-n-card h3', '.product-list-n-copy h3']) {
+    expect(css).toContain(selector)
+  }
+  expect(css).toMatch(/white-space: pre-line;/)
+})
+
 it('N×1 商品图片框使用透明底透出卡片背景', () => {
   const css = readFileSync('src/templates/templateStyles.css', 'utf8')
   expect(css).toMatch(/\.product-list-n-image \.editable-image-frame \{[^}]*background: transparent;/)

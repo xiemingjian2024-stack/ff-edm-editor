@@ -100,3 +100,4 @@
 .footer-links-list { display: grid; }
 .footer-link-region { height: 52px; display: grid; place-items: center; padding: 8px 10px; box-sizing: border-box; background: #ffad33; }
 .footer-link-region span { width: 100%; height: 36px; display: block; overflow: hidden; padding: 12px 16px 0; box-sizing: border-box; background: #000; color: #ffad33; font-size: 12px; line-height: 1; text-align: center; white-space: nowrap; text-overflow: ellipsis; }
+.banner-simple h2, .banner-copy h2, .banner-copy p, .title-content h2, .title-content p, .comparison-heading h2, .comparison-heading p, .comparison-result p, .selling-points-heading h2, .selling-points-heading p, .selling-point-copy h3, .selling-point-copy p, .product-grid-heading h2, .product-grid-heading p, .product-grid-n-card h3, .product-list-n-copy h3 { white-space: pre-line; }

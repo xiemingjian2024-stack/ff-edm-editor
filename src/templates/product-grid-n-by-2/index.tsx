@@ -3,6 +3,7 @@ import { getActiveProductSlots } from '../productSlots'
 import arrowIcon from '../../assets/product-card/跳转.svg'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
+import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
 
 function ProductGridNBy2({ floor, template, onProductChange }: FloorRenderProps) {
   const textColor = floor.values.textColor || '#000000'
@@ -14,7 +15,7 @@ function ProductGridNBy2({ floor, template, onProductChange }: FloorRenderProps)
       <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
       <div className="product-grid-n-price"><span>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</span><img src={arrowIcon} alt="" /></div>
     </article> })}</div>
-    {floor.values.buttonText ? <span className="banner-button non-banner-button product-grid-n-button" data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className={`banner-button non-banner-button product-grid-n-button${buttonWidthClass(floor.values.buttonWidth)}`} data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 
@@ -32,6 +33,7 @@ export const productGridNBy2: RegisteredTemplate = {
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'See More' },
+      buttonWidthField,
       { id: 'productCount', type: 'choice', label: '商品数量', defaultValue: '2', options: [{ label: '2 个商品', value: '2' }, { label: '4 个商品', value: '4' }, { label: '6 个商品', value: '6' }, { label: '8 个商品', value: '8' }] },
       { id: 'pricePrefix', type: 'text', label: '价格前缀', defaultValue: 'From' },
       { id: 'background', type: 'color', label: '楼层背景颜色', defaultValue: '#FFFFFF' },

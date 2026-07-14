@@ -1,5 +1,6 @@
 import type { FloorRenderProps, MediaState, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
+import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
 
 const emptyMedia: MediaState = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
 
@@ -15,7 +16,7 @@ export function SingleSellingPointInformation({ floor, onMediaSlotChange }: Floo
     <div className="single-selling-point-media" data-testid="single-selling-point-media" style={{ height: imageHeight }}>
       <EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange('feature', value) : undefined} ariaLabel="卖点图片" />
     </div>
-    {floor.values.buttonText ? <span className="banner-button non-banner-button single-selling-point-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className={`banner-button non-banner-button single-selling-point-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 
@@ -26,6 +27,7 @@ export const singleSellingPointInformation: RegisteredTemplate = {
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'Shop Now' },
+      buttonWidthField,
       { id: 'imageHeight', type: 'range', label: '图片高度', defaultValue: '200', min: 100, max: 300, step: 1, unit: 'px' },
       { id: 'background', type: 'color', label: '背景颜色', defaultValue: '#FFFFFF' },
       { id: 'textColor', type: 'color', label: '文字颜色', defaultValue: '#000000' },

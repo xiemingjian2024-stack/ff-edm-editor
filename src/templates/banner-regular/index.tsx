@@ -2,6 +2,7 @@ import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getFloorHeight } from '../floorGeometry'
 import { useBannerFrame } from '../useBannerFrame'
+import { buttonAlignSelf, buttonWidthClass, buttonWidthField } from '../buttonWidth'
 
 function BannerRegular({ floor, template, onMediaChange }: FloorRenderProps) {
   const height = getFloorHeight(template, floor)
@@ -19,7 +20,7 @@ function BannerCopy({ floor, position }: { floor: FloorRenderProps['floor']; pos
   return <div className="banner-copy banner-copy--overlay" data-testid="banner-copy" data-position={position} style={{ textAlign: alignment as 'left' | 'center' | 'right', [position]: 24 }}>
     <h2 style={{ color: floor.values.textColor }}>{floor.values.title}</h2>
     {floor.values.description ? <p style={{ color: floor.values.textColor }}>{floor.values.description}</p> : null}
-    <span className="banner-button" style={{ backgroundColor: floor.values.buttonBackground, color: floor.values.buttonTextColor, alignSelf: alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : 'center' }}>{floor.values.buttonText}</span>
+    <span className={`banner-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground, color: floor.values.buttonTextColor, alignSelf: buttonAlignSelf(floor.values.buttonWidth, alignment) }}>{floor.values.buttonText}</span>
   </div>
 }
 
@@ -31,6 +32,7 @@ export const bannerRegular: RegisteredTemplate = {
       { id: 'title', type: 'text', label: '标题', defaultValue: 'Spend Less Time Cleaning' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Protect your sofa from spills, scratches and everyday mess' },
       { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'Shop Now' },
+      buttonWidthField,
       { id: 'copyPosition', type: 'choice', label: '文案位置', defaultValue: 'bottom', options: [{ label: '顶部', value: 'top' }, { label: '底部', value: 'bottom' }] },
       { id: 'alignment', type: 'choice', label: '对齐方式', defaultValue: 'center', options: [{ label: '左对齐', value: 'left' }, { label: '居中', value: 'center' }, { label: '右对齐', value: 'right' }] },
       { id: 'overlay', type: 'choice', label: '渐变遮罩', defaultValue: 'on', options: [{ label: '开启遮罩', value: 'on' }, { label: '关闭遮罩', value: 'off' }] },

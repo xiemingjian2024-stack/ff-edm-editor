@@ -306,9 +306,21 @@ it('标题文本常规模板包含内容、对齐、颜色和自适应高度配�
   const entry = templateRegistry.find(item => item.definition.id === 'title-centered')!
   expect(entry.definition.name).toBe('常规标题')
   expect(entry.definition.autoHeight).toBe(true)
-  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
+  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'buttonWidth', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
   expect(entry.definition.themeColorFields).toBeUndefined()
   expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.title-content \{[^}]*padding: 24px;/)
+})
+
+it('含按钮模板支持适配文案或最大宽度', () => {
+  const buttonTemplateIds = ['banner-regular', 'banner-image-copy', 'title-centered', 'single-selling-point-information', 'selling-points-information', 'product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3']
+  for (const id of buttonTemplateIds) {
+    const field = templateRegistry.find(item => item.definition.id === id)?.definition.fields.find(item => item.id === 'buttonWidth')
+    expect(field).toMatchObject({ type: 'choice', defaultValue: 'auto', options: [{ label: '适配文案', value: 'auto' }, { label: '最大宽度', value: 'full' }] })
+  }
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.banner-button\.button--full \{[^}]*width: 100%;/)
+  expect(css).toMatch(/\.product-grid-n-button\.button--full \{[^}]*margin-left: 8px;[^}]*margin-right: 8px;/)
+  expect(css).toMatch(/\.product-list-n-card-button\.button--full \{[^}]*width: 100%;/)
 })
 
 it('多卖点信息使用新名称且三个信息模板主标题为常规字重', () => {

@@ -14,7 +14,7 @@
 .banner-regular, .banner-image-copy { position: relative; }
 .banner-gradient { position: absolute; z-index: 1; left: 0; right: 0; height: 58%; pointer-events: none; }.banner-gradient--bottom { bottom: 0; background: linear-gradient(to bottom, transparent, rgba(0,0,0,.72)); }.banner-gradient--top { top: 0; background: linear-gradient(to top, transparent, rgba(0,0,0,.72)); }
 .banner-copy { position: relative; z-index: 2; display: flex; flex-direction: column; min-width: 0; }.banner-copy--overlay { position: absolute; left: 24px; right: 24px; }.banner-copy--panel { min-height: 180px; justify-content: center; padding: 24px; }
-.banner-copy h2 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 24px; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }.banner-copy p { display: -webkit-box; overflow: hidden; margin: 10px 0 0; font-size: 14px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }.banner-button { min-width: 182px; max-width: 100%; height: 34px; display: grid; place-items: center; overflow: hidden; margin-top: 14px; padding: 0 24px; font-size: 12px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }
+.banner-copy h2 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 24px; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }.banner-copy p { display: -webkit-box; overflow: hidden; margin: 10px 0 0; font-size: 14px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }.banner-button { min-width: 182px; max-width: 100%; height: 34px; display: grid; place-items: center; overflow: hidden; box-sizing: border-box; margin-top: 14px; padding: 0 24px; font-size: 12px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }.banner-button.button--full { width: 100%; min-width: 0; }
 .banner-image-stage { position: relative; overflow: hidden; }
 .title-content { min-height: 112px; padding: 24px; display: flex; flex-direction: column; justify-content: center; }
 .title-content h2 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 20px; font-weight: 400; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
@@ -49,6 +49,7 @@
 .selling-point--featured .selling-point-copy { padding: 14px 20px 0; }
 .selling-point--featured .selling-point-copy h3 { font-size: 14px; line-height: 1.25; -webkit-line-clamp: 3; }
 .selling-points-button { text-align: center; }
+.selling-points-button.button--full, .single-selling-point-button.button--full { align-self: stretch; width: auto; margin-left: 24px; margin-right: 24px; }
 .single-selling-point-information { display: flex; flex-direction: column; padding-bottom: 24px; }
 .single-selling-point-media { position: relative; width: 100%; overflow: hidden; }
 .single-selling-point-button { margin-top: 20px; text-align: center; }
@@ -61,6 +62,7 @@
 .product-grid-n-card h3 { display: -webkit-box; overflow: hidden; min-height: 35px; margin: 12px 3px 8px; color: #000; font-size: 14px; font-weight: 600; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .product-grid-n-price { min-height: 28px; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 0 3px; color: #000; font-size: 12px; }.product-grid-n-price > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }.product-grid-n-price img { width: 26px; height: 26px; flex: 0 0 26px; }
 .product-grid-n-button { text-align: center; }
+.product-grid-n-button.button--full { align-self: stretch; width: auto; margin-left: 8px; margin-right: 8px; }
 .product-list-n-by-1 { display: flex; flex-direction: column; padding-bottom: 24px; }
 .product-list-n-items { display: grid; gap: 12px; }
 .product-list-n-card { width: calc(100% - 12px); height: 160px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; border-radius: 4px; }
@@ -73,7 +75,9 @@
 .product-list-n-copy h3 { display: -webkit-box; overflow: hidden; margin: 0; font-size: 15px; font-weight: 600; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 .product-list-n-copy p { overflow: hidden; margin: 14px 0 0; font-size: 12px; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
 .product-list-n-card-button { width: 112px; max-width: 100%; height: 28px; display: grid; place-items: center; overflow: hidden; align-self: flex-start; margin-top: 10px; padding: 0 10px; font-size: 10px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }
+.product-list-n-card-button.button--full { width: 100%; align-self: stretch; }
 .product-list-n-main-button { text-align: center; }
+.product-list-n-main-button.button--full { align-self: stretch; width: auto; margin-left: 12px; margin-right: 12px; }
 .code-information { height: 200px; display: grid; grid-template-rows: 60px 56px 84px; }
 .code-information-top { min-width: 0; display: grid; place-items: center; padding: 0 24px; }
 .code-information-title { max-width: 100%; overflow: hidden; margin: 0; color: #000; font-size: 20px; font-weight: 700; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
@@ -94,7 +98,9 @@
 .product-grid-n-by-3-stars { display: block; overflow: hidden; font-size: 15px; line-height: 1; letter-spacing: 1px; white-space: nowrap; }
 .product-grid-n-by-3-title { overflow: hidden; margin: 10px 0 0; font-size: 12px; font-weight: 400; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
 .product-grid-n-by-3-card-button { height: 30px; display: grid; place-items: center; overflow: hidden; margin-top: 12px; padding: 0 8px; font-size: 10px; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }
+.product-grid-n-by-3-card-button.button--full { width: 100%; }
 .product-grid-n-by-3-main-button { text-align: center; }
+.product-grid-n-by-3-main-button.button--full { align-self: stretch; width: auto; margin-left: 6px; margin-right: 6px; }
 .footer-links { display: flex; flex-direction: column; background: #ffad33; }
 .footer-links-showcase, .footer-links-copy { width: 375px; height: auto; display: block; }
 .footer-links-list { display: grid; }

@@ -1,6 +1,7 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
+import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
 
 const productSlots = Array.from({ length: 3 }, (_, index) => ({ id: `product-${index + 1}`, label: `商品 ${index + 1}`, showPrice: false }))
 
@@ -16,11 +17,11 @@ function ProductGridNBy3({ floor, onProductChange }: FloorRenderProps) {
         <div className="product-grid-n-by-3-copy">
           <span className="product-grid-n-by-3-stars" aria-label="5 星" style={{ color: floor.values.starColor || '#FFAC33' }}>★★★★★</span>
           <h3 className="product-grid-n-by-3-title">{product?.title || `商品标题 ${index + 1}`}</h3>
-          {floor.values.cardButtonText ? <span className="product-grid-n-by-3-card-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.cardButtonText}</span> : null}
+          {floor.values.cardButtonText ? <span className={`product-grid-n-by-3-card-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.cardButtonText}</span> : null}
         </div>
       </article>
     })}</div>
-    {floor.values.buttonText ? <span className="banner-button non-banner-button product-grid-n-by-3-main-button" data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className={`banner-button non-banner-button product-grid-n-by-3-main-button${buttonWidthClass(floor.values.buttonWidth)}`} data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 
@@ -32,6 +33,7 @@ export const productGridNBy3: RegisteredTemplate = {
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '主按钮文案', defaultValue: 'Shop Now' },
       { id: 'cardButtonText', type: 'text', label: '商品卡按钮文案', defaultValue: 'SHOP NOW' },
+      buttonWidthField,
       { id: 'background', type: 'color', label: '楼层背景颜色', defaultValue: '#FFFFFF' },
       { id: 'cardBackground', type: 'color', label: '商品卡背景颜色', defaultValue: '#EEEEEE' },
       { id: 'starColor', type: 'color', label: '星星颜色', defaultValue: '#FFAC33' },

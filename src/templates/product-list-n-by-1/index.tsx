@@ -2,6 +2,7 @@ import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { getActiveProductSlots } from '../productSlots'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
+import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
 
 function ProductListNBy1({ floor, template, onProductChange }: FloorRenderProps) {
   const textColor = floor.values.textColor || '#000000'
@@ -16,11 +17,11 @@ function ProductListNBy1({ floor, template, onProductChange }: FloorRenderProps)
         <div className="product-list-n-copy" style={{ color: textColor }}>
           <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
           <p>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</p>
-          {floor.values.cardButtonText ? <span className="product-list-n-card-button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.cardButtonText}</span> : null}
+          {floor.values.cardButtonText ? <span className={`product-list-n-card-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.cardButtonText}</span> : null}
         </div>
       </article>
     })}</div>
-    {floor.values.buttonText ? <span className="banner-button non-banner-button product-list-n-main-button" data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
+    {floor.values.buttonText ? <span className={`banner-button non-banner-button product-list-n-main-button${buttonWidthClass(floor.values.buttonWidth)}`} data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }
 
@@ -39,6 +40,7 @@ export const productListNBy1: RegisteredTemplate = {
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '主按钮文案', defaultValue: 'See More' },
       { id: 'cardButtonText', type: 'text', label: '商品卡按钮文案', defaultValue: 'Shop Now' },
+      buttonWidthField,
       { id: 'productCount', type: 'choice', label: '商品数量', defaultValue: '1', options: [{ label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }] },
       { id: 'pricePrefix', type: 'text', label: '价格前缀', defaultValue: 'From' },
       { id: 'background', type: 'color', label: '楼层背景颜色', defaultValue: '#FFFFFF' },

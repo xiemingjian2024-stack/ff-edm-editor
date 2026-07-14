@@ -1,6 +1,7 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { useBannerFrame } from '../useBannerFrame'
+import { buttonAlignSelf, buttonWidthClass, buttonWidthField } from '../buttonWidth'
 
 function BannerImageCopy({ floor, template, onMediaChange }: FloorRenderProps) {
   const imageHeight = Math.min(500, Math.max(200, Number(floor.values.imageHeight) || 300))
@@ -11,7 +12,7 @@ function BannerImageCopy({ floor, template, onMediaChange }: FloorRenderProps) {
     <div className="banner-copy banner-copy--panel" data-testid="banner-copy" style={{ textAlign: alignment as 'left' | 'center' | 'right' }}>
       <h2 style={{ color: floor.values.textColor }}>{floor.values.title}</h2>
       {floor.values.description ? <p style={{ color: floor.values.textColor }}>{floor.values.description}</p> : null}
-      <span className="banner-button" style={{ backgroundColor: floor.values.buttonBackground, color: floor.values.buttonTextColor, alignSelf: alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : 'center' }}>{floor.values.buttonText}</span>
+      <span className={`banner-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground, color: floor.values.buttonTextColor, alignSelf: buttonAlignSelf(floor.values.buttonWidth, alignment) }}>{floor.values.buttonText}</span>
     </div>
   </section>
 }
@@ -24,6 +25,7 @@ export const bannerImageCopy: RegisteredTemplate = {
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'Shop Now' },
+      buttonWidthField,
       { id: 'alignment', type: 'choice', label: '对齐方式', defaultValue: 'center', options: [{ label: '左对齐', value: 'left' }, { label: '居中', value: 'center' }, { label: '右对齐', value: 'right' }] },
       { id: 'background', type: 'color', label: '文案区背景颜色', defaultValue: '#FFFFFF' },
       { id: 'textColor', type: 'color', label: '标题与描述颜色', defaultValue: '#000000' },

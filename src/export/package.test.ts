@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest'
 import JSZip from 'jszip'
-import { addRenderedFloorsToZip, captureAnimatedBanner, getAnimatedBannerFileName, getExportFloorNode, isAnimatedBanner, isWholeFloorRegion, type RenderedFloor } from './package'
+import { addRenderedFloorsToZip, captureAnimatedBanner, getAnimatedBannerFileName, getExportFloorNode, isAnimatedBanner, isGifImageSource, isUploadedGifBanner, isWholeFloorRegion, type RenderedFloor } from './package'
 
 it('不把 includeFull=false 的整层 JPG 写入 ZIP', () => {
   const zip = new JSZip()
@@ -25,6 +25,15 @@ it('只把启用且至少有两帧的 Banner 作为 GIF 导出', () => {
   expect(isAnimatedBanner({ ...floor, animation: { ...floor.animation, enabled: false } } as never)).toBe(false)
   expect(isAnimatedBanner({ ...floor, templateId: 'title-centered' } as never)).toBe(false)
   expect(getAnimatedBannerFileName(3)).toBe('03-banner-item-01.gif')
+})
+
+it('识别直接上传的 GIF Banner', () => {
+  expect(isGifImageSource('data:image/gif;base64,abc')).toBe(true)
+  expect(isGifImageSource('https://cdn.example.com/banner.gif?x=1')).toBe(true)
+  expect(isGifImageSource('data:image/png;base64,abc')).toBe(false)
+  expect(isUploadedGifBanner({ templateId: 'banner-regular', media: { image: 'data:image/gif;base64,abc' } } as never)).toBe(true)
+  expect(isUploadedGifBanner({ templateId: 'title-centered', media: { image: 'data:image/gif;base64,abc' } } as never)).toBe(false)
+  expect(isUploadedGifBanner({ templateId: 'banner-regular', media: { image: 'data:image/gif;base64,abc' }, animation: { enabled: true, intervalMs: 1000, frames: [{ image: 'a' }, { image: 'b' }] } } as never)).toBe(false)
 })
 
 it('识别覆盖完整楼层的切片以直接复用原始捕获图', () => {

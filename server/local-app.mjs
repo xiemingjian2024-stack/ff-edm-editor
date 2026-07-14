@@ -65,13 +65,21 @@ function openBrowser(url) {
   execFile(commands[0], commands.slice(1), { stdio: 'ignore' }).unref()
 }
 
-export function startLocalServer({ preferredPort = Number(process.env.PORT) || 5174, distDir = defaultDistDir, open = process.env.EDM_NO_OPEN !== '1' } = {}) {
+export function startLocalServer({
+  preferredPort = Number(process.env.PORT) || 5174,
+  distDir = defaultDistDir,
+  open = process.env.EDM_NO_OPEN !== '1',
+  strictPort = process.env.EDM_STRICT_PORT === '1',
+} = {}) {
   if (!existsSync(join(distDir, 'index.html'))) throw new Error(`没有找到构建文件：${distDir}，请先运行 npm run build`)
   const app = createLocalApp({ distDir })
   const listen = port => new Promise((resolveListen, rejectListen) => {
     const server = app.listen(port, '127.0.0.1')
     server.once('listening', () => resolveListen({ server, port }))
-    server.once('error', error => error.code === 'EADDRINUSE' ? resolveListen(listen(port + 1)) : rejectListen(error))
+    server.once('error', error => {
+      if (error.code === 'EADDRINUSE' && !strictPort) resolveListen(listen(port + 1))
+      else rejectListen(error)
+    })
   })
   return listen(preferredPort).then(({ server, port }) => {
     const url = `http://127.0.0.1:${port}/`

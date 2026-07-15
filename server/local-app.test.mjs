@@ -3,7 +3,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { createLocalApp } from './local-app.mjs'
-import { buildProductAdminJsonUrl, readShopifyProduct } from './local-app.mjs'
+import { buildProductAdminJsonUrl, buildProductSuggestUrl, readShopifyProduct } from './local-app.mjs'
 
 const servers = []
 afterEach(async () => {
@@ -56,6 +56,28 @@ it('Shopify .js 持续限流时回退到 .json 商品接口', async () => {
   })
   expect(urls.some(url => url.includes('/products/fallback-bed.json'))).toBe(true)
   expect(String(buildProductAdminJsonUrl('https://funnyfuzzy.co.uk/products/fallback-bed'))).toContain('/products/fallback-bed.json')
+})
+
+it('Shopify 商品接口都被限流时回退到搜索建议接口', async () => {
+  const urls = []
+  const fetcher = async url => {
+    urls.push(String(url))
+    if (url.pathname.endsWith('/cart.js')) return { ok: true, json: async () => ({ currency: 'USD' }) }
+    if (url.pathname.includes('/search/suggest.json')) return { ok: true, json: async () => ({ resources: { results: { products: [
+      { handle: 'other-bed', title: 'Other Bed', image: 'other.jpg', price_min: 99.99 },
+      { handle: 'pawair', title: 'PawAir Cooling Bed', featured_image: { url: '//cdn.test/pawair.jpg' }, price_min: 41.95 },
+    ] } } }) }
+    return { ok: false, status: 429, json: async () => ({}) }
+  }
+
+  await expect(readShopifyProduct('https://funnyfuzzy.com/products/pawair', fetcher)).resolves.toMatchObject({
+    title: 'PawAir Cooling Bed',
+    image: 'https://cdn.test/pawair.jpg',
+    price: '$41.95',
+    url: 'https://funnyfuzzy.com/products/pawair',
+  })
+  expect(urls.some(url => url.includes('/search/suggest.json') && url.includes('pawair'))).toBe(true)
+  expect(String(buildProductSuggestUrl('https://funnyfuzzy.com/products/pawair'))).toContain('/search/suggest.json')
 })
 
 it('本地服务同时提供构建页面和 Shopify 商品读取接口', async () => {

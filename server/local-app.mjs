@@ -35,11 +35,27 @@ export function buildProductAdminJsonUrl(input) {
   return url
 }
 
+export function buildProductSuggestUrl(input) {
+  const url = new URL(input)
+  if (!['http:', 'https:'].includes(url.protocol) || blockedHost.test(url.hostname)) throw new Error('该商品地址不允许读取')
+  const match = url.pathname.match(/\/products\/([^/?#]+)/)
+  if (!match) throw new Error('不是有效的 Shopify 商品地址')
+  const suggestUrl = new URL('/search/suggest.json', url.origin)
+  suggestUrl.searchParams.set('q', decodeURIComponent(match[1]))
+  suggestUrl.searchParams.set('resources[type]', 'product')
+  suggestUrl.searchParams.set('resources[limit]', '4')
+  return suggestUrl
+}
+
 const imageUrl = value => {
-  const source = typeof value === 'string' ? value : value?.src
+  const source = typeof value === 'string' ? value : value?.src || value?.url
   return typeof source === 'string' && source.startsWith('//') ? `https:${source}` : source
 }
 const formatPrice = (value, currency) => `${currency ? currencySymbols[currency.toUpperCase()] ?? `${currency.toUpperCase()} ` : ''}${value.toFixed(2)}`
+const toDisplayPrice = value => {
+  const number = Number(value)
+  return number > 1000 ? number / 100 : number
+}
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 async function fetchShopifyJson(fetcher, url, { required = true } = {}) {
@@ -61,10 +77,7 @@ async function fetchShopifyJson(fetcher, url, { required = true } = {}) {
 export function normalizeShopifyProduct(input, sourceUrl, currency) {
   if (input?.product) input = input.product
   if (!input || typeof input.title !== 'string' || !Array.isArray(input.variants) || input.variants.length === 0) throw new Error('商品数据格式异常')
-  const toPrice = item => {
-    const value = Number(item.price)
-    return value > 1000 ? value / 100 : value
-  }
+  const toPrice = item => toDisplayPrice(item.price)
   const variant = input.variants.reduce((lowest, item) => toPrice(item) < toPrice(lowest) ? item : lowest)
   const rawPrice = toPrice(variant)
   const gallery = Array.isArray(input.images) ? input.images.map(imageUrl).filter(Boolean) : []
@@ -72,15 +85,38 @@ export function normalizeShopifyProduct(input, sourceUrl, currency) {
   return { title: input.title, image, gallery, price: formatPrice(rawPrice, currency), url: sourceUrl }
 }
 
+export function normalizeShopifySuggestProduct(input, sourceUrl, currency) {
+  const source = new URL(sourceUrl)
+  const handle = source.pathname.match(/\/products\/([^/?#]+)/)?.[1]
+  const products = input?.resources?.results?.products
+  if (!Array.isArray(products) || products.length === 0) throw new Error('商品搜索数据格式异常')
+  const product = products.find(item => item?.handle === handle) || products[0]
+  if (!product?.title) throw new Error('商品搜索数据格式异常')
+  const rawPrice = toDisplayPrice(product.price_min ?? product.price ?? product.variants?.[0]?.price ?? 0)
+  const image = imageUrl(product.image) || imageUrl(product.featured_image) || ''
+  const gallery = image ? [image] : []
+  return { title: product.title, image, gallery, price: formatPrice(rawPrice, currency), url: sourceUrl }
+}
+
 export async function readShopifyProduct(input, fetcher = fetch) {
   const endpoint = buildProductJsonUrl(input)
   const fallbackEndpoint = buildProductAdminJsonUrl(input)
+  const suggestEndpoint = buildProductSuggestUrl(input)
   const cartEndpoint = new URL('/cart.js', endpoint.origin)
   let product
-  try { product = await fetchShopifyJson(fetcher, endpoint) }
-  catch { product = await fetchShopifyJson(fetcher, fallbackEndpoint) }
   const cart = await fetchShopifyJson(fetcher, cartEndpoint, { required: false })
-  return normalizeShopifyProduct(product, input, cart.currency)
+  try {
+    product = await fetchShopifyJson(fetcher, endpoint)
+    return normalizeShopifyProduct(product, input, cart.currency)
+  } catch {
+    try {
+      product = await fetchShopifyJson(fetcher, fallbackEndpoint)
+      return normalizeShopifyProduct(product, input, cart.currency)
+    } catch {
+      product = await fetchShopifyJson(fetcher, suggestEndpoint)
+      return normalizeShopifySuggestProduct(product, input, cart.currency)
+    }
+  }
 }
 
 export function createLocalApp({ distDir = defaultDistDir, reader = readShopifyProduct } = {}) {

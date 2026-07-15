@@ -9,6 +9,15 @@ const defaultDistDir = resolve(__dirname, '..', 'dist')
 
 const blockedHost = /^(localhost|127\.|0\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?)$/i
 const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', JPY: '¥', CNY: '¥', HKD: 'HK$', SGD: 'S$' }
+const shopifyHeaders = {
+  accept: 'application/json,text/plain,*/*',
+  'accept-language': 'en-US,en;q=0.9',
+  'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
+  referer: 'https://funnyfuzzy.co.uk/',
+  'sec-fetch-dest': 'empty',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-site': 'same-origin',
+}
 
 export function buildProductJsonUrl(input) {
   const url = new URL(input)
@@ -20,28 +29,58 @@ export function buildProductJsonUrl(input) {
   return url
 }
 
-const imageUrl = value => typeof value === 'string' && value.startsWith('//') ? `https:${value}` : value
+export function buildProductAdminJsonUrl(input) {
+  const url = buildProductJsonUrl(input)
+  url.pathname = url.pathname.replace(/\.js$/, '.json')
+  return url
+}
+
+const imageUrl = value => {
+  const source = typeof value === 'string' ? value : value?.src
+  return typeof source === 'string' && source.startsWith('//') ? `https:${source}` : source
+}
 const formatPrice = (value, currency) => `${currency ? currencySymbols[currency.toUpperCase()] ?? `${currency.toUpperCase()} ` : ''}${value.toFixed(2)}`
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+async function fetchShopifyJson(fetcher, url, { required = true } = {}) {
+  const delays = [0, 180, 420, 800]
+  let lastResponse
+  for (let index = 0; index < delays.length; index++) {
+    if (delays[index]) await wait(delays[index])
+    const requestUrl = new URL(url)
+    if (index > 0) requestUrl.searchParams.set('_edm_retry', `${Date.now()}_${index}`)
+    const response = await fetcher(requestUrl, { signal: AbortSignal.timeout(5000), headers: { ...shopifyHeaders, referer: requestUrl.origin + '/' } })
+    if (response.ok) return response.json()
+    lastResponse = response
+    if (response.status !== 429) break
+  }
+  if (required) throw new Error(`商品读取失败（${lastResponse?.status ?? '网络异常'}）`)
+  return {}
+}
 
 export function normalizeShopifyProduct(input, sourceUrl, currency) {
+  if (input?.product) input = input.product
   if (!input || typeof input.title !== 'string' || !Array.isArray(input.variants) || input.variants.length === 0) throw new Error('商品数据格式异常')
-  const variant = input.variants.reduce((lowest, item) => Number(item.price) < Number(lowest.price) ? item : lowest)
-  const rawPrice = typeof variant.price === 'number' ? variant.price / 100 : Number(variant.price)
+  const toPrice = item => {
+    const value = Number(item.price)
+    return value > 1000 ? value / 100 : value
+  }
+  const variant = input.variants.reduce((lowest, item) => toPrice(item) < toPrice(lowest) ? item : lowest)
+  const rawPrice = toPrice(variant)
   const gallery = Array.isArray(input.images) ? input.images.map(imageUrl).filter(Boolean) : []
-  const image = imageUrl(input.featured_image) || gallery[0] || ''
+  const image = imageUrl(input.featured_image) || imageUrl(input.image) || gallery[0] || ''
   return { title: input.title, image, gallery, price: formatPrice(rawPrice, currency), url: sourceUrl }
 }
 
 export async function readShopifyProduct(input, fetcher = fetch) {
   const endpoint = buildProductJsonUrl(input)
+  const fallbackEndpoint = buildProductAdminJsonUrl(input)
   const cartEndpoint = new URL('/cart.js', endpoint.origin)
-  const [response, cartResponse] = await Promise.all([
-    fetcher(endpoint, { signal: AbortSignal.timeout(5000), headers: { accept: 'application/json' } }),
-    fetcher(cartEndpoint, { signal: AbortSignal.timeout(5000), headers: { accept: 'application/json' } }),
-  ])
-  if (!response.ok) throw new Error(`商品读取失败（${response.status}）`)
-  const cart = cartResponse.ok ? await cartResponse.json() : {}
-  return normalizeShopifyProduct(await response.json(), input, cart.currency)
+  let product
+  try { product = await fetchShopifyJson(fetcher, endpoint) }
+  catch { product = await fetchShopifyJson(fetcher, fallbackEndpoint) }
+  const cart = await fetchShopifyJson(fetcher, cartEndpoint, { required: false })
+  return normalizeShopifyProduct(product, input, cart.currency)
 }
 
 export function createLocalApp({ distDir = defaultDistDir, reader = readShopifyProduct } = {}) {

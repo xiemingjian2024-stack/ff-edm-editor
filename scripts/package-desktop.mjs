@@ -51,6 +51,8 @@ Mac 使用方式：
 1. 解压整个 zip。
 2. 双击「EDM EDITOR.app」。
 3. 如果提示无法验证开发者，请右键点击「EDM EDITOR.app」，选择“打开”，再确认打开。
+4. 如果提示“已损坏，无法打开”，请联系设计同事重新发送新版安装包，或在终端执行：
+   xattr -cr /Applications/EDM\\ EDITOR.app
 
 说明：
 - 不需要安装 Node.js。
@@ -79,8 +81,14 @@ const appPaths = await packager({
 })
 
 const appPath = appPaths[0]
+if (platform === 'darwin') {
+  execFileSync('xattr', ['-cr', join(appPath, `${appName}.app`)], { stdio: 'inherit' })
+  execFileSync('codesign', ['--force', '--deep', '--sign', '-', join(appPath, `${appName}.app`)], { stdio: 'inherit' })
+}
 await writeFile(join(appPath, platform === 'darwin' ? 'README-MAC.txt' : 'README-WINDOWS.txt'), platform === 'darwin' ? macUsage : windowsUsage)
-const zipName = `EDM-EDITOR-v${appVersion}-${platform}-${arch}.zip`
+const platformLabel = platform === 'win32' ? 'win' : platform === 'darwin' ? 'Mac' : platform
+const archLabel = platform === 'darwin' && arch !== 'arm64' ? `-${arch}` : ''
+const zipName = `EDM-EDITOR-v${appVersion}-${platformLabel}${archLabel}.zip`
 const zipPath = join(releaseRoot, zipName)
 await rm(zipPath, { force: true })
 execFileSync('zip', ['-qr', zipPath, basename(appPath)], { cwd: dirname(appPath), stdio: 'inherit' })

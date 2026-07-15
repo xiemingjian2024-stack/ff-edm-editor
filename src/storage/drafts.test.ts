@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto'
+import { openDB } from 'idb'
 import { createDraftRepository } from './drafts'
 import { initialEditorState } from '../editor/reducer'
 
@@ -33,4 +34,24 @@ it('加载旧草稿时补充配色套餐', async () => {
   const repo = createDraftRepository(`test-${crypto.randomUUID()}`)
   await repo.save({ ...initialEditorState.draft, id: 'legacy', themePaletteId: undefined } as never)
   expect((await repo.load('legacy'))?.themePaletteId).toBe('funnyfuzzy-classic')
+})
+
+it('首次启动时自动迁移旧版本数据库中的设计稿、导出记录和配色', async () => {
+  const legacyName = `ff-edm-editor-${crypto.randomUUID()}`
+  const currentName = `ff-edm-builder-${crypto.randomUUID()}`
+  const legacyDb = await openDB(legacyName, 3, { upgrade(db) {
+    db.createObjectStore('drafts', { keyPath: 'id' })
+    db.createObjectStore('exports', { keyPath: 'id' })
+    db.createObjectStore('palettes', { keyPath: 'id' })
+  } })
+  const legacyDraft = { ...initialEditorState.draft, id: 'legacy-draft', name: '旧包设计稿', updatedAt: '2026-07-10T10:00:00.000Z' }
+  await legacyDb.put('drafts', legacyDraft)
+  await legacyDb.put('exports', { id: legacyDraft.id, draft: legacyDraft, exportedAt: '2026-07-10T11:00:00.000Z' })
+  await legacyDb.put('palettes', { id: 'legacy-palette', name: '旧配色', slots: { A: '#111111', B: '#222222', C: '#333333' } })
+  legacyDb.close()
+
+  const repo = createDraftRepository(currentName, { legacyNames: [legacyName] })
+  expect((await repo.list()).map(item => item.name)).toContain('旧包设计稿')
+  expect((await repo.listExports()).map(item => item.draft.name)).toContain('旧包设计稿')
+  expect((await repo.listPalettes()).map(item => item.name)).toContain('旧配色')
 })

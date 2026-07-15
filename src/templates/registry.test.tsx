@@ -306,9 +306,11 @@ it('标题文本常规模板包含内容、对齐、颜色和自适应高度配�
   const entry = templateRegistry.find(item => item.definition.id === 'title-centered')!
   expect(entry.definition.name).toBe('常规标题')
   expect(entry.definition.autoHeight).toBe(true)
-  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'buttonWidth', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
+  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'buttonWidth', 'descriptionSize', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
+  expect(entry.definition.fields.find(field => field.id === 'descriptionSize')).toMatchObject({ type: 'choice', defaultValue: 'small', options: [{ label: '小字', value: 'small' }, { label: '大字', value: 'large' }] })
   expect(entry.definition.themeColorFields).toBeUndefined()
   expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.title-content \{[^}]*padding: 24px;/)
+  expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.title-content p\.is-large \{[^}]*font-size: 18px;/)
 })
 
 it('含按钮模板支持适配文案或最大宽度', () => {
@@ -323,11 +325,11 @@ it('含按钮模板支持适配文案或最大宽度', () => {
   expect(css).toMatch(/\.product-list-n-card-button\.button--full \{[^}]*width: 100%;/)
 })
 
-it('多卖点信息使用新名称且三个信息模板主标题为常规字重', () => {
+it('多卖点信息使用新名称且非 Banner 楼层主标题为粗体', () => {
   expect(templateRegistry.find(item => item.definition.id === 'selling-points-information')?.definition.name).toBe('多卖点信息')
   const css = readFileSync('src/templates/templateStyles.css', 'utf8')
-  for (const selector of ['title-content', 'comparison-heading', 'selling-points-heading']) {
-    expect(css).toMatch(new RegExp(`\\.${selector} h2 \\{[^}]*font-weight: 400`))
+  for (const selector of ['title-content', 'comparison-heading', 'selling-points-heading', 'product-grid-heading']) {
+    expect(css).toMatch(new RegExp(`\\.${selector} h2 \\{[^}]*font-weight: 700`))
   }
 })
 
@@ -336,6 +338,8 @@ it('标题文本模板隐藏空内容并兼容旧草稿字段', () => {
   const { rerender } = render(<entry.Renderer template={entry.definition} floor={{ id: '1', templateId: entry.definition.id, values: { title: 'Summer Picks', textColor: '#111111', background: '#ffffff' }, products: {} }} />)
   expect(screen.getByText('Summer Picks')).toBeVisible()
   expect(screen.queryByText('SHOP NOW')).not.toBeInTheDocument()
+  rerender(<entry.Renderer template={entry.definition} floor={{ id: '1', templateId: entry.definition.id, values: { title: 'Summer Picks', description: 'Big subtitle', descriptionSize: 'large', textColor: '#111111', background: '#ffffff' }, products: {} }} />)
+  expect(screen.getByText('Big subtitle')).toHaveClass('is-large')
   rerender(<entry.Renderer template={entry.definition} floor={{ id: '1', templateId: entry.definition.id, values: { title: '', description: '', buttonText: '', alignment: 'right', textColor: '#111111', background: '#ffffff', buttonBackground: '#000000', buttonTextColor: '#ffffff' }, products: {} }} />)
   expect(screen.getByTestId('title-content')).toHaveAttribute('data-alignment', 'right')
   expect(screen.queryByRole('heading')).not.toBeInTheDocument()

@@ -13,8 +13,8 @@ export function normalizeTextHighlight(value?: TextHighlight): TextHighlight {
 
 function getHighlightStyle(highlight: TextHighlight): CSSProperties {
   const style: CSSProperties = {}
-  if (highlight.bold) style.fontWeight = 700
-  if (highlight.enlarge) style.fontSize = 'calc(1em + 2px)'
+  style.fontWeight = 700
+  style.fontSize = 'calc(1em + 2px)'
   if (highlight.color) style.color = highlight.color
   return style
 }

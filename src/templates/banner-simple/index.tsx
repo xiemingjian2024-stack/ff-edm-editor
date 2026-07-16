@@ -1,9 +1,10 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
+import { floorText } from '../../text/HighlightedText'
 
 function BannerSimple({ floor }: FloorRenderProps) {
   const image = floor.values.image
   return <section className="floor-render banner-simple" style={{ backgroundColor: floor.values.background, backgroundImage: image ? `url(${image})` : undefined }}>
-    <h2 style={{ color: floor.values.textColor }}>{floor.values.title}</h2>
+    <h2 style={{ color: floor.values.textColor }}>{floorText(floor, 'title')}</h2>
   </section>
 }
 

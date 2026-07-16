@@ -3,6 +3,7 @@ import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getFloorHeight } from '../floorGeometry'
 import { useBannerFrame } from '../useBannerFrame'
 import { buttonAlignSelf, buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText } from '../../text/HighlightedText'
 
 function BannerRegular({ floor, template, onMediaChange }: FloorRenderProps) {
   const height = getFloorHeight(template, floor)
@@ -18,8 +19,8 @@ function BannerRegular({ floor, template, onMediaChange }: FloorRenderProps) {
 function BannerCopy({ floor, position }: { floor: FloorRenderProps['floor']; position: 'top' | 'bottom' }) {
   const alignment = floor.values.alignment || 'center'
   return <div className="banner-copy banner-copy--overlay" data-testid="banner-copy" data-position={position} style={{ textAlign: alignment as 'left' | 'center' | 'right', [position]: 24 }}>
-    <h2 style={{ color: floor.values.textColor }}>{floor.values.title}</h2>
-    {floor.values.description ? <p style={{ color: floor.values.textColor }}>{floor.values.description}</p> : null}
+    <h2 style={{ color: floor.values.textColor }}>{floorText(floor, 'title')}</h2>
+    {floor.values.description ? <p style={{ color: floor.values.textColor }}>{floorText(floor, 'description')}</p> : null}
     <span className={`banner-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground, color: floor.values.buttonTextColor, alignSelf: buttonAlignSelf(floor.values.buttonWidth, alignment) }}>{floor.values.buttonText}</span>
   </div>
 }

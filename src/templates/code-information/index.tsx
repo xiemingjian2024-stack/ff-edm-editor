@@ -1,10 +1,11 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
+import { floorText } from '../../text/HighlightedText'
 
 function CodeInformation({ floor }: FloorRenderProps) {
   const background = floor.values.background || '#FFFFFF'
   const accent = floor.values.accentColor || '#FFAC33'
   return <section className="floor-render code-information" data-testid="code-information" style={{ backgroundColor: background }}>
-    <header className="code-information-top" data-testid="code-information-top" data-export-region-id="top"><h2 className="code-information-title">{floor.values.topText}</h2></header>
+    <header className="code-information-top" data-testid="code-information-top" data-export-region-id="top"><h2 className="code-information-title">{floorText(floor, 'topText')}</h2></header>
     <div className="code-information-placeholder" data-testid="code-information-placeholder"><span>CODE</span></div>
     <footer className="code-information-bottom" data-testid="code-information-bottom" data-export-region-id="bottom">
       <div className="code-information-action" style={{ color: accent }}>
@@ -13,7 +14,7 @@ function CodeInformation({ floor }: FloorRenderProps) {
         <i className="code-information-arrow" style={{ borderColor: accent }} />
         <i className="code-information-line" style={{ backgroundColor: accent }} />
       </div>
-      <p className="code-information-note">{floor.values.noteText}</p>
+      <p className="code-information-note">{floorText(floor, 'noteText')}</p>
     </footer>
   </section>
 }

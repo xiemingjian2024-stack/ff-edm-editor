@@ -1,13 +1,14 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { buttonAlignSelf, buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText } from '../../text/HighlightedText'
 
 function TitleCentered({ floor }: FloorRenderProps) {
   const alignment = floor.values.alignment || 'center'
   const alignSelf = buttonAlignSelf(floor.values.buttonWidth, alignment)
   const descriptionClassName = floor.values.descriptionSize === 'large' ? 'is-large' : undefined
   return <section className="floor-render title-content" data-testid="title-content" data-alignment={alignment} style={{ backgroundColor: floor.values.background || '#FFFFFF', textAlign: alignment as 'left' | 'center' | 'right' }}>
-    {floor.values.title ? <h2 style={{ color: floor.values.textColor || '#000000' }}>{floor.values.title}</h2> : null}
-    {floor.values.description ? <p className={descriptionClassName} style={{ color: floor.values.textColor || '#000000' }}>{floor.values.description}</p> : null}
+    {floor.values.title ? <h2 style={{ color: floor.values.textColor || '#000000' }}>{floorText(floor, 'title')}</h2> : null}
+    {floor.values.description ? <p className={descriptionClassName} style={{ color: floor.values.textColor || '#000000' }}>{floorText(floor, 'description')}</p> : null}
     {floor.values.buttonText ? <span className={`banner-button non-banner-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ alignSelf, backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
 }

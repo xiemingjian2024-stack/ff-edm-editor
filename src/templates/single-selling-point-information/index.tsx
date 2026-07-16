@@ -1,6 +1,7 @@
 import type { FloorRenderProps, MediaState, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText } from '../../text/HighlightedText'
 
 const emptyMedia: MediaState = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
 
@@ -10,8 +11,8 @@ export function SingleSellingPointInformation({ floor, onMediaSlotChange }: Floo
   const media = floor.mediaSlots?.feature ?? emptyMedia
   return <section className="floor-render single-selling-point-information" data-testid="single-selling-point-information" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
     <header className="selling-points-heading">
-      <h2 style={{ color: textColor }}>{floor.values.title || 'A Better Spot for Every Ride'}</h2>
-      {floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}
+      <h2 style={{ color: textColor }}>{floorText(floor, 'title', 'A Better Spot for Every Ride')}</h2>
+      {floor.values.description ? <p style={{ color: textColor }}>{floorText(floor, 'description')}</p> : null}
     </header>
     <div className="single-selling-point-media" data-testid="single-selling-point-media" style={{ height: imageHeight }}>
       <EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange('feature', value) : undefined} ariaLabel="卖点图片" />

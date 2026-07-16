@@ -2,6 +2,7 @@ import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
 import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText, renderHighlightedText } from '../../text/HighlightedText'
 
 const productSlots = Array.from({ length: 3 }, (_, index) => ({ id: `product-${index + 1}`, label: `商品 ${index + 1}`, showPrice: false }))
 
@@ -9,14 +10,14 @@ function ProductGridNBy3({ floor, onProductChange }: FloorRenderProps) {
   const textColor = floor.values.textColor || '#000000'
   const cardBackground = floor.values.cardBackground || '#EEEEEE'
   return <section className="floor-render product-grid-n-by-3" data-testid="product-grid-n-by-3" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
-    <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floor.values.title}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}</header>
+    <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floorText(floor, 'title')}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floorText(floor, 'description')}</p> : null}</header>
     <div className="product-grid-n-by-3-list">{productSlots.map((slot, index) => {
       const product = floor.products[slot.id]
       return <article className="product-grid-n-by-3-card" data-testid="product-grid-n-by-3-card" data-export-region-id={`item-${index + 1}`} key={slot.id} style={{ backgroundColor: cardBackground }}>
         <div className="product-grid-n-by-3-image" style={{ backgroundColor: cardBackground }}><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×3 商品卡 商品 ${index + 1} 图片`} designWidth={117} fit="contain" /></div>
         <div className="product-grid-n-by-3-copy">
           <span className="product-grid-n-by-3-stars" aria-label="5 星" style={{ color: floor.values.starColor || '#FFAC33' }}>★★★★★</span>
-          <h3 className="product-grid-n-by-3-title">{product?.title || `商品标题 ${index + 1}`}</h3>
+          <h3 className="product-grid-n-by-3-title">{renderHighlightedText(product?.title || `商品标题 ${index + 1}`, product?.titleHighlight)}</h3>
           {floor.values.cardButtonText ? <span className={`product-grid-n-by-3-card-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.cardButtonText}</span> : null}
         </div>
       </article>

@@ -3,19 +3,20 @@ import { getActiveProductSlots } from '../productSlots'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
 import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText, renderHighlightedText } from '../../text/HighlightedText'
 
 function ProductListNBy1({ floor, template, onProductChange }: FloorRenderProps) {
   const textColor = floor.values.textColor || '#000000'
   const slots = getActiveProductSlots(template, floor)
   return <section className="floor-render product-list-n-by-1" data-testid="product-list-n-by-1" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
-    <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floor.values.title}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}</header>
+    <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floorText(floor, 'title')}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floorText(floor, 'description')}</p> : null}</header>
     <div className="product-list-n-items">{slots.map((slot, index) => {
       const product = floor.products[slot.id]
       const cardBackground = floor.values[`cardBackground${index + 1}`] || ['#F6E2CC', '#E1DEE8', '#E3F1FF', '#FFDAD0'][index]
       return <article className={`product-list-n-card ${index % 2 === 0 ? 'is-image-left' : 'is-image-right'}`} data-testid="product-list-n-card" data-export-region-id={`item-${index + 1}`} key={slot.id} style={{ backgroundColor: cardBackground }}>
         <div className="product-list-n-image" data-testid="product-list-n-image" style={{ backgroundColor: cardBackground }}><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×1 商品卡 商品 ${index + 1} 图片`} designWidth={181.5} fit="contain" /></div>
         <div className="product-list-n-copy" style={{ color: textColor }}>
-          <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
+          <h3>{renderHighlightedText(product?.title || `商品标题 ${index + 1}`, product?.titleHighlight)}</h3>
           <p>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</p>
           {floor.values.cardButtonText ? <span className={`product-list-n-card-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.cardButtonText}</span> : null}
         </div>

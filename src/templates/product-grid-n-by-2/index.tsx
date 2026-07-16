@@ -4,15 +4,16 @@ import arrowIcon from '../../assets/product-card/跳转.svg'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
 import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText, renderHighlightedText } from '../../text/HighlightedText'
 
 function ProductGridNBy2({ floor, template, onProductChange }: FloorRenderProps) {
   const textColor = floor.values.textColor || '#000000'
   const slots = getActiveProductSlots(template, floor)
   return <section className="floor-render product-grid-n-by-2" data-testid="product-grid-n-by-2" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
-    <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floor.values.title}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}</header>
+    <header className="product-grid-heading" data-export-region-id="header"><h2 style={{ color: textColor }}>{floorText(floor, 'title')}</h2>{floor.values.description ? <p style={{ color: textColor }}>{floorText(floor, 'description')}</p> : null}</header>
     <div className="product-grid-n-list">{slots.map((slot, index) => { const product = floor.products[slot.id]; return <article className="product-grid-n-card" data-testid="product-grid-n-card" data-export-region-id={`item-${index + 1}`} key={slot.id}>
       <div className="product-grid-n-image"><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×2 商品卡 商品 ${index + 1} 图片`} designWidth={175.5} fit="cover" /></div>
-      <h3>{product?.title || `商品标题 ${index + 1}`}</h3>
+      <h3>{renderHighlightedText(product?.title || `商品标题 ${index + 1}`, product?.titleHighlight)}</h3>
       <div className="product-grid-n-price"><span>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</span><img src={arrowIcon} alt="" /></div>
     </article> })}</div>
     {floor.values.buttonText ? <span className={`banner-button non-banner-button product-grid-n-button${buttonWidthClass(floor.values.buttonWidth)}`} data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}

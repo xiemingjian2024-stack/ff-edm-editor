@@ -1,6 +1,7 @@
 import type { FieldDefinition, FloorRenderProps, MediaState, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText } from '../../text/HighlightedText'
 
 const emptyMedia: MediaState = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
 const defaults = [
@@ -15,8 +16,8 @@ export function SellingPointsInformation({ floor, onMediaSlotChange }: FloorRend
   const textColor = floor.values.textColor || '#000000'
   return <section className="floor-render selling-points-information" data-testid="selling-points-information" style={{ backgroundColor: floor.values.background || '#FFFFFF', color: textColor }}>
     <header className="selling-points-heading">
-      <h2 style={{ color: textColor }}>{floor.values.title || 'A Better Spot for Every Ride'}</h2>
-      {floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}
+      <h2 style={{ color: textColor }}>{floorText(floor, 'title', 'A Better Spot for Every Ride')}</h2>
+      {floor.values.description ? <p style={{ color: textColor }}>{floorText(floor, 'description')}</p> : null}
     </header>
     <div className={`selling-points-grid${count === 3 ? ' selling-points-grid--three' : ''}`}>
       {Array.from({ length: count }, (_, index) => {
@@ -25,7 +26,7 @@ export function SellingPointsInformation({ floor, onMediaSlotChange }: FloorRend
         const featured = count === 3 && index === 0
         return <article className={`selling-point${featured ? ' selling-point--featured' : ''}`} data-testid={featured ? 'selling-point-featured' : 'selling-point'} key={id}>
           <div className="selling-point-media" data-testid="selling-point-media"><EditableImageFrame value={media} onChange={onMediaSlotChange ? value => onMediaSlotChange(id, value) : undefined} ariaLabel={`卖点 ${index + 1} 图片`} designWidth={featured ? 375 : 184} /></div>
-          <div className="selling-point-copy"><h3 style={{ color: textColor }}>{floor.values[`${id}Title`]}</h3>{featured ? null : <p style={{ color: textColor }}>{floor.values[`${id}Description`]}</p>}</div>
+          <div className="selling-point-copy"><h3 style={{ color: textColor }}>{floorText(floor, `${id}Title`)}</h3>{featured ? null : <p style={{ color: textColor }}>{floorText(floor, `${id}Description`)}</p>}</div>
         </article>
       })}
     </div>

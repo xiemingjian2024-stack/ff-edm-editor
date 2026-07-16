@@ -1,8 +1,9 @@
-import type { FloorRenderProps, MediaState, RegisteredTemplate } from '../../domain/edm'
+import type { FloorRenderProps, MediaState, RegisteredTemplate, TextHighlight } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import beforeIcon from '../../assets/comparison/Before.svg'
 import afterIcon from '../../assets/comparison/After.svg'
 import vsIcon from '../../assets/comparison/VS.svg'
+import { floorText, renderHighlightedText } from '../../text/HighlightedText'
 
 const emptyMedia: MediaState = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
 
@@ -12,8 +13,8 @@ function ComparisonInformation({ floor, onMediaSlotChange }: FloorRenderProps) {
   const textColor = floor.values.textColor || '#000000'
   return <section className="floor-render comparison-information" data-testid="comparison-information" style={{ backgroundColor: floor.values.background || '#FFAC33', color: textColor }}>
     <header className="comparison-heading">
-      <h2 style={{ color: textColor }}>{floor.values.title || 'A Better Spot for Every Ride'}</h2>
-      {floor.values.description ? <p style={{ color: textColor }}>{floor.values.description}</p> : null}
+      <h2 style={{ color: textColor }}>{floorText(floor, 'title', 'A Better Spot for Every Ride')}</h2>
+      {floor.values.description ? <p style={{ color: textColor }}>{floorText(floor, 'description')}</p> : null}
     </header>
     <div className="comparison-media" data-testid="comparison-media">
       <div className="comparison-pane comparison-pane--before"><EditableImageFrame value={before} onChange={onMediaSlotChange ? value => onMediaSlotChange('before', value) : undefined} ariaLabel="Before 对比图片" designWidth={212} /></div>
@@ -21,14 +22,14 @@ function ComparisonInformation({ floor, onMediaSlotChange }: FloorRenderProps) {
       <img className="comparison-vs" src={vsIcon} alt="VS" />
     </div>
     <footer className="comparison-results">
-      <ComparisonResult icon={beforeIcon} label="BEFORE" description={floor.values.beforeDescription} color={textColor} />
-      <ComparisonResult icon={afterIcon} label="AFTER" description={floor.values.afterDescription} color={textColor} />
+      <ComparisonResult icon={beforeIcon} label="BEFORE" description={floor.values.beforeDescription} highlight={floor.textHighlights?.beforeDescription} color={textColor} />
+      <ComparisonResult icon={afterIcon} label="AFTER" description={floor.values.afterDescription} highlight={floor.textHighlights?.afterDescription} color={textColor} />
     </footer>
   </section>
 }
 
-function ComparisonResult({ icon, label, description, color }: { icon: string; label: string; description: string; color: string }) {
-  return <div className="comparison-result"><strong style={{ color }}><img src={icon} alt="" />{label}</strong><p style={{ color }}>{description}</p></div>
+function ComparisonResult({ icon, label, description, highlight, color }: { icon: string; label: string; description: string; highlight?: TextHighlight; color: string }) {
+  return <div className="comparison-result"><strong style={{ color }}><img src={icon} alt="" />{label}</strong><p style={{ color }}>{renderHighlightedText(description, highlight)}</p></div>
 }
 
 export const comparisonInformation: RegisteredTemplate = {

@@ -1,4 +1,4 @@
-import type { EdmDraft, FloorInstance, MediaState, NavigationItem, ProductValue, ThemeSlot } from '../domain/edm'
+import type { EdmDraft, FloorInstance, MediaState, NavigationItem, ProductValue, TextHighlight, ThemeSlot } from '../domain/edm'
 import { getTemplate } from '../templates/registry'
 
 export interface EditorState { draft: EdmDraft; selectedFloorId: string | null }
@@ -11,6 +11,7 @@ export type EditorAction =
   | { type: 'selectFloor'; floorId: string }
   | { type: 'moveFloor'; floorId: string; direction: -1 | 1 }
   | { type: 'updateField'; floorId: string; fieldId: string; value: string }
+  | { type: 'updateTextHighlight'; floorId: string; fieldId: string; value: TextHighlight }
   | { type: 'updateProduct'; floorId: string; slotId: string; value: ProductValue }
   | { type: 'changeThemePalette'; paletteId: string }
   | { type: 'overrideThemeColor'; floorId: string; fieldId: string; color: string }
@@ -78,6 +79,13 @@ export function createEditorReducer(createId: () => string = () => crypto.random
         const template = getTemplate(floor.templateId)?.definition
         if (!template?.fields.some(field => field.id === action.fieldId)) return floor
         return { ...floor, values: { ...floor.values, [action.fieldId]: action.value } }
+      })
+    } else if (action.type === 'updateTextHighlight') {
+      floors = floors.map(floor => {
+        if (floor.id !== action.floorId) return floor
+        const template = getTemplate(floor.templateId)?.definition
+        if (!template?.fields.some(field => field.id === action.fieldId && field.type === 'text')) return floor
+        return { ...floor, textHighlights: { ...floor.textHighlights, [action.fieldId]: action.value } }
       })
     } else if (action.type === 'updateProduct') {
       floors = floors.map(floor => floor.id === action.floorId ? { ...floor, products: { ...floor.products, [action.slotId]: action.value } } : floor)

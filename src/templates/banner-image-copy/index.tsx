@@ -2,6 +2,7 @@ import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { useBannerFrame } from '../useBannerFrame'
 import { buttonAlignSelf, buttonWidthClass, buttonWidthField } from '../buttonWidth'
+import { floorText } from '../../text/HighlightedText'
 
 function BannerImageCopy({ floor, template, onMediaChange }: FloorRenderProps) {
   const imageHeight = Math.min(500, Math.max(200, Number(floor.values.imageHeight) || 300))
@@ -10,8 +11,8 @@ function BannerImageCopy({ floor, template, onMediaChange }: FloorRenderProps) {
   return <section className="floor-render banner-image-copy" data-testid="banner-image-copy" style={{ backgroundColor: floor.values.background }}>
     <div className="banner-image-stage" data-testid="banner-image-stage" style={{ height: imageHeight }}>{floor.media ? <EditableImageFrame value={media} onChange={floor.animation?.enabled ? undefined : onMediaChange} ariaLabel="图文 Banner 图片" /> : null}</div>
     <div className="banner-copy banner-copy--panel" data-testid="banner-copy" style={{ textAlign: alignment as 'left' | 'center' | 'right' }}>
-      <h2 style={{ color: floor.values.textColor }}>{floor.values.title}</h2>
-      {floor.values.description ? <p style={{ color: floor.values.textColor }}>{floor.values.description}</p> : null}
+      <h2 style={{ color: floor.values.textColor }}>{floorText(floor, 'title')}</h2>
+      {floor.values.description ? <p style={{ color: floor.values.textColor }}>{floorText(floor, 'description')}</p> : null}
       <span className={`banner-button${buttonWidthClass(floor.values.buttonWidth)}`} style={{ backgroundColor: floor.values.buttonBackground, color: floor.values.buttonTextColor, alignSelf: buttonAlignSelf(floor.values.buttonWidth, alignment) }}>{floor.values.buttonText}</span>
     </div>
   </section>

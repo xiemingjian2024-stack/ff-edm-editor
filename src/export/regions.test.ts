@@ -131,6 +131,24 @@ it('N×3 商品卡导出标题、三张商品卡和底部按钮并关联各自�
   expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/product-1', '/product-2', '/product-3'])
 })
 
+it('N×3 商品卡 DOM 切图时三张商品卡固定为 375 三等分', () => {
+  const regions = ['header', 'item-1', 'item-2', 'item-3', 'button'].map(id => ({ id, name: id, x: 0, y: 0, width: 1, height: 1 }))
+  const root = document.createElement('section')
+  root.className = 'product-grid-n-by-3'
+  root.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, right: 375, bottom: 520, width: 375, height: 520, toJSON() {} })
+  const rects = [[0, 0, 375, 130], [6, 160, 117, 260], [129, 160, 117, 260], [252, 160, 117, 260], [96, 456, 183, 34]]
+  regions.forEach((region, index) => {
+    const node = document.createElement('div')
+    node.dataset.exportRegionId = region.id
+    const [left, top, width, height] = rects[index]
+    node.getBoundingClientRect = () => ({ x: left, y: top, left, top, right: left + width, bottom: top + height, width, height, toJSON() {} })
+    root.append(node)
+  })
+  const tiled = getDomExportRegions(root, regions)
+  expect(tiled.filter(region => region.id.startsWith('item-')).map(region => [region.x, region.width])).toEqual([[0, 125], [125, 125], [250, 125]])
+  expect(scaleRegions(tiled.filter(region => region.id.startsWith('item-'))).map(region => [region.x, region.width])).toEqual([[0, 250], [250, 250], [500, 250]])
+})
+
 it('页尾按展示区、当前链接和文案顺序生成 DOM 导出区域', () => {
   const template = getTemplate('footer-links')!.definition
   const current: FloorInstance = {

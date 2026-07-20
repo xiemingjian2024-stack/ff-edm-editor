@@ -39,6 +39,7 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
 
 export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]): ExportRegion[] {
   const rootRect = root.getBoundingClientRect()
+  const useFixedThirdsForProductGrid = root.classList.contains('product-grid-n-by-3')
   const entries = regions.flatMap((region, index) => {
     const node = root.querySelector<HTMLElement>(`[data-export-region-id="${region.id}"]`)
     if (!node) return []
@@ -59,8 +60,10 @@ export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]):
     const row = group.entries.sort((a, b) => a.left - b.left)
     row.forEach((entry, columnIndex) => {
       const previousEntry = row[columnIndex - 1], nextEntry = row[columnIndex + 1]
-      const x = previousEntry ? (previousEntry.right + entry.left) / 2 : 0
-      const right = nextEntry ? (entry.right + nextEntry.left) / 2 : rootRect.width
+      const fixedThirdMatch = useFixedThirdsForProductGrid ? entry.region.id.match(/^item-(\d+)$/) : null
+      const fixedThirdIndex = fixedThirdMatch ? Number(fixedThirdMatch[1]) - 1 : -1
+      const x = fixedThirdIndex >= 0 && fixedThirdIndex < 3 ? rootRect.width * fixedThirdIndex / 3 : previousEntry ? (previousEntry.right + entry.left) / 2 : 0
+      const right = fixedThirdIndex >= 0 && fixedThirdIndex < 3 ? rootRect.width * (fixedThirdIndex + 1) / 3 : nextEntry ? (entry.right + nextEntry.left) / 2 : rootRect.width
       tiled.set(entry.index, { ...entry.region, x, y, width: right - x, height: bottom - y })
     })
   })

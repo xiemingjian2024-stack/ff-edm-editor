@@ -378,3 +378,30 @@ it('对比信息上下间距与多卖点信息一致', () => {
   expect(css).toContain('padding: 12px 18px 24px;')
   expect(css).toContain('.comparison-result p { display: -webkit-box; overflow: hidden; margin: 7px 0 0;')
 })
+
+it('对比信息可切换行动引导样式并隐藏 VS 与前后说明', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'comparison-information')!
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  const floor = {
+    id: 'comparison-action', templateId: entry.definition.id,
+    values: { bottomStyle: 'action', title: 'Title', description: 'Top copy', actionDescription: 'First line\n0711WEEKEND', buttonText: 'Shop Now', buttonWidth: 'full', background: '#FFFFFF', textColor: '#111111', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
+    textHighlights: { actionDescription: { enabled: true, text: '0711WEEKEND', color: '#FF0000' } },
+    products: {}, mediaSlots: { before: media, after: media },
+  }
+  const { container } = render(<entry.Renderer template={entry.definition} floor={floor} />)
+  expect(screen.queryByAltText('VS')).not.toBeInTheDocument()
+  expect(screen.queryByText('BEFORE')).not.toBeInTheDocument()
+  expect(screen.getByText('0711WEEKEND')).toHaveStyle({ color: '#FF0000' })
+  expect(screen.getByText('Shop Now')).toHaveClass('button--full')
+  expect(container.querySelector('.comparison-action')).toBeInTheDocument()
+})
+
+it('对比信息行动引导按钮允许留空且底部文案最多五行', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'comparison-information')!
+  const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }
+  render(<entry.Renderer template={entry.definition} floor={{ id: 'comparison-action', templateId: entry.definition.id, values: { bottomStyle: 'action', title: 'Title', description: '', actionDescription: 'Action copy', buttonText: '', background: '#FFFFFF', textColor: '#111111' }, products: {}, mediaSlots: { before: media, after: media } }} />)
+  expect(screen.queryByText('Shop Now')).not.toBeInTheDocument()
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.comparison-action p \{[^}]*white-space: pre-line;[^}]*-webkit-line-clamp: 5;/)
+  expect(entry.definition.autoHeight).toBe(true)
+})

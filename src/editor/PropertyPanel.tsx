@@ -33,11 +33,20 @@ function TextField({ floor, field, onChange, onTextHighlightChange }: { floor: F
 
 export function PropertyPanel({ floor, themeFields = [], onChange, onTextHighlightChange, onThemeColorChange, onThemeColorRelink, onNavigationItemChange, onMediaChange, onAnimationChange = () => {}, onMediaSlotChange = () => {}, onProductChange, onDuplicate, onDelete }: { floor?: FloorInstance; themeFields?: ThemeColorField[]; onChange: (fieldId: string, value: string) => void; onTextHighlightChange: (fieldId: string, value: TextHighlight) => void; onThemeColorChange: (fieldId: string, color: string) => void; onThemeColorRelink: (fieldId: string, slot: ThemeSlot) => void; onNavigationItemChange: (index: number, value: NavigationItem) => void; onMediaChange: (value: MediaState) => void; onAnimationChange?: (value: import('../domain/edm').BannerAnimation) => void; onMediaSlotChange?: (slotId: string, value: MediaState) => void; onProductChange: (slotId: string, value: import('../domain/edm').ProductValue) => void; onDuplicate: () => void; onDelete: () => void }) {
   const template = floor ? getTemplate(floor.templateId)?.definition : undefined
-  const colorFields = template?.fields.filter(field => field.type === 'color') ?? []
+  const comparisonBottomStyle = floor?.values.bottomStyle === 'action' ? 'action' : 'comparison'
+  const colorFields = template?.fields.filter(field => {
+    if (field.type !== 'color') return false
+    if (template.id === 'comparison-information' && comparisonBottomStyle !== 'action' && (field.id === 'buttonBackground' || field.id === 'buttonTextColor')) return false
+    return true
+  }) ?? []
   const navigationCount = template?.navigationConfig ? Math.min(template.navigationConfig.maxItems, Math.max(template.navigationConfig.minItems, Number(floor?.values.navigationCount) || template.navigationConfig.minItems)) : 0
   const mediaSlotCount = template?.mediaSlotCountFieldId ? Number(floor?.values[template.mediaSlotCountFieldId]) : template?.mediaSlots?.length
   const contentFields = template?.fields.filter(field => {
     if (field.type === 'color') return false
+    if (template.id === 'comparison-information') {
+      if (comparisonBottomStyle === 'action') return field.id !== 'beforeDescription' && field.id !== 'afterDescription'
+      return field.id !== 'actionDescription' && field.id !== 'buttonText' && field.id !== 'buttonWidth'
+    }
     if (template.id !== 'selling-points-information') return true
     const match = field.id.match(/^point(\d+)(Title|Description)$/)
     return !match || Number(match[1]) <= (mediaSlotCount ?? 0)

@@ -13,7 +13,7 @@ it('新建 EDM 默认包含品牌 Logo 和页尾且均可删除', async () => {
   await user.click(screen.getByRole('button', { name: '新建 EDM' }))
   expect(screen.getByTestId('head-brand-logo')).toBeVisible()
   expect(screen.getByTestId('footer-links')).toBeVisible()
-  await user.click(screen.getByRole('button', { name: '删除楼层' }))
+  await user.keyboard('{Delete}')
   expect(screen.queryByTestId('head-brand-logo')).not.toBeInTheDocument()
   expect(screen.getByTestId('footer-links')).toBeVisible()
 })

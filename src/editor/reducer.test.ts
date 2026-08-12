@@ -15,14 +15,6 @@ it('加载旧标题草稿时补齐新版模板默认字段', () => {
   expect(state.draft.floors[0].values).toMatchObject({ title: '旧标题', description: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.', buttonText: 'SHOP NOW', alignment: 'center' })
 })
 
-it('复制楼层时生成新 ID 并保留内容', () => {
-  let state = reducer(initialEditorState, { type: 'addFloor', templateId: 'title-centered' })
-  state = reducer(state, { type: 'updateField', floorId: 'floor-2', fieldId: 'title', value: '新品上线' })
-  state = reducer(state, { type: 'duplicateFloor', floorId: 'floor-2' })
-  expect(state.draft.floors[1].id).not.toBe('floor-2')
-  expect(state.draft.floors[1].values.title).toBe('新品上线')
-})
-
 it('忽略模板未声明的字段', () => {
   let state = reducer(initialEditorState, { type: 'addFloor', templateId: 'title-centered' })
   const id = state.draft.floors[0].id
@@ -94,17 +86,33 @@ it('Logo 固定首层、页尾固定末层，普通楼层新增在页尾之前',
   state = localReducer(state, { type: 'addFloor', templateId: 'head-brand-logo' })
   state = localReducer(state, { type: 'addFloor', templateId: 'product-grid-n-by-2' })
   expect(state.draft.floors.map(floor => floor.templateId)).toEqual(['head-brand-logo', 'title-centered', 'product-grid-n-by-2', 'footer-links'])
-  const unchanged = localReducer(state, { type: 'moveFloor', floorId: state.draft.floors[1].id, direction: -1 })
-  expect(unchanged.draft.floors.map(floor => floor.templateId)).toEqual(state.draft.floors.map(floor => floor.templateId))
 })
 
-it('Logo 和页尾不可重复添加或复制但可以删除', () => {
+it('拖拽楼层可跨层排序但不会越过 Logo 和页尾', () => {
+  const state = {
+    ...initialEditorState,
+    draft: { ...initialEditorState.draft, floors: [
+      { id: 'logo', templateId: 'head-brand-logo', values: {}, products: {} },
+      { id: 'title', templateId: 'title-centered', values: {}, products: {} },
+      { id: 'banner', templateId: 'banner-regular', values: {}, products: {} },
+      { id: 'products', templateId: 'product-grid-n-by-2', values: {}, products: {} },
+      { id: 'footer', templateId: 'footer-links', values: {}, products: {} },
+    ] },
+  }
+  const reordered = reducer(state, { type: 'reorderFloor', floorId: 'products', overFloorId: 'title' })
+  expect(reordered.draft.floors.map(floor => floor.id)).toEqual(['logo', 'products', 'title', 'banner', 'footer'])
+  const clampedToTop = reducer(state, { type: 'reorderFloor', floorId: 'products', overFloorId: 'logo' })
+  expect(clampedToTop.draft.floors.map(floor => floor.id)).toEqual(['logo', 'products', 'title', 'banner', 'footer'])
+  const clampedToBottom = reducer(state, { type: 'reorderFloor', floorId: 'title', overFloorId: 'footer' })
+  expect(clampedToBottom.draft.floors.map(floor => floor.id)).toEqual(['logo', 'banner', 'products', 'title', 'footer'])
+})
+
+it('Logo 和页尾不可重复添加但可以删除', () => {
   const localReducer = createEditorReducer(() => `id-${Math.random()}`)
   let state = localReducer(initialEditorState, { type: 'addFloor', templateId: 'head-brand-logo' })
   state = localReducer(state, { type: 'addFloor', templateId: 'footer-links' })
   const logoId = state.draft.floors[0].id
   state = localReducer(state, { type: 'addFloor', templateId: 'head-brand-logo' })
-  state = localReducer(state, { type: 'duplicateFloor', floorId: logoId })
   expect(state.draft.floors.filter(floor => floor.templateId === 'head-brand-logo')).toHaveLength(1)
   state = localReducer(state, { type: 'deleteFloor', floorId: logoId })
   expect(state.draft.floors.some(floor => floor.templateId === 'head-brand-logo')).toBe(false)

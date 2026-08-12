@@ -83,6 +83,41 @@ it('按商品数量截取链接区域并把 DOM 间距分配给相邻切片', ()
   ])
 })
 
+it('商品卡切图忽略编辑器画布 120% 预览缩放', () => {
+  const regions = ['header', 'item-1', 'item-2', 'button'].map(id => ({ id, name: id, x: 0, y: 0, width: 1, height: 1 }))
+  const root = document.createElement('section')
+  Object.defineProperties(root, {
+    clientWidth: { value: 375 },
+    clientHeight: { value: 600 },
+  })
+  root.getBoundingClientRect = () => ({ x: 100, y: 50, left: 100, top: 50, right: 550, bottom: 770, width: 450, height: 720, toJSON() {} })
+  const logicalRects = [[0, 0, 375, 100], [12, 130, 175, 280], [200, 130, 175, 280], [90, 450, 195, 50]]
+  regions.forEach((region, index) => {
+    const node = document.createElement('div')
+    node.dataset.exportRegionId = region.id
+    const [left, top, width, height] = logicalRects[index]
+    node.getBoundingClientRect = () => ({
+      x: 100 + left * 1.2,
+      y: 50 + top * 1.2,
+      left: 100 + left * 1.2,
+      top: 50 + top * 1.2,
+      right: 100 + (left + width) * 1.2,
+      bottom: 50 + (top + height) * 1.2,
+      width: width * 1.2,
+      height: height * 1.2,
+      toJSON() {},
+    })
+    root.append(node)
+  })
+  const tiled = getDomExportRegions(root, regions)
+  expect(tiled).toEqual([
+    expect.objectContaining({ id: 'header', x: 0, y: 0, width: 375, height: 115 }),
+    expect.objectContaining({ id: 'item-1', x: 0, y: 115, width: 193.5, height: 315 }),
+    expect.objectContaining({ id: 'item-2', x: 193.5, y: 115, width: 181.5, height: 315 }),
+    expect.objectContaining({ id: 'button', x: 0, y: 430, width: 375, height: 170 }),
+  ])
+})
+
 it('N×1 每张商品卡切片都覆盖整行宽度并保留上下间距', () => {
   const regions = ['header', 'item-1', 'item-2', 'button'].map(id => ({ id, name: id, x: 0, y: 0, width: 1, height: 1 }))
   const root = document.createElement('section'); root.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, right: 375, bottom: 500, width: 375, height: 500, toJSON() {} })

@@ -44,7 +44,7 @@ it('可以通过图片链接手动填写商品图片并保留其他内容', asyn
   render(<ProductSlotEditor label="商品 4" value={{ image: '', title: 'Cloud Bed', price: '$99', url: '/products/cloud', gallery: [] }} onChange={onChange} />)
 
   await user.type(screen.getByLabelText('商品 4 商品图片链接'), 'https://cdn.example.com/cloud.jpg')
-  await user.click(screen.getByRole('button', { name: '从链接获取 商品 4 商品图片' }))
+  await user.click(screen.getByRole('button', { name: '读取链接 商品 4 商品图片' }))
   expect(onChange).toHaveBeenLastCalledWith({
     image: 'https://cdn.example.com/cloud.jpg',
     title: 'Cloud Bed',

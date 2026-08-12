@@ -37,6 +37,12 @@ it('商品卡 SVG 缩略图不叠加旧占位色块', () => {
   expect(css).not.toContain('.template-mini--product-card::after')
 })
 
+it('顶部横幅使用指定 SVG 缩略图', () => {
+  render(<TemplateLibrary onAdd={() => {}} />)
+  const tile = screen.getByRole('button', { name: /添加 顶部横幅/ })
+  expect(tile.querySelector('img')?.getAttribute('src')).toContain('D2D4E4')
+})
+
 it('在楼层和配色内容之间切换', async () => {
   const user = userEvent.setup()
   render(<TemplateLibrary onAdd={() => {}} paletteId={classicPalette.id} palettes={[classicPalette]} onPaletteChange={() => {}} />)

@@ -6,10 +6,9 @@ export type EditorAction =
   | { type: 'loadDraft'; draft: EdmDraft }
   | { type: 'renameDraft'; name: string }
   | { type: 'addFloor'; templateId: string }
-  | { type: 'duplicateFloor'; floorId: string }
   | { type: 'deleteFloor'; floorId: string }
   | { type: 'selectFloor'; floorId: string }
-  | { type: 'moveFloor'; floorId: string; direction: -1 | 1 }
+  | { type: 'reorderFloor'; floorId: string; overFloorId: string }
   | { type: 'updateField'; floorId: string; fieldId: string; value: string }
   | { type: 'updateTextHighlight'; floorId: string; fieldId: string; value: TextHighlight }
   | { type: 'updateProduct'; floorId: string; slotId: string; value: ProductValue }
@@ -62,17 +61,20 @@ export function createEditorReducer(createId: () => string = () => crypto.random
       else if (action.templateId === 'footer-links') floors = [...floors, floor]
       else { const footerIndex = floors.findIndex(item => item.templateId === 'footer-links'); floors = footerIndex < 0 ? [...floors, floor] : [...floors.slice(0, footerIndex), floor, ...floors.slice(footerIndex)] }
       selectedFloorId = floor.id
-    } else if (action.type === 'duplicateFloor') {
-      const index = floors.findIndex(item => item.id === action.floorId); if (index < 0 || floors[index].templateId === 'head-brand-logo' || floors[index].templateId === 'footer-links') return state
-      const copy = structuredClone(floors[index]); copy.id = createId(); floors = [...floors.slice(0, index + 1), copy, ...floors.slice(index + 1)]; selectedFloorId = copy.id
     } else if (action.type === 'deleteFloor') {
       floors = floors.filter(item => item.id !== action.floorId); selectedFloorId = floors[0]?.id ?? null
     } else if (action.type === 'selectFloor') selectedFloorId = action.floorId
-    else if (action.type === 'moveFloor') {
-      const from = floors.findIndex(item => item.id === action.floorId); const to = from + action.direction
-      if (from < 0 || to < 0 || to >= floors.length) return state
-      if (floors[from].templateId === 'head-brand-logo' || floors[from].templateId === 'footer-links' || floors[to].templateId === 'head-brand-logo' || floors[to].templateId === 'footer-links') return state
-      floors = [...floors]; [floors[from], floors[to]] = [floors[to], floors[from]]
+    else if (action.type === 'reorderFloor') {
+      const from = floors.findIndex(item => item.id === action.floorId)
+      const over = floors.findIndex(item => item.id === action.overFloorId)
+      if (from < 0 || over < 0 || from === over) return state
+      if (floors[from].templateId === 'head-brand-logo' || floors[from].templateId === 'footer-links') return state
+      const firstMovable = floors[0]?.templateId === 'head-brand-logo' ? 1 : 0
+      const lastMovable = floors.at(-1)?.templateId === 'footer-links' ? floors.length - 2 : floors.length - 1
+      const to = Math.min(lastMovable, Math.max(firstMovable, over))
+      floors = [...floors]
+      const [moved] = floors.splice(from, 1)
+      floors.splice(to, 0, moved)
     } else if (action.type === 'updateField') {
       floors = floors.map(floor => {
         if (floor.id !== action.floorId) return floor

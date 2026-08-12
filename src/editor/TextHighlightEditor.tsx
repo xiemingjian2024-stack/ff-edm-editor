@@ -1,9 +1,24 @@
 import type { RefObject } from 'react'
 import type { TextHighlight } from '../domain/edm'
 import { normalizeTextHighlight } from '../text/HighlightedText'
-import { getColorPreviewValue, normalizeHexColorInput } from '../themes/colorInput'
+import { normalizeHexColorInput } from '../themes/colorInput'
+import { ColorInput } from './ColorInput'
 
 type SelectableTextControl = HTMLTextAreaElement | HTMLInputElement
+
+export function TextHighlightToggle({
+  value,
+  onChange,
+}: {
+  value?: TextHighlight
+  onChange: (value: TextHighlight) => void
+}) {
+  const highlight = normalizeTextHighlight(value)
+  return <label className="text-highlight-toggle">
+    <input type="checkbox" checked={highlight.enabled} onChange={event => onChange({ ...highlight, enabled: event.target.checked })} />
+    <span>强调部分文本</span>
+  </label>
+}
 
 export function TextHighlightEditor({
   text,
@@ -30,18 +45,14 @@ export function TextHighlightEditor({
   const changeColor = (next: string) => {
     update({ color: next.trim() ? (normalizeHexColorInput(next) ?? next) : '' })
   }
+  if (!highlight.enabled) return null
   return <div className="text-highlight-editor">
-    <label className="text-highlight-toggle">
-      <input type="checkbox" checked={highlight.enabled} onChange={event => update({ enabled: event.target.checked })} />
-      <span>强调部分文本</span>
-    </label>
-    {highlight.enabled ? <div className="text-highlight-controls">
-      <button type="button" onClick={useSelectedText}>使用当前选中文本</button>
-      <input aria-label="重点文字" value={highlight.text ?? ''} placeholder="输入或选择要强调的文字" onChange={event => update({ text: event.target.value })} />
-      <div className="color-field text-highlight-color">
-        <input aria-label="重点文字颜色" type="color" value={getColorPreviewValue(highlight.color || defaultColor, '#000000')} onChange={event => changeColor(event.target.value)} />
-        <input aria-label="重点文字色值" value={highlight.color ?? ''} placeholder="默认跟随文字颜色" onChange={event => changeColor(event.target.value)} />
+    <div className="text-highlight-controls">
+      <div className="text-highlight-target">
+        <input aria-label="重点文字" value={highlight.text ?? ''} placeholder="输入或选择要强调的文字" onChange={event => update({ text: event.target.value })} />
+        <button type="button" onMouseDown={event => event.preventDefault()} onClick={useSelectedText}>选中并强调</button>
       </div>
-    </div> : null}
+      <ColorInput colorLabel="重点文字颜色" valueLabel="重点文字色值" value={highlight.color ?? ''} fallback={defaultColor} placeholder="默认跟随文字颜色" onChange={changeColor} />
+    </div>
   </div>
 }

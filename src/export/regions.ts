@@ -39,12 +39,25 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
 
 export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]): ExportRegion[] {
   const rootRect = root.getBoundingClientRect()
+  // The editor scales the whole canvas for preview. DOM rectangles include that
+  // visual scale, while export crops always use the unscaled 375px design space.
+  const rootWidth = root.clientWidth || root.offsetWidth || rootRect.width
+  const rootHeight = root.clientHeight || root.offsetHeight || rootRect.height
+  const scaleX = rootRect.width && rootWidth ? rootRect.width / rootWidth : 1
+  const scaleY = rootRect.height && rootHeight ? rootRect.height / rootHeight : 1
   const useFixedThirdsForProductGrid = root.classList.contains('product-grid-n-by-3')
   const entries = regions.flatMap((region, index) => {
     const node = root.querySelector<HTMLElement>(`[data-export-region-id="${region.id}"]`)
     if (!node) return []
     const rect = node.getBoundingClientRect()
-    return [{ region, index, left: rect.left - rootRect.left, right: rect.right - rootRect.left, top: rect.top - rootRect.top, bottom: rect.bottom - rootRect.top }]
+    return [{
+      region,
+      index,
+      left: (rect.left - rootRect.left) / scaleX,
+      right: (rect.right - rootRect.left) / scaleX,
+      top: (rect.top - rootRect.top) / scaleY,
+      bottom: (rect.bottom - rootRect.top) / scaleY,
+    }]
   })
   const groups: Array<{ top: number; bottom: number; entries: typeof entries }> = []
   ;[...entries].sort((a, b) => a.top - b.top || a.left - b.left).forEach(entry => {
@@ -56,14 +69,14 @@ export function getDomExportRegions(root: HTMLElement, regions: ExportRegion[]):
   groups.forEach((group, groupIndex) => {
     const previous = groups[groupIndex - 1], next = groups[groupIndex + 1]
     const y = previous ? (previous.bottom + group.top) / 2 : 0
-    const bottom = next ? (group.bottom + next.top) / 2 : rootRect.height
+    const bottom = next ? (group.bottom + next.top) / 2 : rootHeight
     const row = group.entries.sort((a, b) => a.left - b.left)
     row.forEach((entry, columnIndex) => {
       const previousEntry = row[columnIndex - 1], nextEntry = row[columnIndex + 1]
       const fixedThirdMatch = useFixedThirdsForProductGrid ? entry.region.id.match(/^item-(\d+)$/) : null
       const fixedThirdIndex = fixedThirdMatch ? Number(fixedThirdMatch[1]) - 1 : -1
-      const x = fixedThirdIndex >= 0 && fixedThirdIndex < 3 ? rootRect.width * fixedThirdIndex / 3 : previousEntry ? (previousEntry.right + entry.left) / 2 : 0
-      const right = fixedThirdIndex >= 0 && fixedThirdIndex < 3 ? rootRect.width * (fixedThirdIndex + 1) / 3 : nextEntry ? (entry.right + nextEntry.left) / 2 : rootRect.width
+      const x = fixedThirdIndex >= 0 && fixedThirdIndex < 3 ? rootWidth * fixedThirdIndex / 3 : previousEntry ? (previousEntry.right + entry.left) / 2 : 0
+      const right = fixedThirdIndex >= 0 && fixedThirdIndex < 3 ? rootWidth * (fixedThirdIndex + 1) / 3 : nextEntry ? (entry.right + nextEntry.left) / 2 : rootWidth
       tiled.set(entry.index, { ...entry.region, x, y, width: right - x, height: bottom - y })
     })
   })

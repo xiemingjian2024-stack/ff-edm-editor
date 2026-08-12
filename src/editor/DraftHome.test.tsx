@@ -79,9 +79,9 @@ it('作品卡片使用数字色块、满幅封面和悬浮更多菜单', async (
   expect(css).toMatch(/\.draft-preview \{[^}]*padding: 0;[^}]*overflow: hidden;/)
   expect(css).toMatch(/\.draft-preview \{[^}]*aspect-ratio: 1 \/ 1;/)
   expect(css).toMatch(/\.draft-cover-image \{[^}]*width: 100%;[^}]*object-fit: cover;/)
-  expect(css).toMatch(/\.draft-count-badge \{[^}]*background: var\(--draft-count-bg, #FFAC33\);[^}]*color: #fff;/)
+  expect(css).toMatch(/\.draft-count-badge \{[^}]*background: var\(--draft-count-bg, #111\);/)
   expect(css).toMatch(/\.draft-more \{[^}]*opacity: 0;/)
-  expect(css).toMatch(/\.draft-action-menu button \{[^}]*color: #FFAC33;/)
+  expect(css).toMatch(/\.draft-action-menu button \{[^}]*color: #111;/)
 })
 
 it('楼层数字标签按楼层数量使用不同颜色', () => {

@@ -10,7 +10,7 @@ it('Shopify 读取首图并保留同一链接', async () => {
   const reader = vi.fn().mockResolvedValue({ title: 'Bed', image: 'first.jpg', gallery: ['first.jpg'], price: '$99', url: 'https://shop/products/bed' })
   render(<BannerMediaEditor value={empty} onChange={onChange} reader={reader} />)
   await user.type(screen.getByLabelText('Banner 图片链接'), 'https://shop/products/bed')
-  await user.click(screen.getByRole('button', { name: '从链接获取 Banner 图片' }))
+  await user.click(screen.getByRole('button', { name: '读取链接 Banner 图片' }))
   expect(onChange).toHaveBeenLastCalledWith({ ...empty, image: 'first.jpg', url: 'https://shop/products/bed' })
 })
 
@@ -18,7 +18,9 @@ it('启用 GIF 后默认创建两帧并支持增加到四帧', async () => {
   const user = userEvent.setup(); const onAnimationChange = vi.fn()
   const value = { image: 'one.jpg', url: '', scale: 1, offsetX: 0, offsetY: 0 }
   const { rerender } = render(<BannerMediaEditor value={value} onChange={() => {}} onAnimationChange={onAnimationChange} />)
-  await user.click(screen.getByRole('button', { name: 'GIF 动画' }))
+  expect(screen.getByRole('tablist', { name: 'Banner 格式' })).toBeVisible()
+  expect(screen.getByRole('tab', { name: '静态图片' })).toHaveAttribute('aria-selected', 'true')
+  await user.click(screen.getByRole('tab', { name: 'GIF 动画' }))
   expect(onAnimationChange).toHaveBeenCalledWith(expect.objectContaining({ enabled: true, intervalMs: 1000, frames: [value, expect.objectContaining({ image: '' })] }))
   const animation = onAnimationChange.mock.calls[0][0]
   rerender(<BannerMediaEditor value={value} onChange={() => {}} animation={animation} onAnimationChange={onAnimationChange} />)

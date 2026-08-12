@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import edmEditorLogo from '../assets/edm-editor-logo.svg'
 import emptyOrderImage from '../assets/empty-order.png'
+import receiveDesignIcon from '../assets/receive-design.svg'
 import type { EdmDraft, ExportRecord } from '../domain/edm'
 import { Icon } from '../ui/Icon'
 import { createTransferFileName } from '../transfer/designTransfer'
@@ -57,8 +58,8 @@ export function DraftHome({ drafts, exports, onCreate, onOpen, onDelete, onDupli
     if (!file) return
     await receive(await file.text())
   }
-  return <><main className="draft-home"><header><div className="draft-brand"><img className="project-logo" src={edmEditorLogo} alt="EDM Editor"/><h1 className="visually-hidden">EDM 搭建器</h1></div><div className="home-actions"><button className="secondary-button new-draft-button" onClick={() => { setReceiveOpen(true); setMessage('') }}>接收设计稿</button><button className="primary-button new-draft-button" onClick={onCreate}><Icon name="plus"/>新建 EDM</button></div></header><section>
-    <div className="home-title"><div><h2>我的作品</h2><p>创建、编辑并导出你的 EDM 设计</p></div><small>内容仅保存在此浏览器，清理站点数据会删除记录。</small></div>
+  return <><main className="draft-home"><header><div className="draft-brand"><img className="project-logo" src={edmEditorLogo} alt="EDM Editor"/><h1 className="visually-hidden">EDM 搭建器</h1></div><div className="home-actions"><button className="secondary-button new-draft-button" onClick={() => { setReceiveOpen(true); setMessage('') }}><img className="button-icon" src={receiveDesignIcon} alt=""/>接收设计稿</button><button className="primary-button new-draft-button" onClick={onCreate}><Icon name="plus"/>新建 EDM</button></div></header><section>
+    <div className="home-title"><div><h2>我的作品</h2><p>创建、编辑并导出你的 EDM 设计</p></div><small>设计稿保存在本机，建议定期下载 .edm 文件备份。</small></div>
     <div className="work-tabs"><button className={tab === 'drafts' ? 'is-active' : ''} onClick={() => setTab('drafts')}>草稿</button><button className={tab === 'exports' ? 'is-active' : ''} onClick={() => setTab('exports')}>已导出</button></div>
     {tab === 'drafts' ? <><div className="draft-grid">{drafts.map(draft => <article key={draft.id}><button className="draft-preview" aria-label={`打开 ${draft.name}`} onClick={() => onOpen(draft)}>{sheet(draft)}</button>{meta(draft, `修改于 ${formatTime(draft.updatedAt)}`, `draft-${draft.id}`, <><button aria-label={`发送 ${draft.name}`} onClick={() => { setOpenMenuId(null); void openSend(draft) }}>发送</button><button aria-label={`复制 ${draft.name}`} onClick={() => { setOpenMenuId(null); onDuplicate(draft) }}>复制</button><button onClick={() => { setOpenMenuId(null); onDelete(draft.id) }}>删除</button></>)}</article>)}</div>{!drafts.length ? <div className="home-empty"><span><Icon name="drafts" size={22}/></span><h3>还没有 EDM 草稿</h3><p>创建第一封，开始组合楼层模板。</p><button className="primary-button" onClick={onCreate}>创建第一个 EDM</button></div> : null}</> : <><div className="draft-grid">{exports.map(record => <article key={record.id}><div className="draft-preview export-preview">{sheet(record.draft)}</div>{meta(record.draft, `导出于 ${formatTime(record.exportedAt)}`, `export-${record.id}`, <><button aria-label={`发送 ${record.draft.name}`} onClick={() => { setOpenMenuId(null); void openSend(record.draft) }}>发送</button><button aria-label={`将 ${record.draft.name} 复制为草稿`} onClick={() => { setOpenMenuId(null); onDuplicate(record.draft) }}>复制为草稿</button><button onClick={() => { setOpenMenuId(null); onDeleteExport(record.id) }}>删除</button></>)}</article>)}</div>{!exports.length ? <div className="home-empty"><span><Icon name="download" size={22}/></span><h3>还没有导出记录</h3><p>成功导出 EDM 后，最近版本会显示在这里。</p></div> : null}</>}
   </section></main>

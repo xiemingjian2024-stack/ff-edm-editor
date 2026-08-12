@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-export type IconName = 'back' | 'layers' | 'drafts' | 'image' | 'search' | 'undo' | 'redo' | 'eye' | 'download' | 'up' | 'down' | 'minus' | 'plus' | 'chevron'
+export type IconName = 'back' | 'layers' | 'drafts' | 'image' | 'search' | 'undo' | 'redo' | 'eye' | 'download' | 'trash' | 'up' | 'down' | 'minus' | 'plus' | 'chevron' | 'drag'
 
 const paths: Record<IconName, ReactNode> = {
   back: <><path d="M15 18l-6-6 6-6"/><path d="M9 12h10"/></>,
@@ -9,8 +9,10 @@ const paths: Record<IconName, ReactNode> = {
   search: <><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></>,
   undo: <><path d="M9 7l-5 5 5 5"/><path d="M4 12h9a6 6 0 016 6"/></>,
   redo: <><path d="M15 7l5 5-5 5"/><path d="M20 12h-9a6 6 0 00-6 6"/></>,
+  drag: <><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></>,
   eye: <><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></>,
   download: <><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></>,
+  trash: <><path d="M4 7h16"/><path d="M9 3h6l1 4H8l1-4z"/><path d="M7 7l1 14h8l1-14"/><path d="M10 11v6M14 11v6"/></>,
   up: <path d="M6 15l6-6 6 6"/>, down: <path d="M6 9l6 6 6-6"/>,
   minus: <path d="M5 12h14"/>, plus: <path d="M12 5v14M5 12h14"/>, chevron: <path d="M9 6l6 6-6 6"/>
 }

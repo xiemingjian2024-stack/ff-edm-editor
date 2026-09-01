@@ -14,7 +14,7 @@ it('按设计坐标记录图片拖拽位移', () => {
 
 it('只读模式仍应用缩放和位移', () => {
   const { container } = render(<EditableImageFrame value={{ image: 'image.jpg', url: '', scale: 1.5, offsetX: 12, offsetY: -8 }} ariaLabel="预览图片" />)
-  expect(container.querySelector('img')).toHaveStyle({ transform: 'translate(-50%, -50%) translate(12px, -8px) scale(1.5)' })
+  expect(container.querySelector('img')).toHaveStyle({ left: '0px', top: '0px', transform: 'translate(12px, -8px) scale(1.5)' })
 })
 
 it('窄图片框按自身设计宽度换算拖拽距离', () => {

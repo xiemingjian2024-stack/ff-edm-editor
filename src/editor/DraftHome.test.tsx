@@ -39,17 +39,15 @@ it('没有 Banner 图片时作品封面展示默认图', () => {
   expect(screen.getByRole('img', { name: '夏日 EDM 封面' })).toHaveAttribute('src', expect.stringContaining('empty-order'))
 })
 
-it('在草稿与最近导出之间切换并可复制为草稿', async () => {
+it('EDM 作品可复制，首页不再显示已导出入口', async () => {
   const user = userEvent.setup(); const onDuplicate = vi.fn()
   render(<DraftHome drafts={[draft]} exports={[{ id: 'a', draft, exportedAt: '2026-07-01T11:00:00.000Z' }]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={onDuplicate} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
   await user.click(screen.getByRole('button', { name: '更多操作 夏日 EDM' }))
   await user.click(screen.getByRole('button', { name: '复制 夏日 EDM' }))
   expect(onDuplicate).toHaveBeenCalledWith(draft)
-  await user.click(screen.getByRole('button', { name: '已导出' }))
-  expect(screen.getByText(/导出于/)).toBeVisible()
-  await user.click(screen.getByRole('button', { name: '更多操作 夏日 EDM' }))
-  await user.click(screen.getByRole('button', { name: '将 夏日 EDM 复制为草稿' }))
-  expect(onDuplicate).toHaveBeenCalledTimes(2)
+  expect(screen.queryByRole('button', { name: '已导出' })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'EDM' })).toBeVisible()
+  expect(screen.getByRole('button', { name: 'GIF' })).toBeVisible()
 })
 
 it('通过 edm 文件发送和接收设计稿', async () => {
@@ -93,4 +91,24 @@ it('楼层数字标签按楼层数量使用不同颜色', () => {
   render(<DraftHome drafts={[oneFloorDraft, twoFloorDraft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
   expect(screen.getByLabelText('1 个楼层')).toHaveStyle({ '--draft-count-bg': '#FFAC33' })
   expect(screen.getByLabelText('2 个楼层')).toHaveStyle({ '--draft-count-bg': '#5B8DEF' })
+})
+
+it('EDM 和 GIF 作品分别展示在对应分类中', async () => {
+  const user = userEvent.setup()
+  const gifDraft = {
+    id: 'gif-new',
+    name: '最新 GIF',
+    templateId: 'grid-slideshow' as const,
+    intervalMs: 500,
+    common: { title: '', description: '', button: '', link: '', backgroundColor: '#FFAC33', textColor: '#000000', accentColor: '#FFAC33', buttonColor: '#000000', buttonTextColor: '#FFFFFF' },
+    scenes: [],
+    createdAt: '2026-07-01T11:00:00.000Z',
+    updatedAt: '2026-07-01T11:00:00.000Z',
+  }
+  render(<DraftHome drafts={[draft]} gifDrafts={[gifDraft]} exports={[]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  expect(screen.getByRole('button', { name: '打开 夏日 EDM' })).toBeVisible()
+  expect(screen.queryByRole('button', { name: '打开 最新 GIF' })).not.toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'GIF' }))
+  expect(screen.getByRole('button', { name: '打开 最新 GIF' })).toBeVisible()
+  expect(screen.queryByRole('button', { name: '打开 夏日 EDM' })).not.toBeInTheDocument()
 })

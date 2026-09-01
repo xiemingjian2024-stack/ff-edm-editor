@@ -36,6 +36,12 @@ it('弹窗外壳样式不会覆盖模板内部的标题与描述字号', () => {
   expect(css).toContain('.export-dialog > header p')
 })
 
+it('下载按钮在非悬停状态也保持黑底白字', () => {
+  const css = readFileSync('src/editor/editor.css', 'utf8')
+  expect(css).toMatch(/\.export-dialog > footer \.primary-button \{[^}]*background: #111;[^}]*color: #fff;/)
+  expect(css).toMatch(/\.export-dialog > footer \.primary-button:disabled \{[^}]*background: #e8e8e8;[^}]*color: #777;/)
+})
+
 it('同一楼层存在多个导出问题时不会产生重复列表标识', () => {
   const error = vi.spyOn(console, 'error').mockImplementation(() => {})
   const media = { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }

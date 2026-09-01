@@ -16,11 +16,12 @@ export function resolveThemeColor(
 }
 
 const fixedBackgroundTemplateIds = new Set(['head-brand-logo', 'head-category-navigation', 'head-top-banner'])
+const customBackgroundTemplateIds = new Set(['footer-links'])
 const hasColorField = (template: FloorTemplate, fieldId: string) => template.fields.some(field => field.id === fieldId && field.type === 'color')
 
 export function getFloorThemeFields(template: FloorTemplate, alternatingBackgroundSlot: ThemeSlot): Array<{ fieldId: string; defaultSlot: ThemeSlot }> {
   const fields: Array<{ fieldId: string; defaultSlot: ThemeSlot }> = []
-  if (hasColorField(template, 'background')) fields.push({ fieldId: 'background', defaultSlot: fixedBackgroundTemplateIds.has(template.id) || template.category === 'banner' ? 'A' : alternatingBackgroundSlot })
+  if (hasColorField(template, 'background') && !customBackgroundTemplateIds.has(template.id)) fields.push({ fieldId: 'background', defaultSlot: fixedBackgroundTemplateIds.has(template.id) || template.category === 'banner' ? 'A' : alternatingBackgroundSlot })
   if (hasColorField(template, 'buttonBackground')) fields.push({ fieldId: 'buttonBackground', defaultSlot: 'C' })
   return fields
 }

@@ -16,13 +16,14 @@ import productsThumb from '../assets/thumbnails/缩略图-商品卡-Nx2商品卡
 import productListThumb from '../assets/thumbnails/缩略图-商品卡-Nx1商品卡.svg'
 import codeThumb from '../assets/thumbnails/缩略图-信息-CODE.svg'
 import productGridThreeThumb from '../assets/thumbnails/缩略图-商品卡-Nx3商品卡.svg'
+import productIntroductionThumb from '../assets/thumbnails/缩略图-商品卡-产品介绍卡.svg'
 import footerThumb from '../assets/thumbnails/缩略图-页尾-页尾.svg'
 import { getColorPreviewValue, isHexColorInput, normalizeHexColorInput } from '../themes/colorInput'
 import { ColorInput } from './ColorInput'
 
 const categoryNames = { head: 'HEAD', banner: 'Banner', title: '标题', information: '信息', 'product-card': '商品卡', content: '内容区', promotion: '优惠区', footer: '页尾' }
 const paletteSlotNames: Record<string, string> = { A: '背景间隔色 A', B: '背景间隔色 B', C: '按钮色 C' }
-const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'head-top-banner': topBannerThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'single-selling-point-information': singlePointThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb, 'footer-links': footerThumb }
+const thumbnails: Record<string, string> = { 'head-brand-logo': logoThumb, 'head-category-navigation': navigationThumb, 'head-top-banner': topBannerThumb, 'banner-regular': regularBannerThumb, 'banner-image-copy': imageCopyBannerThumb, 'title-centered': titleThumb, 'comparison-information': comparisonThumb, 'single-selling-point-information': singlePointThumb, 'selling-points-information': pointsThumb, 'code-information': codeThumb, 'product-grid-n-by-2': productsThumb, 'product-list-n-by-1': productListThumb, 'product-grid-n-by-3': productGridThreeThumb, 'product-introduction-cards': productIntroductionThumb, 'footer-links': footerThumb }
 
 type PaletteForm = { id: string; name: string; A: string; B: string; C: string }
 

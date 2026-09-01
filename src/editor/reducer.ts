@@ -41,7 +41,10 @@ export function createFloorInstance(templateId: string, id: string): FloorInstan
 function hydrateFloorDefaults(floor: FloorInstance): FloorInstance {
   const template = getTemplate(floor.templateId)?.definition
   if (!template) return floor
-  return { ...floor, values: { ...Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])), ...floor.values } }
+  const navigationItems = template.navigationConfig
+    ? template.navigationConfig.defaultItems.map((fallback, index) => floor.navigationItems?.[index] ?? structuredClone(fallback))
+    : floor.navigationItems
+  return { ...floor, values: { ...Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])), ...floor.values }, navigationItems }
 }
 
 export function createEditorReducer(createId: () => string = () => crypto.randomUUID()) {

@@ -144,6 +144,17 @@ it('N×1 商品卡只导出当前商品并关联各自 Shopify 链接', () => {
   expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/products/one', '/products/two', '/products/three'])
 })
 
+it('产品介绍卡按当前数量导出标题、各商品卡和底部按钮', () => {
+  const adaptive = getTemplate('product-introduction-cards')!.definition
+  const current: FloorInstance = {
+    id: 'product-introduction', templateId: adaptive.id, values: { productCount: '3' },
+    products: Object.fromEntries([1, 2, 3].map(index => [`product-${index}`, { image: `${index}.png`, title: `${index}`, description: `介绍 ${index}`, price: '', url: `/product-${index}` }])),
+  }
+  const regions = getFloorExportRegions(adaptive, current)
+  expect(regions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'button'])
+  expect(regions.filter(region => region.linkSlotId).map(region => getRegionUrl(current, region))).toEqual(['/product-1', '/product-2', '/product-3'])
+})
+
 it('CODE 模板跳过中间占位且两个导出区域都没有链接', () => {
   const code = getTemplate('code-information')!.definition
   const current: FloorInstance = { id: 'code', templateId: code.id, values: {}, products: {} }
@@ -184,13 +195,36 @@ it('N×3 商品卡 DOM 切图时三张商品卡固定为 375 三等分', () => {
   expect(scaleRegions(tiled.filter(region => region.id.startsWith('item-'))).map(region => [region.x, region.width])).toEqual([[0, 250], [250, 250], [500, 250]])
 })
 
-it('页尾按展示区、当前链接和文案顺序生成 DOM 导出区域', () => {
+it('新版页尾生成保障区、四个链接、品牌区、三个均分社媒切图和地址区', () => {
   const template = getTemplate('footer-links')!.definition
   const current: FloorInstance = {
-    id: 'footer', templateId: template.id, values: { navigationCount: '2' }, products: {},
-    navigationItems: [{ text: 'HOME', url: '' }, { text: 'Travel Carriers', url: '' }, { text: 'Sofa Covers', url: '' }],
+    id: 'footer', templateId: template.id, values: { background: '#FFAC33' }, products: {},
+    navigationItems: [{ text: 'Shop All', url: '' }, { text: 'Contact Us', url: '' }, { text: 'FAQ', url: '' }, { text: 'Privacy Policy', url: '' }],
   }
   const regions = getFloorExportRegions(template, current)
-  expect(regions.map(region => region.id)).toEqual(['showcase', 'link-1', 'link-2', 'copy'])
-  expect(regions.map(region => region.name)).toEqual(['页尾展示区', 'HOME', 'Travel Carriers', '页尾文案'])
+  expect(regions.map(region => region.id)).toEqual(['trust', 'link-1', 'link-2', 'link-3', 'link-4', 'brand', 'social-instagram', 'social-tiktok', 'social-facebook', 'address'])
+  expect(regions.slice(1, 5).map(region => region.name)).toEqual(['Shop All', 'Contact Us', 'FAQ', 'Privacy Policy'])
+  expect(regions.slice(6, 9).map(region => region.name)).toEqual(['Instagram', 'TikTok', 'Facebook'])
+})
+
+it('新版页尾 DOM 切图将导航分为两列，并把整条社媒行均分为三个等宽区域', () => {
+  const template = getTemplate('footer-links')!.definition
+  const floor: FloorInstance = { id: 'footer', templateId: template.id, values: { background: '#FFAC33' }, products: {}, navigationItems: [{ text: 'Shop All', url: '' }, { text: 'Contact Us', url: '' }, { text: 'FAQ', url: '' }, { text: 'Privacy Policy', url: '' }] }
+  const regions = getFloorExportRegions(template, floor)
+  const root = document.createElement('section')
+  Object.defineProperties(root, { clientWidth: { value: 375 }, clientHeight: { value: 315 } })
+  root.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, right: 375, bottom: 315, width: 375, height: 315, toJSON() {} })
+  const rects: Record<string, [number, number, number, number]> = {
+    trust: [0, 0, 375, 100], 'link-1': [0, 100, 187.5, 25], 'link-2': [187.5, 100, 187.5, 25], 'link-3': [0, 125, 187.5, 25], 'link-4': [187.5, 125, 187.5, 25], brand: [0, 150, 375, 66],
+    'social-instagram': [0, 216, 125, 40], 'social-tiktok': [125, 216, 125, 40], 'social-facebook': [250, 216, 125, 40], address: [0, 256, 375, 59],
+  }
+  regions.forEach(region => {
+    const node = document.createElement('div'); node.dataset.exportRegionId = region.id
+    const [left, top, width, height] = rects[region.id]
+    node.getBoundingClientRect = () => ({ x: left, y: top, left, top, right: left + width, bottom: top + height, width, height, toJSON() {} })
+    root.append(node)
+  })
+  const tiled = getDomExportRegions(root, regions)
+  expect(tiled.slice(1, 5).map(region => [region.x, region.width])).toEqual([[0, 187.5], [187.5, 187.5], [0, 187.5], [187.5, 187.5]])
+  expect(tiled.slice(6, 9).map(region => [region.x, region.width])).toEqual([[0, 125], [125, 125], [250, 125]])
 })

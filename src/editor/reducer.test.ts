@@ -15,6 +15,17 @@ it('加载旧标题草稿时补齐新版模板默认字段', () => {
   expect(state.draft.floors[0].values).toMatchObject({ title: '旧标题', description: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.', buttonText: 'SHOP NOW', alignment: 'center' })
 })
 
+it('加载旧页尾草稿时补齐四个固定链接', () => {
+  const legacyDraft = { ...initialEditorState.draft, floors: [{ id: 'old-footer', templateId: 'footer-links', values: {}, products: {}, navigationItems: [{ text: 'HOME', url: '' }] }] }
+  const state = reducer(initialEditorState, { type: 'loadDraft', draft: legacyDraft })
+  expect(state.draft.floors[0].navigationItems).toEqual([
+    { text: 'HOME', url: '' },
+    { text: 'Contact Us', url: '' },
+    { text: 'FAQ', url: '' },
+    { text: 'Privacy Policy', url: '' },
+  ])
+})
+
 it('忽略模板未声明的字段', () => {
   let state = reducer(initialEditorState, { type: 'addFloor', templateId: 'title-centered' })
   const id = state.draft.floors[0].id

@@ -1,8 +1,9 @@
 import { openDB } from 'idb'
 import type { EdmDraft, ExportRecord, ThemePalette } from '../domain/edm'
+import type { GifDraft } from '../gif/model'
 import { migrateDraftTheme } from '../themes/resolveThemeColor'
 
-const CURRENT_DB_VERSION = 4
+const CURRENT_DB_VERSION = 5
 const migrationMetaKey = 'startup-data-migration-v1'
 const defaultLegacyDatabaseNames = ['ff-edm-editor', 'ff-edm-editor-local', 'edm-editor', 'edm-builder', 'ff-edm-builder-v1', 'ff-edm-builder-v2']
 const legacyLocalStorageKeys = [
@@ -113,6 +114,7 @@ export function createDraftRepository(name = 'ff-edm-builder', options: Reposito
     if (!db.objectStoreNames.contains('exports')) db.createObjectStore('exports', { keyPath: 'id' })
     if (!db.objectStoreNames.contains('palettes')) db.createObjectStore('palettes', { keyPath: 'id' })
     if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta', { keyPath: 'id' })
+    if (!db.objectStoreNames.contains('gifDrafts')) db.createObjectStore('gifDrafts', { keyPath: 'id' })
   } })
   const migration = database.then(db => migrateFromLegacySources(db, name, options))
   async function readyDatabase() {
@@ -132,6 +134,9 @@ export function createDraftRepository(name = 'ff-edm-builder', options: Reposito
     async savePalette(palette: ThemePalette) { (await readyDatabase()).put('palettes', structuredClone(palette)) },
     async listPalettes() { return await (await readyDatabase()).getAll('palettes') as ThemePalette[] },
     async deletePalette(id: string) { (await readyDatabase()).delete('palettes', id) },
+    async saveGif(draft: GifDraft) { await (await readyDatabase()).put('gifDrafts', structuredClone(draft)) },
+    async listGifs() { const items = await (await readyDatabase()).getAll('gifDrafts') as GifDraft[]; return items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) },
+    async deleteGif(id: string) { await (await readyDatabase()).delete('gifDrafts', id) },
   }
 }
 export const draftRepository = createDraftRepository()

@@ -50,3 +50,45 @@ it('上传图片时保存可持久化的数据地址', async () => {
   await user.upload(screen.getByLabelText('上传 卖点图片'), new File(['image'], 'point.png', { type: 'image/png' }))
   await waitFor(() => expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ image: expect.stringMatching(/^data:image\/png;base64,/), url: '' })))
 })
+
+it('多选上传和重新上传都将有序文件列表交给批量处理器', async () => {
+  const user = userEvent.setup(); const onChange = vi.fn(); const onMultipleUpload = vi.fn().mockResolvedValue(undefined)
+  render(<MediaControlCard label="图片 1" value={{ ...empty, image: 'old.png' }} onChange={onChange} onMultipleUpload={onMultipleUpload} maxUploadFiles={4} />)
+  const files = ['b', 'a'].map(name => new File([name], `${name}.png`, { type: 'image/png' }))
+  for (const label of ['上传 图片 1', '重新上传 图片 1']) {
+    const input = screen.getByLabelText(label)
+    expect(input).toHaveAttribute('multiple')
+    await user.upload(input, files)
+    await waitFor(() => expect(input).not.toBeDisabled())
+    expect(input).toHaveValue('')
+  }
+  expect(onMultipleUpload).toHaveBeenCalledTimes(2)
+  expect(onMultipleUpload).toHaveBeenLastCalledWith(files)
+  expect(onChange).not.toHaveBeenCalled()
+})
+
+it('开启多选后只选一张仍走当前图片替换', async () => {
+  const user = userEvent.setup(); const onChange = vi.fn(); const onMultipleUpload = vi.fn()
+  render(<MediaControlCard label="图片 3" value={empty} onChange={onChange} onMultipleUpload={onMultipleUpload} maxUploadFiles={4} />)
+  await user.upload(screen.getByLabelText('上传 图片 3'), new File(['one'], 'one.png', { type: 'image/png' }))
+  await waitFor(() => expect(onChange).toHaveBeenCalledOnce())
+  expect(onMultipleUpload).not.toHaveBeenCalled()
+})
+
+it('超过上限拒绝整批并提示，不截断或覆盖已有图片', async () => {
+  const user = userEvent.setup(); const onChange = vi.fn(); const onMultipleUpload = vi.fn()
+  render(<MediaControlCard label="图片 1" value={empty} onChange={onChange} onMultipleUpload={onMultipleUpload} maxUploadFiles={4} />)
+  await user.upload(screen.getByLabelText('上传 图片 1'), Array.from({ length: 5 }, (_, i) => new File(['x'], `${i}.png`, { type: 'image/png' })))
+  expect(screen.getByRole('alert')).toHaveTextContent('一次最多上传 4 张')
+  expect(onMultipleUpload).not.toHaveBeenCalled()
+  expect(onChange).not.toHaveBeenCalled()
+})
+
+it('批量读取失败显示错误且恢复上传入口', async () => {
+  const user = userEvent.setup()
+  render(<MediaControlCard label="图片 1" value={empty} onChange={vi.fn()} onMultipleUpload={vi.fn().mockRejectedValue(new Error('图片读取失败'))} maxUploadFiles={4} />)
+  const input = screen.getByLabelText('上传 图片 1')
+  await user.upload(input, ['a', 'b'].map(name => new File(['x'], `${name}.png`, { type: 'image/png' })))
+  expect(await screen.findByRole('alert')).toHaveTextContent('图片读取失败')
+  expect(input).not.toBeDisabled()
+})

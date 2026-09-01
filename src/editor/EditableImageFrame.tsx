@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import type { MediaState } from '../domain/edm'
+import { imagePlacement } from '../media/imagePlacement'
 
 export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图片', designWidth = 375, fit = 'cover' }: { value: MediaState; onChange?: (value: MediaState) => void; ariaLabel?: string; designWidth?: number; fit?: 'cover' | 'contain' }) {
   const drag = useRef<{ x: number; y: number; offsetX: number; offsetY: number; ratio: number } | null>(null)
@@ -19,6 +20,6 @@ export function EditableImageFrame({ value, onChange, ariaLabel = '可编辑图�
     onPointerUp={event => { drag.current = null; event.currentTarget.releasePointerCapture?.(event.pointerId) }}
     onPointerCancel={() => { drag.current = null }}
   >
-    {value.image ? <img src={value.image} alt="" draggable={false} style={{ objectFit: fit, transform: `translate(-50%, -50%) translate(${value.offsetX}px, ${value.offsetY}px) scale(${value.scale})` }} /> : null}
+    {value.image ? <img src={value.image} alt="" draggable={false} style={{ ...imagePlacement(value), objectFit: fit }} /> : null}
   </div>
 }

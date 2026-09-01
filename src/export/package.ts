@@ -2,12 +2,13 @@ import JSZip from 'jszip'
 import type { ManifestRow } from './manifest'
 import { makeManifestCsv } from './manifest'
 import { makeFileNames } from './manifest'
-import { captureFloor, cropJpeg, scaleRegions } from './render'
+import { captureFloor, captureFloorPng, cropJpeg, scaleRegions } from './render'
 import type { EdmDraft, FloorInstance, MediaState } from '../domain/edm'
 import { getTemplate } from '../templates/registry'
 import { getDomExportRegions, getFloorExportRegions, getRegionUrl } from './regions'
 import { getFloorHeight } from '../templates/floorGeometry'
-import { encodeGifFrames, type RgbaFrame } from './gif'
+import { encodeGifFrames, stabilizeGifOutsideDynamicRect, type RgbaFrame } from './gif'
+import { imagePlacement } from '../media/imagePlacement'
 
 export interface RenderedFloor { fullName: string; full: Blob; width: number; height: number; includeFull: boolean; regions: { name: string; blob: Blob }[] }
 export async function composeLongPreview(floors: RenderedFloor[]) {
@@ -62,7 +63,7 @@ function applyFrameToNode(root: HTMLElement, frame: MediaState) {
   image.decoding = 'sync'
   image.loading = 'eager'
   image.src = frame.image
-  image.style.transform = `translate(-50%, -50%) translate(${frame.offsetX}px, ${frame.offsetY}px) scale(${frame.scale})`
+  Object.assign(image.style, imagePlacement(frame))
 }
 
 const waitForAnimationFrame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
@@ -103,16 +104,29 @@ async function decodeGifMediaFrames(media: MediaState) {
   }
 }
 
-export async function captureAnimatedBanner(node: HTMLElement, frames: MediaState[], delayMs: number, capture: typeof captureFloor = captureFloor) {
+export async function captureAnimatedBanner(node: HTMLElement, frames: MediaState[], delayMs: number, capture: typeof captureFloor = captureFloorPng) {
   const holder = node.querySelector('.editable-image-frame') as HTMLElement | null
   if (!holder) throw new Error('GIF Banner 图片区域不存在')
+  const nodeRect = node.getBoundingClientRect()
+  const holderRect = holder.getBoundingClientRect()
   let image = holder.querySelector('img')
   if (!image) { image = document.createElement('img'); image.alt = ''; holder.append(image) }
-  const original = { src: image.getAttribute('src'), transform: image.style.transform, crossOrigin: image.crossOrigin, decoding: image.decoding, loading: image.loading }
+  const original = { src: image.getAttribute('src'), style: image.getAttribute('style'), crossOrigin: image.crossOrigin, decoding: image.decoding, loading: image.loading }
   try {
     const captures: Blob[] = []
     for (const frame of frames) { applyFrameToNode(node, frame); await waitForAnimationFrame(); captures.push(await capture(node)) }
     const rgbaFrames = await Promise.all(captures.map(blobToRgbaFrame))
+    if (nodeRect.width > 0 && nodeRect.height > 0) {
+      const scaleX = rgbaFrames[0].width / nodeRect.width
+      const scaleY = rgbaFrames[0].height / nodeRect.height
+      const dynamicRect = {
+        x: (holderRect.left - nodeRect.left) * scaleX,
+        y: (holderRect.top - nodeRect.top) * scaleY,
+        width: holderRect.width * scaleX,
+        height: holderRect.height * scaleY,
+      }
+      stabilizeGifOutsideDynamicRect(rgbaFrames, dynamicRect)
+    }
     const bytes = encodeGifFrames(rgbaFrames, delayMs)
     const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
     return { preview: captures[0], gif: new Blob([buffer], { type: 'image/gif' }) }
@@ -120,7 +134,8 @@ export async function captureAnimatedBanner(node: HTMLElement, frames: MediaStat
     if (original.src === null) image.remove()
     else {
       image.src = original.src
-      image.style.transform = original.transform
+      if (original.style === null) image.removeAttribute('style')
+      else image.setAttribute('style', original.style)
       image.crossOrigin = original.crossOrigin
       image.decoding = original.decoding
       image.loading = original.loading
@@ -128,7 +143,7 @@ export async function captureAnimatedBanner(node: HTMLElement, frames: MediaStat
   }
 }
 
-export async function captureUploadedGifBanner(node: HTMLElement, media: MediaState, capture: typeof captureFloor = captureFloor) {
+export async function captureUploadedGifBanner(node: HTMLElement, media: MediaState, capture: typeof captureFloor = captureFloorPng) {
   const decoded = await decodeGifMediaFrames(media)
   if (decoded && decoded.frames.length >= 2) return captureAnimatedBanner(node, decoded.frames, decoded.delayMs, capture)
   const captures: Blob[] = []

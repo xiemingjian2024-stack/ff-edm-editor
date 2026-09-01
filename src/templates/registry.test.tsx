@@ -3,7 +3,7 @@ import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
 it('注册 HEAD、Banner、标题、信息、商品卡和页尾模板', () => {
-  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card', 'footer'])
+  expect(templateRegistry.map(item => item.definition.category)).toEqual(['head', 'head', 'head', 'banner', 'banner', 'banner', 'title', 'information', 'information', 'information', 'information', 'product-card', 'product-card', 'product-card', 'product-card', 'footer'])
 })
 
 it('信息和商品卡按运营使用顺序排列', () => {
@@ -11,30 +11,62 @@ it('信息和商品卡按运营使用顺序排列', () => {
     'single-selling-point-information', 'selling-points-information', 'comparison-information', 'code-information',
   ])
   expect(templateRegistry.filter(item => item.definition.category === 'product-card').map(item => item.definition.id)).toEqual([
-    'product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3',
+    'product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3', 'product-introduction-cards',
   ])
+})
+
+it('注册支持 1 至 5 个商品且共享面板色的产品介绍卡', () => {
+  const entry = templateRegistry.find(item => item.definition.id === 'product-introduction-cards')!
+  const template = entry.definition
+  expect(template.name).toBe('产品介绍卡')
+  expect(template.productSlotCountFieldId).toBe('productCount')
+  expect(template.productSlots).toHaveLength(5)
+  expect(template.productSlots.every(slot => slot.showPrice === false && slot.showDescription === true)).toBe(true)
+  expect(template.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '1', options: [
+    { label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }, { label: '5 个商品', value: '5' },
+  ] })
+  expect(template.fields.filter(field => field.id === 'cardBackground')).toEqual([expect.objectContaining({ defaultValue: '#F3F3F3' })])
+  expect(template.exportRegions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'button'])
+
+  const floor = {
+    id: 'intro', templateId: template.id,
+    values: { title: 'Title', description: 'Description', buttonText: 'Shop Now', cardButtonText: 'View', buttonWidth: 'auto', productCount: '3', background: '#FFFFFF', cardBackground: '#EFEFEF', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
+    products: {
+      'product-1': { image: 'one.png', title: 'First Product', description: 'First description', price: '', url: '/one', descriptionHighlight: { enabled: true, text: 'description', color: '#FF0000' } },
+      'product-2': { image: 'two.png', title: 'Second Product', description: '', price: '', url: '/two' },
+      'product-3': { image: 'three.png', title: 'Third Product', description: 'Third description', price: '', url: '/three' },
+    },
+  }
+  render(<entry.Renderer template={template} floor={floor} />)
+  const cards = screen.getAllByTestId('product-introduction-card')
+  expect(cards).toHaveLength(3)
+  expect(cards[0]).toHaveClass('is-image-left')
+  expect(cards[1]).toHaveClass('is-image-right')
+  cards.forEach(card => expect(card).toHaveStyle({ backgroundColor: '#EFEFEF' }))
+  expect(cards[0].querySelector('.text-highlight')).toHaveTextContent('description')
+  expect(screen.queryByText('--')).not.toBeInTheDocument()
 })
 
 it('模板不再声明固定主题色位', () => {
   expect(templateRegistry.every(item => (item.definition.themeColorFields ?? []).length === 0)).toBe(true)
 })
 
-it('注册支持 1 至 6 条链接且固定上下图片的页尾模板', () => {
+it('注册固定四个链接与可替换背景色的新版页尾模板', () => {
   const entry = templateRegistry.find(item => item.definition.id === 'footer-links')!
   expect(entry.definition.name).toBe('页尾')
   expect(entry.definition.category).toBe('footer')
-  expect(entry.definition.navigationConfig).toMatchObject({ minItems: 1, maxItems: 6 })
-  expect(entry.definition.fields).toEqual([
-    expect.objectContaining({ id: 'navigationCount', type: 'choice', defaultValue: '3' }),
-  ])
+  expect(entry.definition.version).toBe(2)
+  expect(entry.definition.navigationConfig).toMatchObject({ minItems: 4, maxItems: 4 })
+  expect(entry.definition.fields).toEqual([expect.objectContaining({ id: 'background', type: 'color', defaultValue: '#FFAC33' })])
   const floor = {
-    id: 'footer', templateId: entry.definition.id, values: { navigationCount: '2' }, products: {},
-    navigationItems: [{ text: 'HOME', url: '' }, { text: 'Travel Carriers', url: '' }, { text: 'Sofa Covers', url: '' }],
+    id: 'footer', templateId: entry.definition.id, values: { background: '#FFAC33' }, products: {},
+    navigationItems: [{ text: 'Shop All', url: '' }, { text: 'Contact Us', url: '' }, { text: 'FAQ', url: '' }, { text: 'Privacy Policy', url: '' }],
   }
   render(<entry.Renderer template={entry.definition} floor={floor} />)
-  expect(screen.getByTestId('footer-showcase')).toHaveAttribute('src', expect.stringContaining('footer-showcase'))
-  expect(screen.getAllByTestId('footer-link')).toHaveLength(2)
-  expect(screen.getByTestId('footer-copy')).toHaveAttribute('src', expect.stringContaining('footer-copy'))
+  expect(screen.getAllByTestId('footer-link')).toHaveLength(4)
+  expect(screen.getAllByTestId('footer-social')).toHaveLength(3)
+  expect(screen.getByTestId('footer-links')).toHaveStyle({ backgroundColor: '#FFAC33' })
+  expect(screen.getByText('30-Day', { exact: false })).toBeVisible()
 })
 
 it('注册不声明固定色位的 CODE 信息模板', () => {
@@ -119,6 +151,11 @@ it('N×1 奇偶商品卡分别贴左右边且使用紧凑卡内按钮', () => {
   expect(css).toMatch(/\.product-list-n-card-button \{[^}]*width: 112px;[^}]*height: 28px;/)
 })
 
+it('N×2 商品标题使用 12px 字号并固定预留四行高度', () => {
+  const css = readFileSync('src/templates/templateStyles.css', 'utf8')
+  expect(css).toMatch(/\.product-grid-n-card h3 \{[^}]*height: 60px;[^}]*font-size: 12px;[^}]*line-height: 1\.25;[^}]*-webkit-line-clamp: 4;/)
+})
+
 it('多行文本保留手动换行', () => {
   const css = readFileSync('src/templates/templateStyles.css', 'utf8')
   for (const selector of ['.banner-copy h2', '.title-content p', '.comparison-result p', '.selling-point-copy h3', '.product-grid-n-card h3', '.product-list-n-copy h3']) {
@@ -143,7 +180,7 @@ it('N×1 与 N×2 应用商品图片变换并上报各自商品槽位', () => {
     }
     const { unmount } = render(<entry.Renderer template={entry.definition} floor={floor} onProductChange={onProductChange} />)
     const frame = screen.getByLabelText(`${entry.definition.name} 商品 1 图片`)
-    expect(frame.querySelector('img')).toHaveStyle({ objectFit: fit, transform: 'translate(-50%, -50%) translate(8px, -6px) scale(1.4)' })
+    expect(frame.querySelector('img')).toHaveStyle({ objectFit: fit, left: '0px', top: '0px', transform: 'translate(8px, -6px) scale(1.4)' })
     vi.spyOn(frame, 'getBoundingClientRect').mockReturnValue({ x: 0, y: 0, width: templateId === 'product-list-n-by-1' ? 181.5 : 175.5, height: 160, top: 0, right: 181.5, bottom: 160, left: 0, toJSON: () => ({}) })
     fireEvent.pointerDown(frame, { pointerId: 1, clientX: 50, clientY: 50 })
     fireEvent.pointerMove(frame, { pointerId: 1, clientX: 60, clientY: 45 })
@@ -314,7 +351,7 @@ it('标题文本常规模板包含内容、对齐、颜色和自适应高度配�
 })
 
 it('含按钮模板支持适配文案或最大宽度', () => {
-  const buttonTemplateIds = ['banner-regular', 'banner-image-copy', 'title-centered', 'single-selling-point-information', 'selling-points-information', 'product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3']
+  const buttonTemplateIds = ['banner-regular', 'banner-image-copy', 'title-centered', 'single-selling-point-information', 'selling-points-information', 'product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3', 'product-introduction-cards']
   for (const id of buttonTemplateIds) {
     const field = templateRegistry.find(item => item.definition.id === id)?.definition.fields.find(item => item.id === 'buttonWidth')
     expect(field).toMatchObject({ type: 'choice', defaultValue: 'auto', options: [{ label: '适配文案', value: 'auto' }, { label: '最大宽度', value: 'full' }] })

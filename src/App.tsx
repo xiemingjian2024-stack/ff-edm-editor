@@ -1,20 +1,40 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { EdmDraft, ExportRecord, ThemePalette } from './domain/edm'
+import type { EdmDraft, ThemePalette } from './domain/edm'
 import { EditorPage } from './editor/EditorPage'
 import { DraftHome } from './editor/DraftHome'
 import { draftRepository } from './storage/drafts'
 import { createFloorInstance } from './editor/reducer'
 import { classicPalette } from './themes/palettes'
 import { createTransferCode, parseTransferCode } from './transfer/designTransfer'
+import type { GifDraft, GifTemplateId } from './gif/model'
+import { createGifDraft } from './gif/model'
+import { GifEditorPage } from './gif/GifEditorPage'
 
 export function App() {
-  const [drafts, setDrafts] = useState<EdmDraft[]>([]); const [exports, setExports] = useState<ExportRecord[]>([]); const [customPalettes, setCustomPalettes] = useState<ThemePalette[]>([]); const [active, setActive] = useState<EdmDraft | null>(null)
-  const refresh = useCallback(() => { void Promise.all([draftRepository.list(), draftRepository.listExports(), draftRepository.listPalettes()]).then(([nextDrafts, nextExports, nextPalettes]) => { setDrafts(nextDrafts); setExports(nextExports); setCustomPalettes(nextPalettes) }) }, [])
+  const [drafts, setDrafts] = useState<EdmDraft[]>([]); const [gifDrafts, setGifDrafts] = useState<GifDraft[]>([]); const [customPalettes, setCustomPalettes] = useState<ThemePalette[]>([]); const [active, setActive] = useState<EdmDraft | null>(null); const [activeGif, setActiveGif] = useState<GifDraft | null>(null)
+  const [homeTab, setHomeTab] = useState<'edm' | 'gif'>('edm')
+  const refresh = useCallback(() => { void Promise.all([draftRepository.list(), draftRepository.listGifs(), draftRepository.listPalettes()]).then(([nextDrafts, nextGifs, nextPalettes]) => { setDrafts(nextDrafts); setGifDrafts(nextGifs); setCustomPalettes(nextPalettes) }) }, [])
   useEffect(refresh, [refresh])
   const create = () => { const now = new Date().toISOString(); setActive({ id: crypto.randomUUID(), name: '未命名 EDM', floors: [createFloorInstance('head-brand-logo', crypto.randomUUID()), createFloorInstance('footer-links', crypto.randomUUID())], themePaletteId: 'funnyfuzzy-classic', createdAt: now, updatedAt: now }) }
   const save = useCallback((draft: EdmDraft) => { void draftRepository.save(draft) }, [])
+  const createGif = (templateId: GifTemplateId) => {
+    const draft = createGifDraft(templateId)
+    setGifDrafts(current => [draft, ...current.filter(item => item.id !== draft.id)])
+    void draftRepository.saveGif(draft)
+    setActiveGif(draft)
+  }
+  const saveGif = useCallback((draft: GifDraft) => {
+    setGifDrafts(current => [draft, ...current.filter(item => item.id !== draft.id)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)))
+    void draftRepository.saveGif(draft)
+  }, [])
+  const duplicateGif = (source: GifDraft) => {
+    const now = new Date().toISOString()
+    const copy = { ...structuredClone(source), id: crypto.randomUUID(), name: `${source.name} - 副本`, scenes: source.scenes.map(scene => ({ ...scene, id: crypto.randomUUID() })), createdAt: now, updatedAt: now }
+    setGifDrafts(current => [copy, ...current])
+    void draftRepository.saveGif(copy)
+    setActiveGif(copy)
+  }
   const duplicate = (source: EdmDraft) => { const now = new Date().toISOString(); setActive({ ...structuredClone(source), id: crypto.randomUUID(), name: `${source.name} - 副本`, floors: source.floors.map(floor => ({ ...floor, id: crypto.randomUUID() })), createdAt: now, updatedAt: now }) }
-  const recordExport = async (draft: EdmDraft) => { await draftRepository.saveExport({ id: draft.id, draft: structuredClone(draft), exportedAt: new Date().toISOString() }) }
   const savePalette = async (palette: ThemePalette) => { await draftRepository.savePalette(palette); setCustomPalettes(await draftRepository.listPalettes()) }
   const deletePalette = async (id: string) => { await draftRepository.deletePalette(id); setCustomPalettes(await draftRepository.listPalettes()) }
   const makeTransferCode = (draft: EdmDraft) => createTransferCode(draft, [classicPalette, ...customPalettes])
@@ -36,6 +56,7 @@ export function App() {
     setActive(imported)
     refresh()
   }
-  if (active) return <EditorPage initialDraft={active} palettes={[classicPalette, ...customPalettes]} onPaletteSave={palette => { void savePalette(palette) }} onPaletteDelete={id => { void deletePalette(id) }} onSave={save} onExported={recordExport} onBack={() => { setActive(null); refresh() }} />
-  return <DraftHome drafts={drafts} exports={exports} onCreate={create} onOpen={setActive} onDuplicate={duplicate} onMakeTransferCode={makeTransferCode} onReceiveTransferCode={receiveTransferCode} onDelete={id => { void draftRepository.delete(id).then(refresh) }} onDeleteExport={id => { void draftRepository.deleteExport(id).then(refresh) }} />
+  if (active) return <EditorPage initialDraft={active} gifDrafts={gifDrafts} palettes={[classicPalette, ...customPalettes]} onPaletteSave={palette => { void savePalette(palette) }} onPaletteDelete={id => { void deletePalette(id) }} onSave={save} onBack={() => { setHomeTab('edm'); setActive(null); refresh() }} />
+  if (activeGif) return <GifEditorPage initialDraft={activeGif} onSave={saveGif} onBack={() => { setHomeTab('gif'); setActiveGif(null); refresh() }}/>
+  return <DraftHome drafts={drafts} gifDrafts={gifDrafts} initialTab={homeTab} onCreate={create} onCreateGif={createGif} onOpen={setActive} onOpenGif={setActiveGif} onDuplicate={duplicate} onDuplicateGif={duplicateGif} onMakeTransferCode={makeTransferCode} onReceiveTransferCode={receiveTransferCode} onDelete={id => { void draftRepository.delete(id).then(refresh) }} onDeleteGif={id => { void draftRepository.deleteGif(id).then(refresh) }} />
 }

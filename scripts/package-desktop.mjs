@@ -15,6 +15,9 @@ const appVersion = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).
 
 const ignoredPaths = [
   /^\/\.git($|\/)/,
+  /^\/\.playwright-cli($|\/)/,
+  /^\/output($|\/)/,
+  /(^|\/)\.DS_Store$/,
   /^\/docs($|\/)/,
   /^\/e2e($|\/)/,
   /^\/public($|\/)/,

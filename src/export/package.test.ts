@@ -60,7 +60,8 @@ it('GIF Banner 使用真实楼层逐帧截图并在完成后恢复图片状态',
   const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as never)
   const node = document.createElement('section')
   const holder = document.createElement('div'); holder.className = 'editable-image-frame'
-  const image = document.createElement('img'); image.src = 'original.jpg'; image.style.transform = 'scale(0.8)'
+  const image = document.createElement('img'); image.src = 'original.jpg'; image.style.transform = 'scale(0.8)'; image.style.left = '50%'; image.style.top = '50%'; image.style.objectFit = 'contain'
+  const originalStyle = image.getAttribute('style')
   holder.append(image); node.append(holder)
   const capturedSources: string[] = []
   await captureAnimatedBanner(node, [
@@ -69,11 +70,29 @@ it('GIF Banner 使用真实楼层逐帧截图并在完成后恢复图片状态',
   ], 1000, async captureNode => {
     expect(captureNode).toBe(node)
     capturedSources.push(image.getAttribute('src')!)
+    expect(image.style.left).toBe('0px')
+    expect(image.style.top).toBe('0px')
+    expect(image.style.objectFit).toBe('contain')
+    expect(image.style.transform).toBe(capturedSources.length === 1 ? 'translate(0px, 0px) scale(1)' : 'translate(3px, 4px) scale(1.2)')
     return new Blob(['frame'])
   })
   expect(capturedSources).toEqual(['frame-1.jpg', 'frame-2.jpg'])
   expect(image.getAttribute('src')).toBe('original.jpg')
   expect(image.style.transform).toBe('scale(0.8)')
+  expect(image.getAttribute('style')).toBe(originalStyle)
   getContext.mockRestore()
   vi.unstubAllGlobals()
+})
+
+it('GIF 导出失败后也恢复原始图片和全部定位样式', async () => {
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => { callback(0); return 1 })
+  try {
+    const node = document.createElement('section')
+    node.innerHTML = '<div class="editable-image-frame"><img src="original.jpg" style="left: 0px; top: 0px; transform: translate(9px, 2px) scale(1.4); object-fit: cover;"></div>'
+    const image = node.querySelector('img')!
+    const originalStyle = image.getAttribute('style')
+    await expect(captureAnimatedBanner(node, [{ image: 'frame.png', url: '', scale: 1, offsetX: 0, offsetY: 0 }], 500, async () => { throw new Error('截图失败') })).rejects.toThrow('截图失败')
+    expect(image.getAttribute('style')).toBe(originalStyle)
+    expect(image.getAttribute('src')).toBe('original.jpg')
+  } finally { vi.unstubAllGlobals() }
 })

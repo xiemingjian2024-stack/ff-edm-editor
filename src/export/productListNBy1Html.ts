@@ -1,0 +1,21 @@
+import type { FloorInstance } from '../domain/edm'
+import { escapeHtml, headingHtml, highlightedText, mainButtonHtml, normalizeHex, normalizeLink } from './productCardHtmlShared'
+
+function card(floor: FloorInstance, index: number, imageUrl: string) {
+  const product = floor.products[`product-${index + 1}`]
+  const link = escapeHtml(normalizeLink(product?.url))
+  const background = normalizeHex(floor.values[`cardBackground${index + 1}`], ['#F6E2CC', '#E1DEE8', '#E3F1FF', '#FFDAD0'][index] || '#F3F3F3')
+  const textColor = normalizeHex(floor.values.textColor, '#000000')
+  const image = `<td width="50%" valign="middle" bgcolor="${background}" style="display:table-cell!important;width:50%!important;padding:0;background:${background};line-height:0"><a href="${link}" target="_blank" style="display:block;text-decoration:none"><img src="${escapeHtml(imageUrl)}" width="363" height="320" alt="" style="display:block;width:100%;max-width:100%;height:auto;margin:0;border:0" /></a></td>`
+  const button = floor.values.cardButtonText?.trim() ? `<table role="presentation" width="112" border="0" cellpadding="0" cellspacing="0" style="width:${floor.values.buttonWidth === 'full' ? '100%' : '112px'};margin-top:10px;border-collapse:collapse"><tr><td height="28" align="center" bgcolor="${normalizeHex(floor.values.buttonBackground, '#000000')}" style="height:28px;background:${normalizeHex(floor.values.buttonBackground, '#000000')};text-align:center"><a href="${link}" target="_blank" style="display:block;color:${normalizeHex(floor.values.buttonTextColor, '#FFFFFF')};font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:28px;text-decoration:none">${escapeHtml(floor.values.cardButtonText)}</a></td></tr></table>` : ''
+  const copy = `<td width="50%" valign="middle" bgcolor="${background}" style="display:table-cell!important;width:50%!important;padding:18px 16px;background:${background};color:${textColor};font-family:Arial,Helvetica,sans-serif"><div style="max-height:57px;overflow:hidden;font-size:15px;font-weight:600;line-height:19px;overflow-wrap:break-word;word-break:normal"><a href="${link}" target="_blank" style="display:block;color:${textColor};text-decoration:none">${highlightedText(product?.title || `商品标题 ${index + 1}`, product?.titleHighlight)}</a></div><div style="margin-top:14px;overflow:hidden;font-size:12px;line-height:15px;white-space:nowrap;text-overflow:ellipsis"><a href="${link}" target="_blank" style="color:${textColor};text-decoration:none">${escapeHtml(`${floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}${product?.price || '--'}`)}</a></div>${button}</td>`
+  const cells = index % 2 === 0 ? image + copy : copy + image
+  const alignment = index % 2 === 0 ? 'left' : 'right'
+  return `<tr><td align="${alignment}" style="padding:0 0 12px;text-align:${alignment}"><table role="presentation" width="97%" border="0" cellpadding="0" cellspacing="0" align="${alignment}" bgcolor="${background}" style="width:97%;border-collapse:collapse;table-layout:fixed;background:${background};border-radius:4px;overflow:hidden"><tr style="display:table-row!important">${cells}</tr></table></td></tr>`
+}
+
+export function buildProductListNBy1EmailHtml(floor: FloorInstance, imageUrls: string[]) {
+  const count = Math.max(1, Math.min(4, Number.parseInt(floor.values.productCount || '1', 10) || 1))
+  const background = normalizeHex(floor.values.background, '#FFFFFF')
+  return `<!-- FUNNYFUZZY N×1 商品卡：图片同步至 Klaviyo，商品信息与按钮为邮件 HTML。 --><table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="${background}" style="width:100%;border-collapse:collapse;table-layout:fixed;background:${background};mso-table-lspace:0;mso-table-rspace:0">${headingHtml(floor.values.title || '', floor.values.description || '', background, normalizeHex(floor.values.textColor, '#000000'))}<tr><td><table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;table-layout:fixed">${Array.from({ length: count }, (_, index) => card(floor, index, imageUrls[index] || '')).join('')}</table></td></tr>${mainButtonHtml(floor.values.buttonText || '', floor.values.buttonLink, floor.values.buttonWidth, floor.values.buttonBackground, floor.values.buttonTextColor, 12)}</table>`
+}

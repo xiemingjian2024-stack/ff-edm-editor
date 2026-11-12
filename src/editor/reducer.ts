@@ -30,7 +30,7 @@ export function createFloorInstance(templateId: string, id: string): FloorInstan
     id,
     templateId,
     values: Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])),
-    products: {},
+    products: Object.fromEntries(template.productSlots.filter(slot => slot.defaultActionText !== undefined).map(slot => [slot.id, { image: '', title: '', price: '', url: '', gallery: [], actionText: slot.defaultActionText }])),
     navigationItems: template.navigationConfig ? structuredClone(template.navigationConfig.defaultItems) : undefined,
     media: template.mediaConfig ? { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 } : undefined,
     mediaSlots: template.mediaSlots ? Object.fromEntries(template.mediaSlots.map(slot => [slot.id, { image: '', url: '', scale: 1, offsetX: 0, offsetY: 0 }])) : undefined,
@@ -42,9 +42,21 @@ function hydrateFloorDefaults(floor: FloorInstance): FloorInstance {
   const template = getTemplate(floor.templateId)?.definition
   if (!template) return floor
   const navigationItems = template.navigationConfig
-    ? template.navigationConfig.defaultItems.map((fallback, index) => floor.navigationItems?.[index] ?? structuredClone(fallback))
+    ? template.navigationConfig.defaultItems.map((fallback, index) => {
+      const current = floor.navigationItems?.[index]
+      if (!current) return structuredClone(fallback)
+      return { ...fallback, ...current, url: current.url?.trim() || fallback.url }
+    })
     : floor.navigationItems
-  return { ...floor, values: { ...Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])), ...floor.values }, navigationItems }
+  const products = { ...floor.products }
+  for (const slot of template.productSlots) {
+    if (slot.defaultActionText === undefined) continue
+    const legacyActionText = floor.values.cardButtonText ?? slot.defaultActionText
+    products[slot.id] = products[slot.id]
+      ? { ...products[slot.id], actionText: products[slot.id].actionText ?? legacyActionText }
+      : { image: '', title: '', price: '', url: '', gallery: [], actionText: legacyActionText }
+  }
+  return { ...floor, values: { ...Object.fromEntries(template.fields.map(field => [field.id, field.defaultValue])), ...floor.values }, products, navigationItems }
 }
 
 export function createEditorReducer(createId: () => string = () => crypto.randomUUID()) {

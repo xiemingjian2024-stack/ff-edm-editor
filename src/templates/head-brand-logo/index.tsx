@@ -18,12 +18,17 @@ function HeadBrandLogo({ floor }: FloorRenderProps) {
 export const headBrandLogo: RegisteredTemplate = {
   definition: {
     id: 'head-brand-logo',
-    version: 1,
+    version: 2,
     name: '品牌 Logo',
     category: 'head',
     designWidth: 375,
     designHeight: 56,
     fields: [
+      { id: 'logoLink', type: 'text', label: 'Logo 链接', defaultValue: 'https://funnyfuzzy.com/' },
+      { id: 'logoHtmlMode', type: 'choice', label: 'HTML 输出方式', defaultValue: 'lightweight', options: [
+        { label: '轻量 Logo（推荐）', value: 'lightweight' },
+        { label: '无图兼容 Logo', value: 'pixel' },
+      ] },
       { id: 'background', type: 'color', label: '背景颜色', defaultValue: '#FFFFFF' },
       {
         id: 'logoColor',

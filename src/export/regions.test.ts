@@ -8,7 +8,7 @@ const template = {
   id: 'head-category-navigation', version: 1, name: '分类导航', category: 'head', designWidth: 375, designHeight: 46,
   fields: [{ id: 'navigationCount', type: 'choice', label: '导航数量', defaultValue: '3', options: [{ label: '2', value: '2' }, { label: '3', value: '3' }, { label: '4', value: '4' }] }],
   productSlots: [], exportRegions: [], exportFullImage: false,
-  navigationConfig: { minItems: 2, maxItems: 4, defaultItems: [{ text: 'Home', url: '' }, { text: 'Travel', url: '' }, { text: 'Covers', url: '' }, { text: '', url: '' }] },
+  navigationConfig: { minItems: 2, maxItems: 4, defaultItems: [{ text: 'Home', url: 'https://funnyfuzzy.com/' }, { text: 'Travel', url: '/travel' }, { text: 'Covers', url: '/covers' }, { text: '', url: '' }] },
 } satisfies FloorTemplate
 
 function floor(count: number): FloorInstance {
@@ -25,15 +25,15 @@ describe.each([2, 3, 4])('%s 项导航区域', count => {
   })
 })
 
-it('导航区域不关联链接', () => {
-  expect(getFloorExportRegions(template, floor(3)).map(item => item.navigationItemIndex)).toEqual([undefined, undefined, undefined])
+it('导航区域分别关联对应导航项', () => {
+  expect(getFloorExportRegions(template, floor(3)).map(item => item.navigationItemIndex)).toEqual([0, 1, 2])
 })
 
-it('导航区域忽略旧数据中的链接字符串', () => {
+it('导航区域读取每个导航项自己的链接', () => {
   const current = floor(3)
-  current.navigationItems![1].url = '任意链接字符'
+  current.navigationItems![1].url = 'https://funnyfuzzy.com/collections/travel-1'
   const regions = getFloorExportRegions(template, current)
-  expect(regions.map(region => getRegionUrl(current, region))).toEqual(['', '', ''])
+  expect(regions.map(region => getRegionUrl(current, region))).toEqual(['https://funnyfuzzy.com/', 'https://funnyfuzzy.com/collections/travel-1', '/covers'])
 })
 
 it('Banner 导出区域读取图片关联的 Shopify 链接', () => {
@@ -56,6 +56,13 @@ it('内容自适应模板按实际 DOM 高度生成完整导出区域', () => {
   const adaptive = getTemplate('title-centered')!.definition
   const current: FloorInstance = { id: 'title-1', templateId: adaptive.id, values: {}, products: {} }
   expect(getFloorExportRegions(adaptive, current, 224)[0]).toMatchObject({ width: 375, height: 224 })
+})
+
+it('常规标题只有显示按钮时才导出按钮链接', () => {
+  const title = getTemplate('title-centered')!.definition
+  const region = getFloorExportRegions(title, { id: 'title', templateId: title.id, values: { buttonText: 'Shop Now', buttonLink: 'https://funnyfuzzy.com/collections/beds' }, products: {} })[0]
+  expect(getRegionUrl({ id: 'title', templateId: title.id, values: { buttonText: 'Shop Now', buttonLink: 'https://funnyfuzzy.com/collections/beds' }, products: {} }, region)).toBe('https://funnyfuzzy.com/collections/beds')
+  expect(getRegionUrl({ id: 'title', templateId: title.id, values: { buttonText: '', buttonLink: 'https://funnyfuzzy.com/collections/beds' }, products: {} }, region)).toBe('')
 })
 
 it('按商品数量截取链接区域并把 DOM 间距分配给相邻切片', () => {

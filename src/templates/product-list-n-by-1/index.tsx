@@ -30,16 +30,17 @@ const productSlots = Array.from({ length: 4 }, (_, index) => ({ id: `product-${i
 const exportRegions = [
   { id: 'header', name: '标题与描述', x: 0, y: 0, width: 1, height: 1 },
   ...productSlots.map((slot, index) => ({ id: `item-${index + 1}`, name: `商品 ${index + 1}`, x: 0, y: 0, width: 1, height: 1, linkSlotId: slot.id })),
-  { id: 'button', name: '底部按钮', x: 0, y: 0, width: 1, height: 1 },
+  { id: 'button', name: '底部按钮', x: 0, y: 0, width: 1, height: 1, linkFieldId: 'buttonLink', linkRequiredFieldId: 'buttonText' },
 ]
 
 export const productListNBy1: RegisteredTemplate = {
   definition: {
-    id: 'product-list-n-by-1', version: 1, name: 'N×1 商品卡', category: 'product-card', designWidth: 375, designHeight: 760,
+    id: 'product-list-n-by-1', version: 2, name: 'N×1 商品卡', category: 'product-card', designWidth: 375, designHeight: 760,
     fields: [
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '主按钮文案', defaultValue: 'See More' },
+      { id: 'buttonLink', type: 'text', label: '主按钮链接', defaultValue: '' },
       { id: 'cardButtonText', type: 'text', label: '商品卡按钮文案', defaultValue: 'Shop Now' },
       buttonWidthField,
       { id: 'productCount', type: 'choice', label: '商品数量', defaultValue: '1', options: [{ label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }] },

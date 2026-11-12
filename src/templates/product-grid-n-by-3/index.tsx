@@ -28,11 +28,12 @@ function ProductGridNBy3({ floor, onProductChange }: FloorRenderProps) {
 
 export const productGridNBy3: RegisteredTemplate = {
   definition: {
-    id: 'product-grid-n-by-3', version: 1, name: 'N×3 商品卡', category: 'product-card', designWidth: 375, designHeight: 520,
+    id: 'product-grid-n-by-3', version: 2, name: 'N×3 商品卡', category: 'product-card', designWidth: 375, designHeight: 520,
     fields: [
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '主按钮文案', defaultValue: 'Shop Now' },
+      { id: 'buttonLink', type: 'text', label: '主按钮链接', defaultValue: '' },
       { id: 'cardButtonText', type: 'text', label: '商品卡按钮文案', defaultValue: 'SHOP NOW' },
       buttonWidthField,
       { id: 'background', type: 'color', label: '楼层背景颜色', defaultValue: '#FFFFFF' },
@@ -46,7 +47,7 @@ export const productGridNBy3: RegisteredTemplate = {
     exportRegions: [
       { id: 'header', name: '标题与描述', x: 0, y: 0, width: 1, height: 1 },
       ...productSlots.map((slot, index) => ({ id: `item-${index + 1}`, name: `商品 ${index + 1}`, x: 0, y: 0, width: 1, height: 1, linkSlotId: slot.id })),
-      { id: 'button', name: '底部按钮', x: 0, y: 0, width: 1, height: 1 },
+      { id: 'button', name: '底部按钮', x: 0, y: 0, width: 1, height: 1, linkFieldId: 'buttonLink', linkRequiredFieldId: 'buttonText' },
     ],
   },
   Renderer: ProductGridNBy3,

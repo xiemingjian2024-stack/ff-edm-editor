@@ -1,6 +1,5 @@
 import type { FloorRenderProps, RegisteredTemplate } from '../../domain/edm'
 import { getActiveProductSlots } from '../productSlots'
-import arrowIcon from '../../assets/product-card/跳转.svg'
 import { EditableImageFrame } from '../../editor/EditableImageFrame'
 import { getProductMedia, withProductMedia } from '../../domain/productMedia'
 import { buttonWidthClass, buttonWidthField } from '../buttonWidth'
@@ -14,7 +13,7 @@ function ProductGridNBy2({ floor, template, onProductChange }: FloorRenderProps)
     <div className="product-grid-n-list">{slots.map((slot, index) => { const product = floor.products[slot.id]; return <article className="product-grid-n-card" data-testid="product-grid-n-card" data-export-region-id={`item-${index + 1}`} key={slot.id}>
       <div className="product-grid-n-image"><EditableImageFrame value={getProductMedia(product)} onChange={product && onProductChange ? media => onProductChange(slot.id, withProductMedia(product, media)) : undefined} ariaLabel={`N×2 商品卡 商品 ${index + 1} 图片`} designWidth={175.5} fit="cover" /></div>
       <h3>{renderHighlightedText(product?.title || `商品标题 ${index + 1}`, product?.titleHighlight)}</h3>
-      <div className="product-grid-n-price"><span>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</span><img src={arrowIcon} alt="" /></div>
+      <div className="product-grid-n-price"><span>{floor.values.pricePrefix ? `${floor.values.pricePrefix} ` : ''}{product?.price || '--'}</span><span className="product-grid-n-html-arrow" aria-hidden="true">›</span></div>
     </article> })}</div>
     {floor.values.buttonText ? <span className={`banner-button non-banner-button product-grid-n-button${buttonWidthClass(floor.values.buttonWidth)}`} data-export-region-id="button" style={{ backgroundColor: floor.values.buttonBackground || '#000000', color: floor.values.buttonTextColor || '#FFFFFF' }}>{floor.values.buttonText}</span> : null}
   </section>
@@ -24,16 +23,17 @@ const productSlots = Array.from({ length: 8 }, (_, index) => ({ id: `product-${i
 const exportRegions = [
   { id: 'header', name: '标题与描述', x: 0, y: 0, width: 1, height: 1 },
   ...productSlots.map((slot, index) => ({ id: `item-${index + 1}`, name: `商品 ${index + 1}`, x: 0, y: 0, width: 1, height: 1, linkSlotId: slot.id })),
-  { id: 'button', name: '底部按钮', x: 0, y: 0, width: 1, height: 1 },
+  { id: 'button', name: '底部按钮', x: 0, y: 0, width: 1, height: 1, linkFieldId: 'buttonLink', linkRequiredFieldId: 'buttonText' },
 ]
 
 export const productGridNBy2: RegisteredTemplate = {
   definition: {
-    id: 'product-grid-n-by-2', version: 1, name: 'N×2 商品卡', category: 'product-card', designWidth: 375, designHeight: 1200,
+    id: 'product-grid-n-by-2', version: 2, name: 'N×2 商品卡', category: 'product-card', designWidth: 375, designHeight: 1200,
     fields: [
       { id: 'title', type: 'text', label: '标题', defaultValue: 'A Better Spot for Every Ride' },
       { id: 'description', type: 'text', label: '描述', defaultValue: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.' },
       { id: 'buttonText', type: 'text', label: '按钮文案', defaultValue: 'See More' },
+      { id: 'buttonLink', type: 'text', label: '按钮链接', defaultValue: '' },
       buttonWidthField,
       { id: 'productCount', type: 'choice', label: '商品数量', defaultValue: '2', options: [{ label: '2 个商品', value: '2' }, { label: '4 个商品', value: '4' }, { label: '6 个商品', value: '6' }, { label: '8 个商品', value: '8' }] },
       { id: 'pricePrefix', type: 'text', label: '价格前缀', defaultValue: 'From' },

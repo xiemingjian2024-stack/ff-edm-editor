@@ -2,6 +2,8 @@ import type { EdmDraft } from '../domain/edm'
 import { getTemplate } from '../templates/registry'
 import { getActiveProductSlots } from '../templates/productSlots'
 
+const htmlProductCardTemplateIds = new Set(['product-list-n-by-1', 'product-grid-n-by-2', 'product-grid-n-by-3', 'product-introduction-cards'])
+
 export interface ExportIssue { floorId: string; floorNumber: number; message: string }
 export function validateDraft(draft: EdmDraft) {
   const blockers: ExportIssue[] = [], warnings: ExportIssue[] = []
@@ -10,7 +12,12 @@ export function validateDraft(draft: EdmDraft) {
     if (template.mediaConfig && !floor.media?.image) blockers.push({ floorId: floor.id, floorNumber: index + 1, message: '必填图片尚未设置' })
     const activeMediaSlotCount = template.mediaSlotCountFieldId ? Number(floor.values[template.mediaSlotCountFieldId]) : template.mediaSlots?.length
     template.mediaSlots?.slice(0, activeMediaSlotCount).filter(slot => !floor.mediaSlots?.[slot.id]?.image).forEach(slot => blockers.push({ floorId: floor.id, floorNumber: index + 1, message: `${slot.label}尚未设置` }))
-    getActiveProductSlots(template, floor).forEach(slot => { const product = floor.products[slot.id]; if (!product?.url) warnings.push({ floorId: floor.id, floorNumber: index + 1, message: `${slot.label} 缺少商品链接` }); if (!product?.image) warnings.push({ floorId: floor.id, floorNumber: index + 1, message: `${slot.label} 缺少商品图片` }) })
+    getActiveProductSlots(template, floor).forEach(slot => {
+      const product = floor.products[slot.id]
+      if (!product?.url?.trim()) (htmlProductCardTemplateIds.has(template.id) ? blockers : warnings).push({ floorId: floor.id, floorNumber: index + 1, message: `${slot.label} 缺少必填的 Shopify 商品链接` })
+      if (!product?.image) warnings.push({ floorId: floor.id, floorNumber: index + 1, message: `${slot.label} 缺少商品图片` })
+    })
+    if (htmlProductCardTemplateIds.has(template.id) && floor.values.buttonText?.trim() && !floor.values.buttonLink?.trim()) blockers.push({ floorId: floor.id, floorNumber: index + 1, message: `${floor.values.buttonText} 按钮缺少必填链接` })
   })
   return { blockers, warnings }
 }

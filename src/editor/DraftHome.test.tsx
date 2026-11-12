@@ -18,6 +18,16 @@ it('草稿卡显示名称、楼层数量和修改时间', () => {
   expect(screen.queryByRole('button', { name: '发送 夏日 EDM' })).not.toBeInTheDocument()
 })
 
+it('首页设置下拉可打开 Klaviyo 连接弹窗', async () => {
+  const user = userEvent.setup()
+  render(<DraftHome drafts={[draft]} onCreate={() => {}} onOpen={() => {}} onDelete={() => {}} onDuplicate={() => {}} onMakeTransferCode={async () => 'FFEDM1-test'} onReceiveTransferCode={async () => {}} />)
+  await user.click(screen.getByRole('button', { name: /设置/ }))
+  expect(screen.getByRole('menuitem', { name: /Klaviyo 连接/ })).toBeVisible()
+  await user.click(screen.getByRole('menuitem', { name: /Klaviyo 连接/ }))
+  expect(screen.getByRole('dialog', { name: 'Klaviyo 连接设置' })).toBeVisible()
+  expect(screen.getByText('当前环境无法启用系统安全存储，请使用本机启动地址或桌面安装包。')).toBeVisible()
+})
+
 it('作品封面优先展示第一个 Banner 图片', () => {
   const draftWithBanner = { ...draft, floors: [
     { id: 'title', templateId: 'title-centered', values: {}, products: {} },

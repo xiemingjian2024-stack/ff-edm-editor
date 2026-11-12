@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { templateRegistry } from './registry'
 import { readFileSync } from 'node:fs'
 
@@ -21,7 +21,8 @@ it('注册支持 1 至 5 个商品且共享面板色的产品介绍卡', () => {
   expect(template.name).toBe('产品介绍卡')
   expect(template.productSlotCountFieldId).toBe('productCount')
   expect(template.productSlots).toHaveLength(5)
-  expect(template.productSlots.every(slot => slot.showPrice === false && slot.showDescription === true)).toBe(true)
+  expect(template.productSlots.every(slot => slot.showPrice === true && slot.showDescription === true && slot.showActionText === true && slot.defaultActionText === 'Shop Now')).toBe(true)
+  expect(template.fields.some(field => field.id === 'cardButtonText')).toBe(false)
   expect(template.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '1', options: [
     { label: '1 个商品', value: '1' }, { label: '2 个商品', value: '2' }, { label: '3 个商品', value: '3' }, { label: '4 个商品', value: '4' }, { label: '5 个商品', value: '5' },
   ] })
@@ -32,9 +33,9 @@ it('注册支持 1 至 5 个商品且共享面板色的产品介绍卡', () => {
     id: 'intro', templateId: template.id,
     values: { title: 'Title', description: 'Description', buttonText: 'Shop Now', cardButtonText: 'View', buttonWidth: 'auto', productCount: '3', background: '#FFFFFF', cardBackground: '#EFEFEF', textColor: '#000000', buttonBackground: '#000000', buttonTextColor: '#FFFFFF' },
     products: {
-      'product-1': { image: 'one.png', title: 'First Product', description: 'First description', price: '', url: '/one', descriptionHighlight: { enabled: true, text: 'description', color: '#FF0000' } },
-      'product-2': { image: 'two.png', title: 'Second Product', description: '', price: '', url: '/two' },
-      'product-3': { image: 'three.png', title: 'Third Product', description: 'Third description', price: '', url: '/three' },
+      'product-1': { image: 'one.png', title: 'First Product', description: 'First description', price: '$10', url: '/one', actionText: 'Buy Now', descriptionHighlight: { enabled: true, text: 'description', color: '#FF0000' } },
+      'product-2': { image: 'two.png', title: 'Second Product', description: '', price: '$20', url: '/two', actionText: '' },
+      'product-3': { image: 'three.png', title: 'Third Product', description: 'Third description', price: '$30', url: '/three' },
     },
   }
   render(<entry.Renderer template={template} floor={floor} />)
@@ -43,6 +44,9 @@ it('注册支持 1 至 5 个商品且共享面板色的产品介绍卡', () => {
   expect(cards[0]).toHaveClass('is-image-left')
   expect(cards[1]).toHaveClass('is-image-right')
   cards.forEach(card => expect(card).toHaveStyle({ backgroundColor: '#EFEFEF' }))
+  expect(within(cards[0]).getByText('Buy Now')).toBeVisible()
+  expect(within(cards[1]).getByText('$20')).toBeVisible()
+  expect(within(cards[2]).getByText('View')).toBeVisible()
   expect(cards[0].querySelector('.text-highlight')).toHaveTextContent('description')
   expect(screen.queryByText('--')).not.toBeInTheDocument()
 })
@@ -103,6 +107,8 @@ it('用 N×2 商品卡替换旧双列商品卡', () => {
   expect(template?.fields.find(field => field.id === 'productCount')).toMatchObject({ type: 'choice', defaultValue: '2', options: [{ label: '2 个商品', value: '2' }, { label: '4 个商品', value: '4' }, { label: '6 个商品', value: '6' }, { label: '8 个商品', value: '8' }] })
   expect(template?.productSlots).toHaveLength(8)
   expect(template?.productSlotCountFieldId).toBe('productCount')
+  expect(template?.fields.find(field => field.id === 'buttonLink')).toMatchObject({ type: 'text', defaultValue: '' })
+  expect(template?.exportRegions.at(-1)).toMatchObject({ linkFieldId: 'buttonLink', linkRequiredFieldId: 'buttonText' })
   expect(template?.domExportRegions).toBe(true)
   expect(template?.exportRegions.map(region => region.id)).toEqual(['header', 'item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'button'])
   expect(template?.themeColorFields).toBeUndefined()
@@ -287,7 +293,11 @@ it('分类导航固定为 375×46 且不声明固定主题色位', () => {
   expect(template.designHeight).toBe(46)
   expect(template.exportFullImage).toBe(false)
   expect(template.themeColorFields).toBeUndefined()
-  expect(template.navigationConfig?.defaultItems.slice(0, 3).map(item => item.text)).toEqual(['Home', 'Carrier & Travel', 'Couch Covers'])
+  expect(template.navigationConfig?.defaultItems.slice(0, 3)).toEqual([
+    { text: 'Home', url: 'https://funnyfuzzy.com/' },
+    { text: 'Carrier & Travel', url: 'https://funnyfuzzy.com/collections/travel-1' },
+    { text: 'Couch Covers', url: 'https://funnyfuzzy.com/collections/couch-cover' },
+  ])
 })
 
 it('注册两个新 Banner 并保留隐藏的旧 Banner', () => {
@@ -316,6 +326,8 @@ it('整层型模板只导出一个楼层文件而不重复输出 full JPG', () =
 it('HEAD 品牌 Logo 使用固定尺寸且不声明固定主题色位', () => {
   const template = templateRegistry.find(item => item.definition.id === 'head-brand-logo')!.definition
   expect(template.designHeight).toBe(56)
+  expect(template.fields.find(field => field.id === 'logoLink')).toMatchObject({ type: 'text', label: 'Logo 链接', defaultValue: 'https://funnyfuzzy.com/' })
+  expect(template.fields.find(field => field.id === 'logoHtmlMode')).toMatchObject({ type: 'choice', defaultValue: 'lightweight' })
   expect(template.themeColorFields).toBeUndefined()
   expect(template.exportRegions).toEqual([{ id: 'full', name: 'HEAD 品牌 Logo', x: 0, y: 0, width: 375, height: 56 }])
 })
@@ -343,7 +355,8 @@ it('标题文本常规模板包含内容、对齐、颜色和自适应高度配�
   const entry = templateRegistry.find(item => item.definition.id === 'title-centered')!
   expect(entry.definition.name).toBe('常规标题')
   expect(entry.definition.autoHeight).toBe(true)
-  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'buttonWidth', 'descriptionSize', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
+  expect(entry.definition.fields.map(field => field.id)).toEqual(['title', 'description', 'buttonText', 'buttonLink', 'buttonWidth', 'descriptionSize', 'alignment', 'background', 'textColor', 'buttonBackground', 'buttonTextColor'])
+  expect(entry.definition.exportRegions[0]).toMatchObject({ linkFieldId: 'buttonLink', linkRequiredFieldId: 'buttonText' })
   expect(entry.definition.fields.find(field => field.id === 'descriptionSize')).toMatchObject({ type: 'choice', defaultValue: 'small', options: [{ label: '小字', value: 'small' }, { label: '大字', value: 'large' }] })
   expect(entry.definition.themeColorFields).toBeUndefined()
   expect(readFileSync('src/templates/templateStyles.css', 'utf8')).toMatch(/\.title-content \{[^}]*padding: 24px;/)

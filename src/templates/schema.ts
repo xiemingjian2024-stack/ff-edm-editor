@@ -23,8 +23,8 @@ const schema = z.object({
   heightConfig: z.object({ fieldId: z.string().min(1), min: z.number().positive(), max: z.number().positive(), offset: z.number().nonnegative() }).optional(),
   autoHeight: z.boolean().optional(),
   hiddenInLibrary: z.boolean().optional(),
-  productSlots: z.array(z.object({ id: z.string().min(1), label: z.string(), showPrice: z.boolean().optional(), showDescription: z.boolean().optional() })),
-  exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional(), navigationItemIndex: z.number().int().nonnegative().optional(), mediaLink: z.boolean().optional() }))
+  productSlots: z.array(z.object({ id: z.string().min(1), label: z.string(), showPrice: z.boolean().optional(), showDescription: z.boolean().optional(), showActionText: z.boolean().optional(), defaultActionText: z.string().optional() })),
+  exportRegions: z.array(z.object({ id: z.string(), name: z.string(), x: z.number().nonnegative(), y: z.number().nonnegative(), width: z.number().positive(), height: z.number().positive(), linkSlotId: z.string().optional(), navigationItemIndex: z.number().int().nonnegative().optional(), mediaLink: z.boolean().optional(), linkFieldId: z.string().optional(), linkRequiredFieldId: z.string().optional() }))
 })
 
 export function parseTemplate(input: unknown): FloorTemplate {
@@ -45,6 +45,8 @@ export function parseTemplate(input: unknown): FloorTemplate {
   for (const region of value.exportRegions) {
     if (region.x + region.width > 375 || region.y + region.height > value.designHeight) throw new Error(`导出区域 ${region.id} 超出楼层边界`)
     if (region.linkSlotId && !slots.has(region.linkSlotId)) throw new Error(`导出区域 linkSlotId ${region.linkSlotId} 不存在`)
+    if (region.linkFieldId && !value.fields.some(item => item.id === region.linkFieldId && item.type === 'text')) throw new Error(`导出区域 linkFieldId ${region.linkFieldId} 不存在`)
+    if (region.linkRequiredFieldId && !value.fields.some(item => item.id === region.linkRequiredFieldId && item.type === 'text')) throw new Error(`导出区域 linkRequiredFieldId ${region.linkRequiredFieldId} 不存在`)
   }
   return value
 }

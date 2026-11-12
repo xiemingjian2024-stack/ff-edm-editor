@@ -4,6 +4,11 @@ import { getActiveProductSlots } from '../templates/productSlots'
 
 export function getRegionUrl(floor: FloorInstance, region: ExportRegion): string {
   if (region.mediaLink) return floor.media?.url ?? ''
+  if (region.navigationItemIndex !== undefined) return floor.navigationItems?.[region.navigationItemIndex]?.url ?? ''
+  if (region.linkFieldId) {
+    if (region.linkRequiredFieldId && !floor.values[region.linkRequiredFieldId]?.trim()) return ''
+    return floor.values[region.linkFieldId]?.trim() ?? ''
+  }
   return region.linkSlotId ? floor.products[region.linkSlotId]?.url ?? '' : ''
 }
 
@@ -33,6 +38,7 @@ export function getFloorExportRegions(template: FloorTemplate, floor: FloorInsta
       y: 0,
       width: nextX - x,
       height: template.designHeight,
+      navigationItemIndex: index,
     }
   })
 }

@@ -12,6 +12,11 @@ const appName = 'EDM EDITOR'
 const platform = process.argv[2] || 'win32'
 const arch = process.argv[3] || 'x64'
 const appVersion = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version
+const icon = platform === 'darwin'
+  ? join(root, 'build', 'icon.icns')
+  : platform === 'win32'
+    ? join(root, 'build', 'icon.ico')
+    : join(root, 'build', 'icon.png')
 
 const ignoredPaths = [
   /^\/\.git($|\/)/,
@@ -81,6 +86,7 @@ const appPaths = await packager({
   ignore: ignoredPaths,
   appVersion,
   executableName: 'EDM EDITOR',
+  icon,
 })
 
 const appPath = appPaths[0]

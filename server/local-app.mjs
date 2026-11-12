@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { execFile } from 'node:child_process'
+import { createLocalKlaviyoService } from './klaviyo-local.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const defaultDistDir = resolve(__dirname, '..', 'dist')
@@ -119,12 +120,21 @@ export async function readShopifyProduct(input, fetcher = fetch) {
   }
 }
 
-export function createLocalApp({ distDir = defaultDistDir, reader = readShopifyProduct } = {}) {
+export function createLocalApp({ distDir = defaultDistDir, reader = readShopifyProduct, klaviyo = createLocalKlaviyoService() } = {}) {
   const app = express()
   app.use(express.json({ limit: '8kb' }))
   app.post('/api/shopify/product', async (request, response) => {
     try { response.json(await reader(String(request.body?.url ?? ''))) }
     catch (error) { response.status(422).json({ code: 'PRODUCT_READ_FAILED', message: error instanceof Error ? error.message : '商品读取失败' }) }
+  })
+  const ensureLocalRequest = (request, response, next) => request.get('x-edm-editor') === '1' ? next() : response.status(403).json({ message: '仅允许 EDM EDITOR 本机页面访问' })
+  const sendKlaviyoError = (response, error) => response.status(422).json({ message: error instanceof Error ? error.message : 'Klaviyo 请求失败' })
+  app.get('/api/klaviyo/status', ensureLocalRequest, async (_request, response) => { try { response.json(await klaviyo.status()) } catch (error) { sendKlaviyoError(response, error) } })
+  app.post('/api/klaviyo/connect', ensureLocalRequest, async (request, response) => { try { response.json(await klaviyo.connect(request.body?.key)) } catch (error) { sendKlaviyoError(response, error) } })
+  app.post('/api/klaviyo/disconnect', ensureLocalRequest, async (_request, response) => { try { response.json(await klaviyo.disconnect()) } catch (error) { sendKlaviyoError(response, error) } })
+  app.post('/api/klaviyo/image', ensureLocalRequest, express.raw({ type: ['image/jpeg', 'image/png', 'image/gif'], limit: '5mb' }), async (request, response) => {
+    try { response.json(await klaviyo.upload(request.body, request.get('content-type') || 'image/jpeg')) }
+    catch (error) { sendKlaviyoError(response, error) }
   })
   app.use(express.static(distDir))
   app.get(/.*/, (_request, response) => response.sendFile(join(distDir, 'index.html')))

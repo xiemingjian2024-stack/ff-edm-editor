@@ -7,7 +7,7 @@ export function createDesktopAppPaths(appRoot) {
   }
 }
 
-export function getDesktopWindowOptions() {
+export function getDesktopWindowOptions(preload) {
   return {
     width: 1440,
     height: 960,
@@ -20,6 +20,7 @@ export function getDesktopWindowOptions() {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
+      ...(preload ? { preload } : {}),
     },
   }
 }

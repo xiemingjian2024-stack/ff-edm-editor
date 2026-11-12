@@ -1,0 +1,41 @@
+name: Desktop release
+on:
+  push:
+    tags: ['v*-desktop*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+          - os: ubuntu-latest
+            platform: win32
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: node scripts/package-desktop.mjs ${{ matrix.platform }} ${{ matrix.arch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}-${{ matrix.arch }}
+          path: release/*.zip
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: release/*.zip
+          generate_release_notes: true
+          body: |
+            最新源码构建：模块化 EDM、Shopify 商品读取、GIF、Klaviyo 图片同步与楼层 HTML 复制。
+            Mac 包适用于 Apple Silicon；Windows 包适用于 x64。安装与升级说明见 README。
+            升级前退出应用并导出重要草稿，仅替换程序、保留本机应用数据。

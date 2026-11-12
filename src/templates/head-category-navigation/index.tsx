@@ -22,7 +22,12 @@ export const headCategoryNavigation: RegisteredTemplate = {
     ],
     navigationConfig: {
       minItems: 2, maxItems: 4,
-      defaultItems: [{ text: 'Home', url: '' }, { text: 'Carrier & Travel', url: '' }, { text: 'Couch Covers', url: '' }, { text: 'New Category', url: '' }],
+      defaultItems: [
+        { text: 'Home', url: 'https://funnyfuzzy.com/' },
+        { text: 'Carrier & Travel', url: 'https://funnyfuzzy.com/collections/travel-1' },
+        { text: 'Couch Covers', url: 'https://funnyfuzzy.com/collections/couch-cover' },
+        { text: 'New Category', url: '' },
+      ],
     },
     exportFullImage: false,
     productSlots: [], exportRegions: [],

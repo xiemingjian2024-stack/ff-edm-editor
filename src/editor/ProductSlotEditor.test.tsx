@@ -2,6 +2,12 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ProductSlotEditor } from './ProductSlotEditor'
 
+it('可将 Shopify 商品链接标记为必填', () => {
+  render(<ProductSlotEditor label="商品 1" value={undefined} onChange={() => {}} requiredLink />)
+  expect(screen.getByText('Shopify 商品链接（必填）')).toBeVisible()
+  expect(screen.getByLabelText('商品 1 Shopify 链接')).toBeRequired()
+})
+
 it('读取商品并允许修改自动填充内容', async () => {
   const user = userEvent.setup(); const onChange = vi.fn()
   const reader = vi.fn().mockResolvedValue({ title: 'Cloud Bed', image: 'https://cdn/a.jpg', gallery: ['https://cdn/a.jpg'], price: '99.00', url: 'https://shop/products/a' })
@@ -75,23 +81,26 @@ it('可按商品槽位隐藏价格且默认仍显示价格', () => {
   expect(screen.getByLabelText('商品 1 价格')).toBeVisible()
 })
 
-it('产品介绍卡可编辑商品描述并分别强调标题与描述', async () => {
+it('产品介绍卡可独立编辑价格、按钮文案、描述和强调文本', async () => {
   const user = userEvent.setup()
   const onChange = vi.fn()
-  const product = { image: '', title: 'Cloud Bed', description: 'Soft and calm', price: '', url: '/bed' }
-  render(<ProductSlotEditor label="商品 1" value={product} onChange={onChange} showPrice={false} showDescription />)
-  expect(screen.queryByLabelText('商品 1 价格')).not.toBeInTheDocument()
+  const product = { image: '', title: 'Cloud Bed', description: 'Soft and calm', price: '$99', url: '/bed', actionText: 'Shop Now' }
+  render(<ProductSlotEditor label="商品 1" value={product} onChange={onChange} showDescription showActionText />)
+  expect(screen.getByLabelText('商品 1 价格')).toHaveValue('$99')
+  expect(screen.getByLabelText('商品 1 按钮文案')).toHaveValue('Shop Now')
   expect(screen.getByLabelText('商品 1 商品描述')).toHaveValue('Soft and calm')
   expect(screen.getAllByText('强调部分文本')).toHaveLength(2)
+  await user.clear(screen.getByLabelText('商品 1 按钮文案'))
+  expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ actionText: '', price: '$99' }))
   await user.type(screen.getByLabelText('商品 1 商品描述'), '。')
   expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ title: 'Cloud Bed', description: 'Soft and calm。' }))
 })
 
-it('从 Shopify 读取标题时保留产品介绍卡已填写的描述', async () => {
+it('从 Shopify 同步标题、图片和价格时保留产品介绍卡独立文案与描述', async () => {
   const user = userEvent.setup()
   const onChange = vi.fn()
   const reader = vi.fn().mockResolvedValue({ title: 'New title', image: 'new.jpg', gallery: [], price: '$10', url: '/new' })
-  render(<ProductSlotEditor label="商品 1" value={{ image: '', title: 'Old', description: 'Keep me', price: '', url: '/new', descriptionHighlight: { enabled: true, text: 'Keep' } }} onChange={onChange} reader={reader} showDescription />)
+  render(<ProductSlotEditor label="商品 1" value={{ image: '', title: 'Old', description: 'Keep me', price: '', url: '/new', actionText: 'Buy It', descriptionHighlight: { enabled: true, text: 'Keep' } }} onChange={onChange} reader={reader} showDescription showActionText />)
   await user.click(screen.getByRole('button', { name: '自动填充商品 1' }))
-  expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ title: 'New title', description: 'Keep me', descriptionHighlight: { enabled: true, text: 'Keep' } }))
+  expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ title: 'New title', image: 'new.jpg', price: '$10', actionText: 'Buy It', description: 'Keep me', descriptionHighlight: { enabled: true, text: 'Keep' } }))
 })

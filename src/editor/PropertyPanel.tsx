@@ -18,8 +18,8 @@ const isHighlightEligibleTextField = (field: NonNullable<ReturnType<typeof getTe
   const id = field.id.toLowerCase()
   const label = field.label.toLowerCase()
   if (excludedHighlightFieldIds.has(field.id)) return false
-  if (id.includes('button') || id.includes('price') || id.includes('currency')) return false
-  if (label.includes('按钮') || label.includes('价格') || label.includes('货币')) return false
+  if (id.includes('button') || id.includes('price') || id.includes('currency') || id.includes('link') || id.includes('url')) return false
+  if (label.includes('按钮') || label.includes('价格') || label.includes('货币') || label.includes('链接')) return false
   return true
 }
 
@@ -27,6 +27,7 @@ function TextField({ floor, field, onChange, onTextHighlightChange }: { floor: F
   const textRef = useRef<HTMLTextAreaElement | null>(null)
   const value = floor.values[field.id] ?? ''
   const canHighlight = isHighlightEligibleTextField(field)
+  const isLink = field.id.toLowerCase().includes('link') || field.id.toLowerCase().includes('url')
   useLayoutEffect(() => {
     const textarea = textRef.current
     if (!textarea) return
@@ -35,7 +36,9 @@ function TextField({ floor, field, onChange, onTextHighlightChange }: { floor: F
   }, [value])
   return <div className="field" key={field.id}>
     <div className="field-label-row"><span>{field.label}</span>{canHighlight ? <TextHighlightToggle value={floor.textHighlights?.[field.id]} onChange={next => onTextHighlightChange(field.id, next)} /> : null}</div>
-    <textarea className="property-copy-input" rows={1} ref={textRef} aria-label={field.label} value={value} onChange={event => onChange(field.id, event.target.value)} />
+    {isLink
+      ? <input className="property-text-input" type="url" aria-label={field.label} value={value} onChange={event => onChange(field.id, event.target.value)} />
+      : <textarea className="property-copy-input" rows={1} ref={textRef} aria-label={field.label} value={value} onChange={event => onChange(field.id, event.target.value)} />}
     {canHighlight ? <TextHighlightEditor text={value} textRef={textRef} value={floor.textHighlights?.[field.id]} defaultColor={floor.values.textColor || '#000000'} onChange={next => onTextHighlightChange(field.id, next)} /> : null}
   </div>
 }
@@ -120,8 +123,8 @@ export function PropertyPanel({ floor, gifDrafts = [], themeFields = [], onChang
   const hasMediaOrProducts = Boolean((template?.mediaConfig && floor?.media) || (visibleMediaSlots && floor?.mediaSlots) || visibleProductSlots.length)
   return <aside className="panel property-panel"><div className="panel-heading"><div><h2>属性</h2><small>{template?.name ?? '选择楼层开始编辑'}</small></div></div>
     {!floor || !template ? <div className="empty-panel"><strong>还没有选中楼层</strong><p>在画布中选择一个楼层后，这里会出现可编辑内容。</p></div> : <>
-      {contentFields.length || navigationCount ? <InspectorSection title="内容"><div className="field-list">{contentFields.map(renderField)}{navigationCount ? <div className="navigation-copy-list">{floor.navigationItems?.slice(0, navigationCount).map((item, index) => <label className="field" key={index}><span>文案 {index + 1}</span><input className="property-text-input" aria-label={`文案 ${index + 1}`} value={item.text} onChange={event => onNavigationItemChange(index, { ...item, text: event.target.value })} /></label>)}</div> : null}</div></InspectorSection> : null}
-      {hasMediaOrProducts ? <InspectorSection title="图片与商品">{template.mediaConfig && floor.media ? <BannerMediaEditor value={floor.media} onChange={onMediaChange} animation={floor.animation} onAnimationChange={onAnimationChange} gifDrafts={gifDrafts} /> : null}{visibleMediaSlots && floor.mediaSlots ? <div className="manual-media-list">{visibleMediaSlots.map(slot => <ManualMediaEditor key={slot.id} label={slot.label} value={floor.mediaSlots![slot.id]} onChange={value => onMediaSlotChange(slot.id, value)} />)}</div> : null}{pricePrefixField ? <div className="product-shared-fields">{renderField(pricePrefixField)}</div> : null}{visibleProductSlots.length ? <div className="product-list">{visibleProductSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} showPrice={slot.showPrice !== false} showDescription={slot.showDescription === true} defaultTextColor={floor.values.textColor || '#000000'} />)}</div> : null}</InspectorSection> : null}
+      {contentFields.length || navigationCount ? <InspectorSection title="内容"><div className="field-list">{contentFields.map(renderField)}{navigationCount ? <div className="navigation-copy-list">{floor.navigationItems?.slice(0, navigationCount).map((item, index) => template.id === 'head-category-navigation' ? <div className="navigation-item-fields" key={index}><strong>导航 {index + 1}</strong><label className="field"><span>文案</span><input className="property-text-input" aria-label={`文案 ${index + 1}`} value={item.text} onChange={event => onNavigationItemChange(index, { ...item, text: event.target.value })} /></label><label className="field"><span>链接</span><input className="property-text-input" type="url" aria-label={`链接 ${index + 1}`} placeholder="https://" value={item.url} onChange={event => onNavigationItemChange(index, { ...item, url: event.target.value })} /></label></div> : <label className="field" key={index}><span>文案 {index + 1}</span><input className="property-text-input" aria-label={`文案 ${index + 1}`} value={item.text} onChange={event => onNavigationItemChange(index, { ...item, text: event.target.value })} /></label>)}</div> : null}</div></InspectorSection> : null}
+      {hasMediaOrProducts ? <InspectorSection title="图片与商品">{template.mediaConfig && floor.media ? <BannerMediaEditor value={floor.media} onChange={onMediaChange} animation={floor.animation} onAnimationChange={onAnimationChange} gifDrafts={gifDrafts} /> : null}{visibleMediaSlots && floor.mediaSlots ? <div className="manual-media-list">{visibleMediaSlots.map(slot => <ManualMediaEditor key={slot.id} label={slot.label} value={floor.mediaSlots![slot.id]} onChange={value => onMediaSlotChange(slot.id, value)} />)}</div> : null}{pricePrefixField ? <div className="product-shared-fields">{renderField(pricePrefixField)}</div> : null}{visibleProductSlots.length ? <div className="product-list">{visibleProductSlots.map(slot => <ProductSlotEditor key={slot.id} label={slot.label} value={floor.products[slot.id]} onChange={value => onProductChange(slot.id, value)} showPrice={slot.showPrice !== false} showDescription={slot.showDescription === true} showActionText={slot.showActionText === true} defaultActionText={floor.values.cardButtonText ?? slot.defaultActionText} defaultTextColor={floor.values.textColor || '#000000'} requiredLink={template.category === 'product-card'} />)}</div> : null}</InspectorSection> : null}
       {colorFields.length ? <InspectorSection title="样式" defaultOpen={false}><div className="field-list">{colorFields.map(renderField)}</div></InspectorSection> : null}
     </>}
   </aside>

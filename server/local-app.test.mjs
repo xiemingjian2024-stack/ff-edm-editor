@@ -96,3 +96,25 @@ it('本地服务同时提供构建页面和 Shopify 商品读取接口', async (
     body: JSON.stringify({ url: 'https://shop.example/products/dog-bed' }),
   }).then(response => response.json())).resolves.toMatchObject({ title: 'Dog Bed', price: '£10.00' })
 })
+
+it('本机浏览器通过受保护接口连接 Klaviyo 并上传图片', async () => {
+  const distDir = await mkdtemp(join(tmpdir(), 'edm-local-dist-'))
+  await writeFile(join(distDir, 'index.html'), '<main>EDM EDITOR</main>')
+  const calls = []
+  const klaviyo = {
+    status: async () => ({ available: true, connected: false, suffix: '' }),
+    connect: async key => { calls.push(['connect', key]); return { available: true, connected: true, suffix: key.slice(-4) } },
+    disconnect: async () => ({ available: true, connected: false, suffix: '' }),
+    upload: async (bytes, type) => { calls.push(['upload', bytes.byteLength, type]); return { url: 'https://cdn.example/banner.jpg', reused: false } },
+  }
+  const server = createLocalApp({ distDir, klaviyo }).listen(0, '127.0.0.1')
+  servers.push(server)
+  await new Promise(resolve => server.once('listening', resolve))
+  const { port } = server.address()
+  const base = `http://127.0.0.1:${port}`
+
+  expect((await fetch(`${base}/api/klaviyo/status`)).status).toBe(403)
+  await expect(fetch(`${base}/api/klaviyo/connect`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-edm-editor': '1' }, body: JSON.stringify({ key: 'pk_exampleABCD' }) }).then(response => response.json())).resolves.toMatchObject({ connected: true, suffix: 'ABCD' })
+  await expect(fetch(`${base}/api/klaviyo/image`, { method: 'POST', headers: { 'content-type': 'image/jpeg', 'x-edm-editor': '1' }, body: new Uint8Array([1, 2, 3]) }).then(response => response.json())).resolves.toMatchObject({ url: 'https://cdn.example/banner.jpg' })
+  expect(calls).toEqual([['connect', 'pk_exampleABCD'], ['upload', 3, 'image/jpeg']])
+})

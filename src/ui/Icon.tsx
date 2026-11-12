@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-export type IconName = 'back' | 'layers' | 'drafts' | 'image' | 'search' | 'undo' | 'redo' | 'eye' | 'download' | 'trash' | 'up' | 'down' | 'minus' | 'plus' | 'chevron' | 'drag'
+export type IconName = 'back' | 'layers' | 'drafts' | 'image' | 'search' | 'undo' | 'redo' | 'eye' | 'download' | 'trash' | 'up' | 'down' | 'minus' | 'plus' | 'chevron' | 'drag' | 'settings'
 
 const paths: Record<IconName, ReactNode> = {
   back: <><path d="M15 18l-6-6 6-6"/><path d="M9 12h10"/></>,
@@ -14,7 +14,8 @@ const paths: Record<IconName, ReactNode> = {
   download: <><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></>,
   trash: <><path d="M4 7h16"/><path d="M9 3h6l1 4H8l1-4z"/><path d="M7 7l1 14h8l1-14"/><path d="M10 11v6M14 11v6"/></>,
   up: <path d="M6 15l6-6 6 6"/>, down: <path d="M6 9l6 6 6-6"/>,
-  minus: <path d="M5 12h14"/>, plus: <path d="M12 5v14M5 12h14"/>, chevron: <path d="M9 6l6 6-6 6"/>
+  minus: <path d="M5 12h14"/>, plus: <path d="M12 5v14M5 12h14"/>, chevron: <path d="M9 6l6 6-6 6"/>,
+  settings: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1.03 1.56V21h-4v-.08A1.7 1.7 0 009 19.36a1.7 1.7 0 00-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 004.64 15a1.7 1.7 0 00-1.56-1.03H3v-4h.08A1.7 1.7 0 004.64 9a1.7 1.7 0 00-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 009 4.64a1.7 1.7 0 001.03-1.56V3h4v.08A1.7 1.7 0 0015 4.64a1.7 1.7 0 001.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0019.36 9a1.7 1.7 0 001.56 1.03H21v4h-.08A1.7 1.7 0 0019.4 15z"/></>
 }
 
 export function Icon({ name, size = 16 }: { name: IconName; size?: number }) {

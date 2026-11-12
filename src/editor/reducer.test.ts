@@ -15,6 +15,39 @@ it('加载旧标题草稿时补齐新版模板默认字段', () => {
   expect(state.draft.floors[0].values).toMatchObject({ title: '旧标题', description: 'Give them a snug, supportive place to curl up, settle in and enjoy the journey.', buttonText: 'SHOP NOW', alignment: 'center' })
 })
 
+it('加载旧 Logo 草稿时补齐默认链接', () => {
+  const legacyDraft = { ...initialEditorState.draft, floors: [{ id: 'old-logo', templateId: 'head-brand-logo', values: { background: '#FFFFFF', logoColor: '#000000' }, products: {} }] }
+  const state = reducer(initialEditorState, { type: 'loadDraft', draft: legacyDraft })
+  expect(state.draft.floors[0].values.logoLink).toBe('https://funnyfuzzy.com/')
+})
+
+it('加载旧分类导航草稿时保留文案并补齐三个默认链接', () => {
+  const legacyDraft = { ...initialEditorState.draft, floors: [{
+    id: 'old-navigation', templateId: 'head-category-navigation',
+    values: { navigationCount: '3', background: '#FFFFFF', textColor: '#000000' }, products: {},
+    navigationItems: [{ text: 'HOME', url: '' }, { text: 'Travel', url: '' }, { text: 'Covers', url: '' }],
+  }] }
+  const state = reducer(initialEditorState, { type: 'loadDraft', draft: legacyDraft })
+  expect(state.draft.floors[0].navigationItems).toEqual([
+    { text: 'HOME', url: 'https://funnyfuzzy.com/' },
+    { text: 'Travel', url: 'https://funnyfuzzy.com/collections/travel-1' },
+    { text: 'Covers', url: 'https://funnyfuzzy.com/collections/couch-cover' },
+    { text: 'New Category', url: '' },
+  ])
+})
+
+it('产品介绍卡新建时初始化独立按钮文案，旧草稿继承原统一文案', () => {
+  const localReducer = createEditorReducer(() => 'intro-1')
+  const created = localReducer(initialEditorState, { type: 'addFloor', templateId: 'product-introduction-cards' })
+  expect(created.draft.floors[0].products['product-1'].actionText).toBe('Shop Now')
+  expect(created.draft.floors[0].values.cardButtonText).toBeUndefined()
+
+  const legacyDraft = { ...initialEditorState.draft, floors: [{ id: 'old-intro', templateId: 'product-introduction-cards', values: { cardButtonText: 'View' }, products: { 'product-1': { image: 'a.jpg', title: 'Bed', price: '$10', url: '/bed' } } }] }
+  const loaded = localReducer(initialEditorState, { type: 'loadDraft', draft: legacyDraft })
+  expect(loaded.draft.floors[0].products['product-1'].actionText).toBe('View')
+  expect(loaded.draft.floors[0].products['product-2'].actionText).toBe('View')
+})
+
 it('加载旧页尾草稿时补齐四个固定链接', () => {
   const legacyDraft = { ...initialEditorState.draft, floors: [{ id: 'old-footer', templateId: 'footer-links', values: {}, products: {}, navigationItems: [{ text: 'HOME', url: '' }] }] }
   const state = reducer(initialEditorState, { type: 'loadDraft', draft: legacyDraft })

@@ -128,11 +128,14 @@ it('普通楼层按顺序应用 A/B 背景且不再显示上下移动按钮', as
   expect(screen.queryByRole('button', { name: '下移楼层' })).not.toBeInTheDocument()
 })
 
-it('分类导航只编辑文案并保留隐藏项', async () => {
+it('分类导航分别编辑文案与链接并保留隐藏项', async () => {
   const user = userEvent.setup(); render(<EditorPage />)
   await user.click(screen.getByRole('button', { name: '添加 分类导航' }))
   expect(screen.getByLabelText('文案 1')).toHaveValue('Home')
   expect(screen.getByLabelText('文案 1')).toHaveClass('property-text-input')
+  expect(screen.getByLabelText('链接 1')).toHaveValue('https://funnyfuzzy.com/')
+  expect(screen.getByLabelText('链接 2')).toHaveValue('https://funnyfuzzy.com/collections/travel-1')
+  expect(screen.getByLabelText('链接 3')).toHaveValue('https://funnyfuzzy.com/collections/couch-cover')
   expect(screen.queryByRole('heading', { name: '导航项' })).not.toBeInTheDocument()
   expect(screen.queryByRole('group', { name: '导航项 1' })).not.toBeInTheDocument()
   expect(screen.queryByLabelText('导航项 1 链接')).not.toBeInTheDocument()
